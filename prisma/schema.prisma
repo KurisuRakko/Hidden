@@ -93,6 +93,7 @@ model QuestionBox {
   title              String
   slug               String            @unique
   description        String?
+  wallpaperUrl       String?
   status             QuestionBoxStatus @default(ACTIVE)
   acceptingQuestions Boolean           @default(true)
   createdAt          DateTime          @default(now())

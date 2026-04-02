@@ -58,6 +58,7 @@ export default async function BoxSettingsPage({
                   title: box.title,
                   description: box.description,
                   slug: box.slug,
+                  wallpaperUrl: box.wallpaperUrl,
                   acceptingQuestions: box.acceptingQuestions,
                   status: box.status === "DISABLED" ? "HIDDEN" : box.status,
                 }}
@@ -94,6 +95,7 @@ export default async function BoxSettingsPage({
               <Stack spacing={1}>
                 <div>状态：{boxSummary.status}</div>
                 <div>接收提问：{boxSummary.acceptingQuestions ? "开启" : "关闭"}</div>
+                <div>壁纸：{boxSummary.wallpaperUrl ? "已设置" : "未设置"}</div>
                 <div>累计问题：{boxSummary._count.questions}</div>
               </Stack>
             </SectionCard>

@@ -86,17 +86,24 @@ export async function createBoxForOwner(
     slug: string;
     acceptingQuestions: boolean;
     status?: "ACTIVE" | "HIDDEN";
+    wallpaper?: File | null;
   },
 ) {
   const parsed = boxInputSchema.parse(input);
+  let uploadedWallpaperUrl: string | null = null;
 
   try {
+    uploadedWallpaperUrl = input.wallpaper
+      ? await uploadImage(input.wallpaper, `boxes/${ownerId}/wallpapers`)
+      : null;
+
     return await prisma.questionBox.create({
       data: {
         ownerId,
         title: parsed.title,
         description: parsed.description || null,
         slug: parsed.slug,
+        wallpaperUrl: uploadedWallpaperUrl,
         acceptingQuestions: parsed.acceptingQuestions,
         status: parsed.status,
       },
@@ -107,6 +114,10 @@ export async function createBoxForOwner(
       error.code === "P2002"
     ) {
       throw new AppError(409, "Slug is already taken.", "SLUG_TAKEN");
+    }
+
+    if (uploadedWallpaperUrl) {
+      await removeImageByUrl(uploadedWallpaperUrl);
     }
 
     throw error;
@@ -122,28 +133,52 @@ export async function updateBoxForOwner(
     slug: string;
     acceptingQuestions: boolean;
     status?: "ACTIVE" | "HIDDEN";
+    wallpaper?: File | null;
+    removeWallpaper?: boolean;
   },
 ) {
-  await getOwnedBoxOrThrow(boxId, ownerId);
+  const existingBox = await getOwnedBoxOrThrow(boxId, ownerId);
   const parsed = boxInputSchema.parse(input);
+  let uploadedWallpaperUrl: string | null = null;
 
   try {
-    return await prisma.questionBox.update({
+    uploadedWallpaperUrl = input.wallpaper
+      ? await uploadImage(input.wallpaper, `boxes/${ownerId}/wallpapers`)
+      : null;
+
+    const wallpaperUrl = uploadedWallpaperUrl
+      ?? (input.removeWallpaper ? null : existingBox.wallpaperUrl);
+
+    const updatedBox = await prisma.questionBox.update({
       where: { id: boxId },
       data: {
         title: parsed.title,
         description: parsed.description || null,
         slug: parsed.slug,
+        wallpaperUrl,
         acceptingQuestions: parsed.acceptingQuestions,
         status: parsed.status,
       },
     });
+
+    if (
+      existingBox.wallpaperUrl &&
+      existingBox.wallpaperUrl !== updatedBox.wallpaperUrl
+    ) {
+      await removeImageByUrl(existingBox.wallpaperUrl);
+    }
+
+    return updatedBox;
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
       throw new AppError(409, "Slug is already taken.", "SLUG_TAKEN");
+    }
+
+    if (uploadedWallpaperUrl) {
+      await removeImageByUrl(uploadedWallpaperUrl);
     }
 
     throw error;

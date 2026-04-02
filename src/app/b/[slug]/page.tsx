@@ -9,6 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { PublicShell } from "@/components/layout/public-shell";
 import { PublicQuestionForm } from "@/components/questions/public-question-form";
 import { getPublicBoxBySlug } from "@/features/boxes/service";
@@ -27,25 +28,68 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
   return (
     <PublicShell>
       <Stack spacing={{ xs: 2.5, md: 3 }} sx={{ py: { xs: 2.75, md: 5 } }}>
-        <Card className="motion-pop surface-glass">
-          <CardContent sx={{ p: { xs: 2.25, sm: 3, md: 4 } }}>
-            <Stack spacing={{ xs: 1.75, md: 2 }}>
-              <Typography variant="h3" className="text-break">
-                {box.title}
-              </Typography>
-              <Typography color="text.secondary" className="text-break">
-                {box.description || "Ask something thoughtful and keep it anonymous."}
-              </Typography>
-              {!box.acceptingQuestions ? (
-                <Alert severity="warning" className="status-feedback">
-                  This box is visible, but the owner has paused new submissions.
-                </Alert>
-              ) : null}
-              <PublicQuestionForm
-                slug={box.slug}
-                disabled={!box.acceptingQuestions}
+        <Card
+          className={`motion-pop${box.wallpaperUrl ? "" : " surface-glass"}`}
+          sx={{
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {box.wallpaperUrl ? (
+            <>
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundImage: `url("${box.wallpaperUrl}")`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
               />
-            </Stack>
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(180deg, rgba(18, 22, 28, 0.2) 0%, rgba(18, 22, 28, 0.52) 100%)",
+                }}
+              />
+            </>
+          ) : null}
+
+          <CardContent
+            sx={{
+              position: "relative",
+              p: { xs: 2.25, sm: 3, md: 4 },
+            }}
+          >
+            <Box
+              sx={{
+                p: { xs: 2, sm: 2.5, md: 3 },
+                borderRadius: "24px",
+                bgcolor: box.wallpaperUrl ? alpha("#ffffff", 0.82) : "transparent",
+                backdropFilter: box.wallpaperUrl ? "blur(14px)" : "none",
+                WebkitBackdropFilter: box.wallpaperUrl ? "blur(14px)" : "none",
+              }}
+            >
+              <Stack spacing={{ xs: 1.75, md: 2 }}>
+                <Typography variant="h3" className="text-break">
+                  {box.title}
+                </Typography>
+                <Typography color="text.secondary" className="text-break">
+                  {box.description || "Ask something thoughtful and keep it anonymous."}
+                </Typography>
+                {!box.acceptingQuestions ? (
+                  <Alert severity="warning" className="status-feedback">
+                    This box is visible, but the owner has paused new submissions.
+                  </Alert>
+                ) : null}
+                <PublicQuestionForm
+                  slug={box.slug}
+                  disabled={!box.acceptingQuestions}
+                />
+              </Stack>
+            </Box>
           </CardContent>
         </Card>
 

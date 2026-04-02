@@ -13,12 +13,14 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FileUploadField } from "@/components/common/file-upload-field";
 
 type BoxFormValues = {
   id?: string;
   title: string;
   description: string | null;
   slug: string;
+  wallpaperUrl?: string | null;
   acceptingQuestions: boolean;
   status: "ACTIVE" | "HIDDEN";
 };
@@ -43,18 +45,15 @@ export function BoxForm({
   const [status, setStatus] = useState<"ACTIVE" | "HIDDEN">(
     initialValues?.status ?? "ACTIVE",
   );
+  const [removeWallpaper, setRemoveWallpaper] = useState(false);
+  const [hasPendingWallpaper, setHasPendingWallpaper] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
     setError(null);
-
-    const payload = {
-      title: String(formData.get("title") ?? ""),
-      description: String(formData.get("description") ?? ""),
-      slug: String(formData.get("slug") ?? ""),
-      acceptingQuestions,
-      status,
-    };
+    formData.set("acceptingQuestions", String(acceptingQuestions));
+    formData.set("status", status);
+    formData.set("removeWallpaper", String(removeWallpaper));
 
     const url = initialValues?.id ? `/api/boxes/${initialValues.id}` : "/api/boxes";
     const method = initialValues?.id ? "PATCH" : "POST";
@@ -62,10 +61,7 @@ export function BoxForm({
     try {
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
       const result = await response.json();
 
@@ -92,6 +88,7 @@ export function BoxForm({
 
   return (
     <Stack component="form" action={handleSubmit} spacing={2.25}>
+      <input type="hidden" name="removeWallpaper" value={String(removeWallpaper)} />
       <Collapse in={Boolean(error)} unmountOnExit>
         {error ? <Alert severity="error" className="status-feedback">{error}</Alert> : null}
       </Collapse>
@@ -118,6 +115,61 @@ export function BoxForm({
         helperText="Public URLs use /b/[slug]."
         defaultValue={initialValues?.slug ?? ""}
       />
+      <Stack spacing={1.5}>
+        {initialValues?.wallpaperUrl && !removeWallpaper && !hasPendingWallpaper ? (
+          <Box
+            sx={(theme) => ({
+              p: 1.25,
+              borderRadius: "18px",
+              border: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.action.hover,
+            })}
+          >
+            <Box
+              component="img"
+              src={initialValues.wallpaperUrl}
+              alt="当前提问箱壁纸"
+              sx={{
+                width: "100%",
+                maxHeight: 220,
+                borderRadius: "14px",
+                objectFit: "cover",
+              }}
+            />
+          </Box>
+        ) : null}
+
+        <FileUploadField
+          name="wallpaper"
+          accept="image/png,image/jpeg,image/webp"
+          helperText="可选上传一张提问箱壁纸，它会显示在公开提问页顶部。上传新图会替换旧图。"
+          buttonLabel="上传壁纸"
+          emptyLabel={
+            initialValues?.wallpaperUrl && !removeWallpaper
+              ? "当前保留已有壁纸"
+              : "暂未选择壁纸"
+          }
+          onFileChange={() => {
+            setRemoveWallpaper(false);
+            setHasPendingWallpaper(true);
+          }}
+        />
+
+        {initialValues?.wallpaperUrl ? (
+          <Button
+            type="button"
+            variant={removeWallpaper ? "contained" : "text"}
+            color={removeWallpaper ? "warning" : "inherit"}
+            onClick={() => {
+              setRemoveWallpaper((value) => !value);
+              setHasPendingWallpaper(false);
+            }}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
+            {removeWallpaper ? "恢复当前壁纸" : "移除当前壁纸"}
+          </Button>
+        ) : null}
+      </Stack>
       <TextField
         select
         label="Visibility"

@@ -84,6 +84,16 @@ export function getStringFromFormData(formData: FormData, key: string) {
   return typeof value === "string" ? value : "";
 }
 
+export function getBooleanFromFormData(formData: FormData, key: string) {
+  const value = formData.get(key);
+
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  return value === "true" || value === "1" || value === "on";
+}
+
 export function getOptionalFileFromFormData(formData: FormData, key: string) {
   const value = formData.get(key);
 
