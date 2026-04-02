@@ -137,9 +137,9 @@ export function QuestionReviewCard({
   }
 
   return (
-    <Card className="motion-enter interactive-panel">
+    <Card className="motion-enter-soft interactive-panel surface-glass">
       <CardContent sx={{ p: { xs: 2.25, sm: 3 } }}>
-        <Stack spacing={{ xs: 2.25, sm: 2.5 }}>
+        <Stack spacing={{ xs: 2, sm: 2.5 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
@@ -163,69 +163,98 @@ export function QuestionReviewCard({
             </Stack>
           </Stack>
 
-          <Typography sx={{ whiteSpace: "pre-wrap" }} className="text-break">
-            {question.content}
-          </Typography>
-          {question.imageUrl ? (
-            <Box
-              component="img"
-              src={question.imageUrl}
-              alt="Question attachment"
-              sx={{
-                borderRadius: "12px",
-                maxHeight: 320,
-                width: "100%",
-                objectFit: "cover",
-              }}
-            />
-          ) : null}
+          <Box
+            sx={{
+              px: { xs: 1.5, sm: 1.75 },
+              py: { xs: 1.5, sm: 1.75 },
+              borderRadius: "16px",
+              bgcolor: "rgba(255, 255, 255, 0.58)",
+              border: "1px solid rgba(32, 34, 39, 0.06)",
+            }}
+          >
+            <Stack spacing={1.25}>
+              <Typography variant="overline" color="text.secondary">
+                Question
+              </Typography>
+              <Typography sx={{ whiteSpace: "pre-wrap" }} className="text-break">
+                {question.content}
+              </Typography>
+              {question.imageUrl ? (
+                <Box
+                  component="img"
+                  src={question.imageUrl}
+                  alt="Question attachment"
+                  sx={{
+                    borderRadius: "14px",
+                    maxHeight: { xs: 220, sm: 300 },
+                    width: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : null}
+            </Stack>
+          </Box>
 
-          <Divider />
+          <Divider className="list-divider-soft" />
 
           <Collapse in={Boolean(error)} unmountOnExit>
-            {error ? <Alert severity="error">{error}</Alert> : null}
+            {error ? <Alert severity="error" className="status-feedback">{error}</Alert> : null}
           </Collapse>
           <Collapse in={Boolean(success)} unmountOnExit>
-            {success ? <Alert severity="success">{success}</Alert> : null}
+            {success ? <Alert severity="success" className="status-feedback">{success}</Alert> : null}
           </Collapse>
 
-          <Stack component="form" action={saveAnswer} spacing={2}>
-            <TextField
-              label="Answer"
-              name="content"
-              multiline
-              minRows={4}
-              fullWidth
-              disabled={isLocked || saving}
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-            />
-            <FileUploadField
-              name="image"
-              accept="image/png,image/jpeg,image/webp"
-              disabled={isLocked || saving}
-              helperText="Optional answer image. Uploading a new one replaces the previous image."
-              buttonLabel="Upload answer image"
-            />
-            {question.answer?.imageUrl ? (
-              <Box
-                component="img"
-                src={question.answer.imageUrl}
-                alt="Answer attachment"
-                sx={{
-                  borderRadius: "12px",
-                  maxHeight: 320,
-                  width: "100%",
-                  objectFit: "cover",
-                }}
-              />
-            ) : null}
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1.25}>
+          <Stack component="form" action={saveAnswer} spacing={1.75}>
+            <Box
+              sx={{
+                p: { xs: 1.5, sm: 1.75 },
+                borderRadius: "16px",
+                bgcolor: "rgba(255, 255, 255, 0.48)",
+                border: "1px solid rgba(32, 34, 39, 0.06)",
+              }}
+            >
+              <Stack spacing={1.5}>
+                <Typography variant="overline" color="text.secondary">
+                  Draft answer
+                </Typography>
+                <TextField
+                  label="Answer"
+                  name="content"
+                  multiline
+                  minRows={4}
+                  fullWidth
+                  disabled={isLocked || saving}
+                  value={content}
+                  onChange={(event) => setContent(event.target.value)}
+                />
+                <FileUploadField
+                  name="image"
+                  accept="image/png,image/jpeg,image/webp"
+                  disabled={isLocked || saving}
+                  helperText="Optional answer image. Uploading a new one replaces the previous image."
+                  buttonLabel="Upload answer image"
+                />
+                {question.answer?.imageUrl ? (
+                  <Box
+                    component="img"
+                    src={question.answer.imageUrl}
+                    alt="Answer attachment"
+                    sx={{
+                      borderRadius: "14px",
+                      maxHeight: { xs: 220, sm: 300 },
+                      width: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : null}
+              </Stack>
+            </Box>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
               <Button
                 type="submit"
                 variant="contained"
                 disabled={isLocked || saving}
-                sx={{ width: { xs: "100%", md: "auto" } }}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 Save answer
               </Button>
@@ -234,27 +263,29 @@ export function QuestionReviewCard({
                 variant="outlined"
                 onClick={publishQuestion}
                 disabled={isLocked || saving}
-                sx={{ width: { xs: "100%", md: "auto" } }}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 Publish
               </Button>
+            </Stack>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
               <Button
                 type="button"
                 color="warning"
                 variant="outlined"
                 onClick={() => updateStatus("REJECTED")}
                 disabled={isLocked || saving}
-                sx={{ width: { xs: "100%", md: "auto" } }}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 Reject
               </Button>
               <Button
                 type="button"
                 color="error"
-                variant="outlined"
+                variant="text"
                 onClick={() => updateStatus("DELETED")}
                 disabled={question.status === "DELETED" || saving}
-                sx={{ width: { xs: "100%", md: "auto" } }}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 Delete
               </Button>

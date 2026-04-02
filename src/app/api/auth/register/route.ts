@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { registerUser } from "@/features/auth/service";
+import { withApiHandler } from "@/lib/api";
 import { attachSessionCookie } from "@/lib/auth/session";
-import { errorResponse } from "@/lib/http";
 
 function serializeUser(user: {
   id: string;
@@ -19,26 +19,22 @@ function serializeUser(user: {
   };
 }
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const result = await registerUser(body);
-    const response = NextResponse.json(
-      {
-        user: serializeUser(result.user),
-        redirectTo: "/dashboard",
-      },
-      { status: 201 },
-    );
+export const POST = withApiHandler(async (request: Request) => {
+  const body = await request.json();
+  const result = await registerUser(body);
+  const response = NextResponse.json(
+    {
+      user: serializeUser(result.user),
+      redirectTo: "/dashboard",
+    },
+    { status: 201 },
+  );
 
-    attachSessionCookie(
-      response,
-      result.session.token,
-      result.session.expiresAt,
-    );
+  attachSessionCookie(
+    response,
+    result.session.token,
+    result.session.expiresAt,
+  );
 
-    return response;
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+  return response;
+});

@@ -15,7 +15,7 @@ export default async function DashboardBoxesPage() {
     <Grid container spacing={{ xs: 2, md: 3 }}>
       <Grid size={{ xs: 12, xl: 4 }}>
         <SectionCard
-          className="motion-enter"
+          className="motion-pop"
           title="Create a new box"
           description="Each box gets its own public URL and moderation queue."
         >
@@ -24,32 +24,37 @@ export default async function DashboardBoxesPage() {
       </Grid>
       <Grid size={{ xs: 12, xl: 8 }}>
         <SectionCard
-          className="motion-enter motion-delay-1"
+          className="motion-enter-soft motion-delay-1"
           title="Your boxes"
           description="Manage titles, slugs, submission settings, and moderation from here."
         >
           <Stack spacing={2}>
             {boxes.length === 0 ? (
               <EmptyState
+                className="motion-enter-soft motion-delay-2"
                 title="No question boxes yet"
                 description="Create your first box on the left to start receiving anonymous questions."
               />
             ) : (
-              boxes.map((box) => (
+              boxes.map((box, index) => (
                 <Stack
                   key={box.id}
                   direction={{ xs: "column", md: "row" }}
                   justifyContent="space-between"
                   spacing={{ xs: 1.75, md: 2 }}
-                  className="interactive-panel"
+                  className={`interactive-panel motion-enter-soft motion-delay-${Math.min(
+                    4,
+                    index + 1,
+                  )}`}
                   sx={{
                     px: { xs: 1.75, sm: 2.25, md: 2.5 },
                     py: { xs: 1.75, sm: 2.25, md: 2.5 },
-                    borderRadius: "16px",
-                    bgcolor: "rgba(255, 255, 255, 0.7)",
+                    borderRadius: "18px",
+                    bgcolor: "rgba(255, 255, 255, 0.64)",
+                    border: "1px solid rgba(32, 34, 39, 0.06)",
                   }}
                 >
-                  <Stack spacing={1}>
+                  <Stack spacing={0.9} sx={{ minWidth: 0 }}>
                     <Stack
                       direction={{ xs: "column", sm: "row" }}
                       spacing={1}
@@ -61,7 +66,11 @@ export default async function DashboardBoxesPage() {
                     <Typography color="text.secondary" className="text-break">
                       /b/{box.slug}
                     </Typography>
-                    <Typography color="text.secondary" className="text-break">
+                    <Typography
+                      color="text.secondary"
+                      className="text-break"
+                      sx={{ fontSize: "0.95rem" }}
+                    >
                       {box.description || "No description yet."}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -72,11 +81,12 @@ export default async function DashboardBoxesPage() {
                       {box._count.questions} total questions
                     </Typography>
                   </Stack>
-                  <Stack direction={{ xs: "column", md: "row" }} spacing={1.25}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
                     <Button
                       component={Link}
                       href={`/b/${box.slug}`}
                       target="_blank"
+                      variant="text"
                       sx={{ width: { xs: "100%", sm: "auto" } }}
                     >
                       Public page

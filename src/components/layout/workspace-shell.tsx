@@ -3,6 +3,8 @@
 import Link from "next/link";
 import {
   Box,
+  BottomNavigation,
+  BottomNavigationAction,
   Button,
   Card,
   CardContent,
@@ -28,6 +30,7 @@ type WorkspaceShellProps = {
   navigation: WorkspaceNavItem[];
   children: React.ReactNode;
   mobileNavigation?: boolean;
+  mobileNavigationVariant?: "tabs" | "bottom";
   logoutRedirectTo?: string;
 };
 
@@ -38,36 +41,43 @@ export function WorkspaceShell({
   navigation,
   children,
   mobileNavigation = false,
+  mobileNavigationVariant = "tabs",
   logoutRedirectTo = "/",
 }: WorkspaceShellProps) {
   const pathname = usePathname();
+  const showBottomNavigation = mobileNavigation && mobileNavigationVariant === "bottom";
+  const activeNavigation =
+    navigation.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+      ?.href ?? navigation[0]?.href;
 
   return (
     <Box
-      className="safe-shell"
+      className={`safe-shell${showBottomNavigation ? " safe-bottom-nav" : ""}`}
       sx={{
         px: { xs: 1.5, sm: 2, md: 4 },
-        py: { xs: 2, sm: 2.5, md: 5 },
+        py: { xs: 1.5, sm: 2.5, md: 5 },
         minHeight: "100dvh",
       }}
     >
       <Stack spacing={3}>
-        <Card>
-          <CardContent sx={{ p: { xs: 2.25, sm: 3, md: 4 } }}>
+        <Card className="motion-enter-soft surface-glass">
+          <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
             <Stack
               direction={{ xs: "column", md: "row" }}
               justifyContent="space-between"
-              spacing={{ xs: 2.5, md: 3 }}
+              spacing={{ xs: 2, md: 3 }}
             >
-              <Stack spacing={0.75}>
-                <Typography variant="h4" sx={{ fontSize: { xs: "1.7rem", sm: "2rem" } }}>
+              <Stack spacing={0.6} sx={{ maxWidth: { md: 620 } }}>
+                <Typography variant="h4" sx={{ fontSize: { xs: "1.45rem", sm: "2rem" } }}>
                   {title}
                 </Typography>
-                <Typography color="text.secondary">{description}</Typography>
+                <Typography color="text.secondary" sx={{ maxWidth: { xs: "100%", md: 560 } }}>
+                  {description}
+                </Typography>
               </Stack>
               <Stack
                 direction={{ xs: "column", sm: "row", md: "column" }}
-                spacing={{ xs: 1.25, sm: 2, md: 0.5 }}
+                spacing={{ xs: 1, sm: 1.75, md: 0.5 }}
                 alignItems={{ xs: "stretch", sm: "center", md: "flex-end" }}
               >
                 <Stack spacing={0.25}>
@@ -84,9 +94,14 @@ export function WorkspaceShell({
           </CardContent>
         </Card>
 
-        {mobileNavigation ? (
+        {mobileNavigation && mobileNavigationVariant === "tabs" ? (
           <Box sx={{ display: { xs: "block", lg: "none" } }} className="touch-scroll-x">
-            <Stack direction="row" spacing={1} sx={{ minWidth: "max-content", pb: 0.5 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ minWidth: "max-content", pb: 0.5, px: 0.25 }}
+              className="motion-enter-soft motion-delay-1"
+            >
               {navigation.map((item) => {
                 const active =
                   pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -102,6 +117,7 @@ export function WorkspaceShell({
                     sx={{
                       whiteSpace: "nowrap",
                       flexShrink: 0,
+                      minHeight: 42,
                     }}
                   >
                     {item.label}
@@ -120,6 +136,7 @@ export function WorkspaceShell({
               position: { xl: "sticky" },
               top: { xl: "calc(env(safe-area-inset-top) + 24px)" },
             }}
+            className="motion-enter-soft motion-delay-1"
           >
             <CardContent sx={{ p: 2 }}>
               <Stack spacing={1}>
@@ -150,6 +167,23 @@ export function WorkspaceShell({
           </Box>
         </Stack>
       </Stack>
+
+      {showBottomNavigation ? (
+        <Box sx={{ display: { xs: "block", lg: "none" } }} className="mobile-bottom-nav surface-glass">
+          <BottomNavigation showLabels value={activeNavigation ?? false}>
+            {navigation.map((item) => (
+              <BottomNavigationAction
+                key={item.href}
+                component={Link}
+                href={item.href}
+                value={item.href}
+                label={item.label}
+                icon={item.icon}
+              />
+            ))}
+          </BottomNavigation>
+        </Box>
+      ) : null}
     </Box>
   );
 }

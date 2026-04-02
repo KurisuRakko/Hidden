@@ -5,8 +5,8 @@ import {
   type AuthPortal,
 } from "@/lib/admin-portal";
 import { loginUser } from "@/features/auth/service";
+import { withApiHandler } from "@/lib/api";
 import { attachSessionCookie } from "@/lib/auth/session";
-import { errorResponse } from "@/lib/http";
 
 function serializeUser(user: {
   id: string;
@@ -24,35 +24,31 @@ function serializeUser(user: {
   };
 }
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const portal: AuthPortal = body.portal === "ADMIN" ? "ADMIN" : "PUBLIC";
+export const POST = withApiHandler(async (request: Request) => {
+  const body = await request.json();
+  const portal: AuthPortal = body.portal === "ADMIN" ? "ADMIN" : "PUBLIC";
 
-    if (portal === "ADMIN") {
-      assertAdminPortalHeaders(request.headers);
-    }
-
-    const result = await loginUser({
-      phone: String(body.phone ?? ""),
-      password: String(body.password ?? ""),
-      portal,
-    });
-    const redirectTo =
-      result.user.role === "ADMIN" ? getAdminAppUrl("/admin") : "/dashboard";
-    const response = NextResponse.json({
-      user: serializeUser(result.user),
-      redirectTo,
-    });
-
-    attachSessionCookie(
-      response,
-      result.session.token,
-      result.session.expiresAt,
-    );
-
-    return response;
-  } catch (error) {
-    return errorResponse(error);
+  if (portal === "ADMIN") {
+    assertAdminPortalHeaders(request.headers);
   }
-}
+
+  const result = await loginUser({
+    phone: String(body.phone ?? ""),
+    password: String(body.password ?? ""),
+    portal,
+  });
+  const redirectTo =
+    result.user.role === "ADMIN" ? getAdminAppUrl("/admin") : "/dashboard";
+  const response = NextResponse.json({
+    user: serializeUser(result.user),
+    redirectTo,
+  });
+
+  attachSessionCookie(
+    response,
+    result.session.token,
+    result.session.expiresAt,
+  );
+
+  return response;
+});

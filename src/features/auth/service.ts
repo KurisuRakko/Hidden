@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { AuthPortal, getAdminAppUrl } from "@/lib/admin-portal";
-import { prisma } from "@/lib/db";
+import { prisma, runSerializableTransaction } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { createSession } from "@/lib/auth/session";
 import {
@@ -30,42 +30,59 @@ export async function registerUser(input: {
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  const user = await prisma.$transaction(async (tx) => {
-    const invite = await tx.inviteCode.findUnique({
-      where: { code: inviteCode },
-    });
+  let user;
 
-    if (!invite || invite.status !== "ACTIVE") {
-      throw new AppError(400, "Invite code is invalid.", "INVITE_INVALID");
-    }
+  try {
+    user = await runSerializableTransaction(async (tx) => {
+      const invite = await tx.inviteCode.findUnique({
+        where: { code: inviteCode },
+      });
 
-    if (invite.expiresAt && invite.expiresAt <= new Date()) {
-      throw new AppError(400, "Invite code has expired.", "INVITE_EXPIRED");
-    }
+      if (!invite || invite.status !== "ACTIVE") {
+        throw new AppError(400, "Invite code is invalid.", "INVITE_INVALID");
+      }
 
-    if (invite.maxUses !== null && invite.usedCount >= invite.maxUses) {
-      throw new AppError(400, "Invite code has reached its usage limit.", "INVITE_EXHAUSTED");
-    }
+      if (invite.expiresAt && invite.expiresAt <= new Date()) {
+        throw new AppError(400, "Invite code has expired.", "INVITE_EXPIRED");
+      }
 
-    const createdUser = await tx.user.create({
-      data: {
-        phone,
-        passwordHash,
-        role: UserRole.USER,
-      },
-    });
+      if (invite.maxUses !== null && invite.usedCount >= invite.maxUses) {
+        throw new AppError(
+          400,
+          "Invite code has reached its usage limit.",
+          "INVITE_EXHAUSTED",
+        );
+      }
 
-    await tx.inviteCode.update({
-      where: { id: invite.id },
-      data: {
-        usedCount: {
-          increment: 1,
+      const createdUser = await tx.user.create({
+        data: {
+          phone,
+          passwordHash,
+          role: UserRole.USER,
         },
-      },
-    });
+      });
 
-    return createdUser;
-  });
+      await tx.inviteCode.update({
+        where: { id: invite.id },
+        data: {
+          usedCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      return createdUser;
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw new AppError(409, "This phone number is already registered.", "PHONE_TAKEN");
+    }
+
+    throw error;
+  }
 
   const session = await createSession(user.id);
 

@@ -26,10 +26,10 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
 
   return (
     <PublicShell>
-      <Stack spacing={3} sx={{ py: { xs: 4, md: 6 } }}>
-        <Card className="motion-enter">
-          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-            <Stack spacing={2}>
+      <Stack spacing={{ xs: 2.5, md: 3 }} sx={{ py: { xs: 2.75, md: 5 } }}>
+        <Card className="motion-pop surface-glass">
+          <CardContent sx={{ p: { xs: 2.25, sm: 3, md: 4 } }}>
+            <Stack spacing={{ xs: 1.75, md: 2 }}>
               <Typography variant="h3" className="text-break">
                 {box.title}
               </Typography>
@@ -37,7 +37,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                 {box.description || "Ask something thoughtful and keep it anonymous."}
               </Typography>
               {!box.acceptingQuestions ? (
-                <Alert severity="warning">
+                <Alert severity="warning" className="status-feedback">
                   This box is visible, but the owner has paused new submissions.
                 </Alert>
               ) : null}
@@ -49,9 +49,9 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
           </CardContent>
         </Card>
 
-        <Card className="motion-enter motion-delay-1">
-          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-            <Stack spacing={3}>
+        <Card className="motion-enter-soft motion-delay-1 surface-glass">
+          <CardContent sx={{ p: { xs: 2.25, sm: 3, md: 4 } }}>
+            <Stack spacing={{ xs: 2.5, md: 3 }}>
               <Stack spacing={1}>
                 <Typography variant="h4">Published answers</Typography>
                 <Typography color="text.secondary">
@@ -59,14 +59,27 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                 </Typography>
               </Stack>
               {box.questions.length === 0 ? (
-                <Typography color="text.secondary">
+                <Alert severity="info" className="status-feedback">
                   No public answers yet.
-                </Typography>
+                </Alert>
               ) : (
                 box.questions.map((question, index) => (
-                  <Stack key={question.id} spacing={2.5} className="interactive-panel">
-                    {index > 0 ? <Divider /> : null}
-                    <Stack spacing={1.25}>
+                  <Stack
+                    key={question.id}
+                    spacing={2}
+                    className={`interactive-panel motion-enter-soft motion-delay-${Math.min(
+                      4,
+                      index + 1,
+                    )}`}
+                    sx={{
+                      p: { xs: 2, sm: 2.5 },
+                      borderRadius: "18px",
+                      bgcolor: "rgba(255, 255, 255, 0.52)",
+                      border: "1px solid rgba(32, 34, 39, 0.06)",
+                    }}
+                  >
+                    {index > 0 ? <Divider className="list-divider-soft" /> : null}
+                    <Stack spacing={1}>
                       <Typography variant="overline" color="text.secondary">
                         Published {formatDateTime(question.publishedAt)}
                       </Typography>
@@ -81,7 +94,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                           alt="Question attachment"
                           sx={{
                             borderRadius: "14px",
-                            maxHeight: 360,
+                            maxHeight: { xs: 220, sm: 300, md: 360 },
                             width: "100%",
                             objectFit: "cover",
                           }}
@@ -89,7 +102,13 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                       ) : null}
                     </Stack>
                     {question.answer ? (
-                      <Stack spacing={1.25}>
+                      <Stack
+                        spacing={1}
+                        sx={{
+                          pt: 0.5,
+                          borderTop: "1px solid rgba(32, 34, 39, 0.06)",
+                        }}
+                      >
                         <Typography variant="h6">Answer</Typography>
                         <Typography sx={{ whiteSpace: "pre-wrap" }} className="text-break">
                           {question.answer.content}
@@ -101,7 +120,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                             alt="Answer attachment"
                             sx={{
                               borderRadius: "14px",
-                              maxHeight: 360,
+                              maxHeight: { xs: 220, sm: 300, md: 360 },
                               width: "100%",
                               objectFit: "cover",
                             }}

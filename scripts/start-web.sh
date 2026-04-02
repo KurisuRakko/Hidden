@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eu
 
-echo "Running database migrations..."
+echo "Running database migrations (waiting for PostgreSQL if needed)..."
 attempt=1
 until npm run prisma:deploy; do
   if [ "$attempt" -ge 20 ]; then
-    echo "Database migrations failed after ${attempt} attempts."
+    echo "Database migrations failed after ${attempt} attempts. The web container will exit."
     exit 1
   fi
 
@@ -17,11 +17,11 @@ done
 echo "Seeding default data..."
 npm run seed
 
-echo "Ensuring MinIO bucket exists..."
+echo "Ensuring MinIO bucket exists (waiting for storage if needed)..."
 attempt=1
 until npm run storage:init; do
   if [ "$attempt" -ge 20 ]; then
-    echo "MinIO initialization failed after ${attempt} attempts."
+    echo "MinIO initialization failed after ${attempt} attempts. The web container will exit."
     exit 1
   fi
 

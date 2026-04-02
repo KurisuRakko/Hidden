@@ -116,16 +116,21 @@ export const appTheme = createTheme({
       },
       styleOverrides: {
         root: {
-          minHeight: 42,
+          minHeight: 44,
           paddingInline: 18,
           borderRadius: 8,
           transition:
             "transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard)",
+          boxShadow: "0 1px 2px rgba(15, 22, 36, 0.03)",
           "&:active": {
             transform: "translateY(1px) scale(0.985)",
           },
           "&:focus-visible": {
             boxShadow: "0 0 0 3px rgba(31, 93, 168, 0.18)",
+          },
+          "@media (max-width:599.95px)": {
+            minHeight: 46,
+            paddingInline: 16,
           },
           "@media (hover: hover)": {
             "&:hover": {
@@ -140,15 +145,16 @@ export const appTheme = createTheme({
         root: {
           borderRadius: 12,
           boxShadow:
-            "0px 8px 24px rgba(15, 22, 36, 0.08), 0px 2px 6px rgba(15, 22, 36, 0.05)",
+            "0px 6px 18px rgba(15, 22, 36, 0.07), 0px 2px 6px rgba(15, 22, 36, 0.04)",
           border: "1px solid rgba(32, 34, 39, 0.06)",
+          overflow: "hidden",
           transition:
             "transform var(--motion-base) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard)",
           "@media (hover: hover)": {
             "&:hover": {
-              transform: "translateY(-3px)",
+              transform: "translateY(-2px)",
               boxShadow:
-                "0px 14px 34px rgba(15, 22, 36, 0.12), 0px 4px 12px rgba(15, 22, 36, 0.08)",
+                "0px 10px 24px rgba(15, 22, 36, 0.1), 0px 4px 12px rgba(15, 22, 36, 0.06)",
             },
           },
         },
@@ -165,6 +171,7 @@ export const appTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: "#ffffff",
+          minHeight: 48,
           transition:
             "background-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard)",
           "&:hover": {
@@ -173,12 +180,51 @@ export const appTheme = createTheme({
           "&.Mui-focused": {
             boxShadow: "0 0 0 4px rgba(31, 93, 168, 0.12)",
           },
+          "@media (max-width:599.95px)": {
+            minHeight: 50,
+          },
+        },
+      },
+    },
+    MuiBottomNavigation: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "transparent",
+          minHeight: "var(--mobile-nav-height)",
+        },
+      },
+    },
+    MuiBottomNavigationAction: {
+      styleOverrides: {
+        root: {
+          minWidth: 0,
+          paddingTop: 10,
+          paddingBottom: 10,
+          borderRadius: 18,
+          color: "#5f6470",
+          transition:
+            "color var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard)",
+          "&.Mui-selected": {
+            color: "#1f5da8",
+            backgroundColor: "rgba(31, 93, 168, 0.08)",
+          },
+          "&:active": {
+            transform: "scale(0.98)",
+          },
+        },
+        label: {
+          fontSize: "0.72rem",
+          fontWeight: 600,
+          "&.Mui-selected": {
+            fontSize: "0.72rem",
+          },
         },
       },
     },
     MuiAlert: {
       styleOverrides: {
         root: {
+          borderRadius: 12,
           transition:
             "transform var(--motion-base) var(--ease-standard), opacity var(--motion-base) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard)",
         },

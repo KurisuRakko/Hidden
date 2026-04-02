@@ -42,27 +42,27 @@ export default async function DashboardOverviewPage() {
           <MetricCard
             label="Question boxes"
             value={boxCount}
-            className="motion-enter"
+            className="motion-enter-soft"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <MetricCard
             label="Pending questions"
             value={pendingCount}
-            className="motion-enter motion-delay-1"
+            className="motion-enter-soft motion-delay-1"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <MetricCard
             label="Published answers"
             value={publishedCount}
-            className="motion-enter motion-delay-2"
+            className="motion-enter-soft motion-delay-2"
           />
         </Grid>
       </Grid>
 
       <SectionCard
-        className="motion-enter motion-delay-2"
+        className="motion-enter-soft motion-delay-2"
         title="Recently updated boxes"
         description="Open any box to review pending questions and publish answers."
       >
@@ -72,30 +72,38 @@ export default async function DashboardOverviewPage() {
               You have not created any question boxes yet.
             </Typography>
           ) : (
-            latestBoxes.map((box) => (
+            latestBoxes.map((box, index) => (
               <Stack
                 key={box.id}
                 direction={{ xs: "column", md: "row" }}
                 justifyContent="space-between"
                 spacing={{ xs: 1.5, md: 2 }}
-                className="interactive-panel"
+                className={`interactive-panel motion-enter-soft motion-delay-${Math.min(
+                  3,
+                  index + 1,
+                )}`}
                 sx={{
                   px: { xs: 1.75, sm: 2 },
                   py: { xs: 1.75, sm: 2.25 },
-                  borderRadius: "16px",
+                  borderRadius: "18px",
                   bgcolor: "rgba(255, 255, 255, 0.6)",
+                  border: "1px solid rgba(32, 34, 39, 0.06)",
                 }}
               >
-                <Stack spacing={0.75}>
+                <Stack spacing={0.55}>
                   <Typography variant="h6">{box.title}</Typography>
-                  <Typography color="text.secondary" className="text-break">
+                  <Typography
+                    color="text.secondary"
+                    className="text-break"
+                    sx={{ fontSize: "0.95rem" }}
+                  >
                     /b/{box.slug}
                   </Typography>
                 </Stack>
                 <Button
                   component={Link}
                   href={`/dashboard/boxes/${box.id}`}
-                  sx={{ width: { xs: "100%", md: "auto" } }}
+                  sx={{ width: { xs: "100%", md: "auto" }, alignSelf: { xs: "stretch", md: "center" } }}
                 >
                   Open box
                 </Button>

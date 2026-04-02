@@ -27,20 +27,20 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
     <Stack spacing={3}>
       <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <MetricCard label="Pending" value={pendingCount} className="motion-enter" />
+          <MetricCard label="Pending" value={pendingCount} className="motion-enter-soft" />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <MetricCard
             label="Published"
             value={publishedCount}
-            className="motion-enter motion-delay-1"
+            className="motion-enter-soft motion-delay-1"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <MetricCard
             label="Public page"
             value={`/b/${box.slug}`}
-            className="motion-enter motion-delay-2"
+            className="motion-enter-soft motion-delay-2"
             supporting={
               box.acceptingQuestions ? "Open for new submissions" : "Submission closed"
             }
@@ -51,7 +51,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
       <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, xl: 4 }}>
           <SectionCard
-            className="motion-enter motion-delay-1"
+            className="motion-enter-soft motion-delay-1"
             title="Box settings"
             description="Update the title, description, slug, visibility, and submission status."
           >
@@ -80,7 +80,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
         </Grid>
         <Grid size={{ xs: 12, xl: 8 }}>
           <SectionCard
-            className="motion-enter motion-delay-2"
+            className="motion-enter-soft motion-delay-2"
             title="Question moderation"
             description="Review incoming questions, draft answers, and publish the ones worth sharing."
           >

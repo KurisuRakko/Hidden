@@ -84,18 +84,32 @@ export function PublicHeaderActions({
           size="small"
           sx={{
             border: "1px solid rgba(32, 34, 39, 0.08)",
-            bgcolor: "rgba(255, 255, 255, 0.8)",
+            bgcolor: "rgba(255, 255, 255, 0.84)",
+            boxShadow: "0 6px 18px rgba(15, 22, 36, 0.08)",
           }}
         >
           <MenuRounded />
         </IconButton>
-        <Drawer anchor="right" open={open} onClose={closeDrawer}>
+        <Drawer
+          anchor="right"
+          open={open}
+          onClose={closeDrawer}
+          PaperProps={{
+            sx: {
+              borderTopLeftRadius: 24,
+              borderBottomLeftRadius: 24,
+              backgroundImage: "none",
+            },
+          }}
+        >
           <Box
             sx={{
               width: 280,
               minHeight: "100%",
               px: 2,
               py: 2.5,
+              pt: "max(20px, calc(env(safe-area-inset-top) + 16px))",
+              pb: "max(24px, calc(env(safe-area-inset-bottom) + 20px))",
               bgcolor: "background.paper",
             }}
           >

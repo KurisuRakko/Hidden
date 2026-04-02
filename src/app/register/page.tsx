@@ -20,7 +20,7 @@ export default async function RegisterPage() {
 
   return (
     <PublicShell>
-      <Box sx={{ py: { xs: 3.5, sm: 5, md: 8 } }}>
+      <Box sx={{ py: { xs: 2.5, sm: 4.5, md: 7 } }}>
         <AuthForm mode="register" defaultDialCode={defaultDialCode} />
       </Box>
     </PublicShell>

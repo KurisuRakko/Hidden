@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <PublicShell>
-      <Box sx={{ py: { xs: 3.5, sm: 5, md: 8 } }}>
+      <Box sx={{ py: { xs: 2.5, sm: 4.5, md: 7 } }}>
         <AuthForm
           mode="login"
           portal="PUBLIC"

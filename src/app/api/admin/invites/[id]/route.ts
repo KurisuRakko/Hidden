@@ -1,6 +1,7 @@
 import { updateInviteCode } from "@/features/admin/service";
+import { withApiHandler } from "@/lib/api";
 import { requireAdminApi } from "@/lib/auth/guards";
-import { errorResponse, ok } from "@/lib/http";
+import { ok } from "@/lib/http";
 
 type RouteContext = {
   params: Promise<{
@@ -8,13 +9,11 @@ type RouteContext = {
   }>;
 };
 
-export async function PATCH(request: Request, context: RouteContext) {
-  try {
+export const PATCH = withApiHandler(
+  async (request: Request, context: RouteContext) => {
     const admin = await requireAdminApi();
     const { id } = await context.params;
     const body = await request.json();
     return ok(await updateInviteCode(admin.id, id, body));
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+  },
+);

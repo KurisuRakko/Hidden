@@ -110,7 +110,9 @@ model Question {
   content         String
   imageUrl        String?
   status          QuestionStatus @default(PENDING)
-  submitterIpHash String
+  submitterIpHash    String
+  submitterIp        String?
+  submitterUserAgent String?
   submittedAt     DateTime       @default(now())
   publishedAt     DateTime?
   deletedAt       DateTime?

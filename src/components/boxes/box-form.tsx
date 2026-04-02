@@ -2,6 +2,7 @@
 
 import {
   Alert,
+  Box,
   Button,
   Collapse,
   FormControlLabel,
@@ -80,9 +81,9 @@ export function BoxForm({ initialValues }: BoxFormProps) {
   }
 
   return (
-    <Stack component="form" action={handleSubmit} spacing={2.5}>
+    <Stack component="form" action={handleSubmit} spacing={2.25}>
       <Collapse in={Boolean(error)} unmountOnExit>
-        {error ? <Alert severity="error">{error}</Alert> : null}
+        {error ? <Alert severity="error" className="status-feedback">{error}</Alert> : null}
       </Collapse>
       <TextField
         name="title"
@@ -116,15 +117,26 @@ export function BoxForm({ initialValues }: BoxFormProps) {
         <MenuItem value="ACTIVE">Active</MenuItem>
         <MenuItem value="HIDDEN">Hidden</MenuItem>
       </TextField>
-      <FormControlLabel
-        control={
-          <Switch
-            checked={acceptingQuestions}
-            onChange={(event) => setAcceptingQuestions(event.target.checked)}
-          />
-        }
-        label="Accept new anonymous questions"
-      />
+      <Box
+        sx={{
+          px: 1.5,
+          py: 1,
+          borderRadius: "14px",
+          bgcolor: "rgba(255, 255, 255, 0.52)",
+          border: "1px solid rgba(32, 34, 39, 0.06)",
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Switch
+              checked={acceptingQuestions}
+              onChange={(event) => setAcceptingQuestions(event.target.checked)}
+            />
+          }
+          label="Accept new anonymous questions"
+          sx={{ m: 0, width: "100%", justifyContent: "space-between" }}
+        />
+      </Box>
       <Button
         type="submit"
         variant="contained"

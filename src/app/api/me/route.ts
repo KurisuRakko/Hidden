@@ -1,18 +1,15 @@
+import { withApiHandler } from "@/lib/api";
 import { getCurrentSession } from "@/lib/auth/session";
-import { errorResponse, ok } from "@/lib/http";
+import { ok } from "@/lib/http";
 
-export async function GET() {
-  try {
-    const session = await getCurrentSession();
+export const GET = withApiHandler(async () => {
+  const session = await getCurrentSession();
 
-    if (!session) {
-      return ok({ user: null });
-    }
-
-    return ok({
-      user: session.user,
-    });
-  } catch (error) {
-    return errorResponse(error);
+  if (!session) {
+    return ok({ user: null });
   }
-}
+
+  return ok({
+    user: session.user,
+  });
+});

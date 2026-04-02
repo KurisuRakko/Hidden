@@ -107,16 +107,16 @@ export function AuthForm({
 
   return (
     <Card
-      className="motion-enter motion-delay-1"
-      sx={{ maxWidth: 520, mx: "auto", overflow: "hidden" }}
+      className="motion-pop motion-delay-1 surface-glass"
+      sx={{ maxWidth: 520, mx: "auto", overflow: "hidden", borderRadius: { xs: "20px", sm: "24px" } }}
     >
-      <CardContent sx={{ p: { xs: 2.5, sm: 3.5, md: 4 } }}>
-        <Stack spacing={{ xs: 2.5, sm: 3 }}>
-          <Box>
+      <CardContent sx={{ p: { xs: 2.25, sm: 3.5, md: 4 } }}>
+        <Stack spacing={{ xs: 2, sm: 2.75 }}>
+          <Box sx={{ pb: 0.25 }}>
             <Typography
               variant="h4"
               gutterBottom
-              sx={{ fontSize: { xs: "1.65rem", sm: "2rem", md: "2.125rem" } }}
+              sx={{ fontSize: { xs: "1.55rem", sm: "2rem", md: "2.125rem" } }}
             >
               {isAdminLogin
                 ? "Admin sign in"
@@ -134,12 +134,12 @@ export function AuthForm({
           </Box>
 
           <Collapse in={Boolean(notice)} unmountOnExit>
-            {notice ? <Alert severity="info">{notice}</Alert> : null}
+            {notice ? <Alert severity="info" className="status-feedback">{notice}</Alert> : null}
           </Collapse>
           <Collapse in={Boolean(error)} unmountOnExit>
             {error ? (
-              <Stack spacing={1.25}>
-                <Alert severity="error">{error}</Alert>
+              <Stack spacing={1.25} sx={{ pb: 0.25 }}>
+                <Alert severity="error" className="status-feedback">{error}</Alert>
                 {errorActionUrl ? (
                   <Button component="a" href={errorActionUrl} variant="outlined">
                     Open admin portal
@@ -150,14 +150,14 @@ export function AuthForm({
           </Collapse>
 
           <Box component="form" action={handleSubmit}>
-            <Stack spacing={{ xs: 2, sm: 2.5 }}>
+            <Stack spacing={{ xs: 1.75, sm: 2.25 }}>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                 <TextField
                   select
                   label="Country code"
                   name="dialCode"
                   defaultValue={defaultDialCode}
-                  sx={{ width: { xs: "100%", sm: 220 } }}
+                  sx={{ width: { xs: "100%", sm: 190 } }}
                 >
                   {DIAL_CODE_OPTIONS.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -199,7 +199,7 @@ export function AuthForm({
                 variant="contained"
                 disabled={submitting}
                 size="large"
-                sx={{ width: { xs: "100%", sm: "auto" } }}
+                sx={{ width: { xs: "100%", sm: "auto" }, mt: 0.25 }}
               >
                 {submitting
                   ? "Submitting..."

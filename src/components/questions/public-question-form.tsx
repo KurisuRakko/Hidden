@@ -2,6 +2,7 @@
 
 import {
   Alert,
+  Box,
   Button,
   Collapse,
   Stack,
@@ -56,21 +57,21 @@ export function PublicQuestionForm({
     <Stack
       component="form"
       action={handleSubmit}
-      spacing={2.5}
-      className="motion-enter motion-delay-2"
+      spacing={{ xs: 2, md: 2.25 }}
+      className="motion-enter-soft motion-delay-2"
     >
       <Collapse in={disabled} unmountOnExit>
         {disabled ? (
-          <Alert severity="warning">
+          <Alert severity="warning" className="status-feedback">
             This box is currently closed for new submissions.
           </Alert>
         ) : null}
       </Collapse>
       <Collapse in={Boolean(error)} unmountOnExit>
-        {error ? <Alert severity="error">{error}</Alert> : null}
+        {error ? <Alert severity="error" className="status-feedback">{error}</Alert> : null}
       </Collapse>
       <Collapse in={Boolean(success)} unmountOnExit>
-        {success ? <Alert severity="success">{success}</Alert> : null}
+        {success ? <Alert severity="success" className="status-feedback">{success}</Alert> : null}
       </Collapse>
       <TextField
         label="Your anonymous question"
@@ -83,20 +84,29 @@ export function PublicQuestionForm({
         value={content}
         onChange={(event) => setContent(event.target.value)}
       />
-      <FileUploadField
-        key={`public-upload-${uploadResetToken}`}
-        name="image"
-        accept="image/png,image/jpeg,image/webp"
-        disabled={disabled || submitting}
-        helperText="Optional image, up to 5 MB. JPG, PNG, and WEBP are supported."
-        buttonLabel="Attach image"
-      />
+      <Box
+        sx={{
+          p: { xs: 1.5, sm: 1.75 },
+          borderRadius: "16px",
+          bgcolor: "rgba(255, 255, 255, 0.54)",
+          border: "1px solid rgba(32, 34, 39, 0.06)",
+        }}
+      >
+        <FileUploadField
+          key={`public-upload-${uploadResetToken}`}
+          name="image"
+          accept="image/png,image/jpeg,image/webp"
+          disabled={disabled || submitting}
+          helperText="Optional image, up to 5 MB. JPG, PNG, and WEBP are supported."
+          buttonLabel="Attach image"
+        />
+      </Box>
       <Button
         type="submit"
         variant="contained"
         disabled={disabled || submitting}
         size="large"
-        sx={{ width: { xs: "100%", sm: "auto" } }}
+        sx={{ width: { xs: "100%", sm: "auto" }, alignSelf: "flex-start", mt: 0.25 }}
       >
         {submitting ? "Submitting..." : "Send anonymously"}
       </Button>

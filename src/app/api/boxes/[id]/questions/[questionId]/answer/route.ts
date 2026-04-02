@@ -1,6 +1,7 @@
 import { saveAnswerForQuestion } from "@/features/boxes/service";
+import { withApiHandler } from "@/lib/api";
 import { requireUserApi } from "@/lib/auth/guards";
-import { errorResponse, ok } from "@/lib/http";
+import { ok } from "@/lib/http";
 import {
   getOptionalFileFromFormData,
   getStringFromFormData,
@@ -13,8 +14,8 @@ type RouteContext = {
   }>;
 };
 
-export async function POST(request: Request, context: RouteContext) {
-  try {
+export const POST = withApiHandler(
+  async (request: Request, context: RouteContext) => {
     const viewer = await requireUserApi();
     const { id, questionId } = await context.params;
     const formData = await request.formData();
@@ -25,7 +26,5 @@ export async function POST(request: Request, context: RouteContext) {
         image: getOptionalFileFromFormData(formData, "image"),
       }),
     );
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+  },
+);

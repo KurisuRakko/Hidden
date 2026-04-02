@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import {
+  Box,
   Button,
   MenuItem,
   Stack,
@@ -28,6 +30,18 @@ type AdminQuestionsPageProps = {
   }>;
 };
 
+function summarizeText(value: string, maxLength = 110) {
+  return value.length > maxLength ? `${value.slice(0, maxLength)}...` : value;
+}
+
+function formatAuditValue(value: string | null | undefined, fallback = "Not collected") {
+  if (!value) {
+    return fallback;
+  }
+
+  return value;
+}
+
 export default async function AdminQuestionsPage({
   searchParams,
 }: AdminQuestionsPageProps) {
@@ -45,13 +59,13 @@ export default async function AdminQuestionsPage({
   return (
     <SectionCard
       title="Questions"
-      description="Moderate content across the entire platform. Search by text, box slug, or owner phone."
+      description="Moderate content across the entire platform. Search by text, box slug, or creator phone."
     >
       <Stack spacing={3}>
         <Stack component="form" direction={{ xs: "column", md: "row" }} spacing={2}>
           <TextField
             name="q"
-            label="Search question or owner"
+            label="Search question or creator"
             defaultValue={params.q ?? ""}
             fullWidth
           />
@@ -79,7 +93,7 @@ export default async function AdminQuestionsPage({
             <TableRow>
               <TableCell>Question</TableCell>
               <TableCell>Answer</TableCell>
-              <TableCell>Owner</TableCell>
+              <TableCell>Creator</TableCell>
               <TableCell>Box</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Submitted</TableCell>
@@ -88,60 +102,200 @@ export default async function AdminQuestionsPage({
           </TableHead>
           <TableBody>
             {result.items.map((question) => (
-              <TableRow key={question.id}>
-                <TableCell>
-                  <Stack spacing={0.75}>
-                    <Typography variant="body2">
-                      {question.content.slice(0, 110)}
-                      {question.content.length > 110 ? "..." : ""}
-                    </Typography>
-                    {question.answer ? (
-                      <Typography variant="caption" color="text.secondary">
-                        Answer saved
-                      </Typography>
-                    ) : null}
-                  </Stack>
-                </TableCell>
-                <TableCell>
-                  {!question.answer ? (
-                    <Typography variant="body2" color="text.secondary">
-                      No answer
-                    </Typography>
-                  ) : question.answer.deletedAt ? (
-                    <Typography variant="body2" color="text.secondary">
-                      Answer removed
-                    </Typography>
-                  ) : (
+              <Fragment key={question.id}>
+                <TableRow>
+                  <TableCell sx={{ borderBottom: "none" }}>
                     <Stack spacing={0.75}>
                       <Typography variant="body2">
-                        {question.answer.content.slice(0, 110)}
-                        {question.answer.content.length > 110 ? "..." : ""}
+                        {summarizeText(question.content)}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {question.answer.imageUrl ? "Has image" : "Text only"}
-                      </Typography>
+                      {question.answer ? (
+                        <Typography variant="caption" color="text.secondary">
+                          Answer saved
+                        </Typography>
+                      ) : null}
                     </Stack>
-                  )}
-                </TableCell>
-                <TableCell>{question.box.owner.phone}</TableCell>
-                <TableCell>
-                  <Button component={Link} href={`/b/${question.box.slug}`} target="_blank">
-                    /b/{question.box.slug}
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <StatusChip status={question.status} />
-                </TableCell>
-                <TableCell>{formatDateTime(question.submittedAt)}</TableCell>
-                <TableCell align="right">
-                  <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    {question.answer && !question.answer.deletedAt ? (
-                      <DeleteAnswerButton answerId={question.answer.id} />
-                    ) : null}
-                    <DeleteQuestionButton questionId={question.id} />
-                  </Stack>
-                </TableCell>
-              </TableRow>
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: "none" }}>
+                    {!question.answer ? (
+                      <Typography variant="body2" color="text.secondary">
+                        No answer
+                      </Typography>
+                    ) : question.answer.deletedAt ? (
+                      <Typography variant="body2" color="text.secondary">
+                        Answer removed
+                      </Typography>
+                    ) : (
+                      <Stack spacing={0.75}>
+                        <Typography variant="body2">
+                          {summarizeText(question.answer.content)}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {question.answer.imageUrl ? "Has image" : "Text only"}
+                        </Typography>
+                      </Stack>
+                    )}
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: "none" }}>
+                    {question.box.owner.phone}
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: "none" }}>
+                    <Button component={Link} href={`/b/${question.box.slug}`} target="_blank">
+                      /b/{question.box.slug}
+                    </Button>
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: "none" }}>
+                    <StatusChip status={question.status} />
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: "none" }}>
+                    {formatDateTime(question.submittedAt)}
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: "none" }}>
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      {question.answer && !question.answer.deletedAt ? (
+                        <DeleteAnswerButton answerId={question.answer.id} />
+                      ) : null}
+                      <DeleteQuestionButton questionId={question.id} />
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ pt: 0, px: 2, pb: 2.5 }}>
+                    <Box
+                      component="details"
+                      sx={{
+                        borderRadius: "16px",
+                        bgcolor: "rgba(245, 245, 247, 0.9)",
+                        border: "1px solid rgba(30, 31, 36, 0.08)",
+                        overflow: "hidden",
+                        "& > summary": {
+                          listStyle: "none",
+                          cursor: "pointer",
+                        },
+                        "& > summary::-webkit-details-marker": {
+                          display: "none",
+                        },
+                      }}
+                    >
+                      <Box
+                        component="summary"
+                        sx={{
+                          px: 2,
+                          py: 1.5,
+                        }}
+                      >
+                        <Stack
+                          direction={{ xs: "column", md: "row" }}
+                          justifyContent="space-between"
+                          spacing={1}
+                        >
+                          <Typography variant="subtitle2">Details</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Creator, submitter IP and UA, full content, and image state
+                          </Typography>
+                        </Stack>
+                      </Box>
+
+                      <Stack spacing={2} sx={{ px: 2, pb: 2, pt: 0.5 }}>
+                        <Stack
+                          direction={{ xs: "column", md: "row" }}
+                          spacing={2}
+                          useFlexGap
+                          flexWrap="wrap"
+                        >
+                          <Box sx={{ minWidth: 220, flex: "1 1 220px" }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Creator
+                            </Typography>
+                            <Typography variant="body2">
+                              {question.box.owner.phone}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ minWidth: 220, flex: "1 1 220px" }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Box
+                            </Typography>
+                            <Typography variant="body2">
+                              {question.box.title} ({question.box.slug})
+                            </Typography>
+                          </Box>
+                          <Box sx={{ minWidth: 220, flex: "1 1 220px" }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Submitter IP
+                            </Typography>
+                            <Typography variant="body2">
+                              {formatAuditValue(
+                                question.submitterIp,
+                                "Not collected (legacy record)",
+                              )}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Hash: {formatAuditValue(question.submitterIpHash, "Unavailable")}
+                            </Typography>
+                          </Box>
+                          <Box sx={{ minWidth: 220, flex: "1 1 220px" }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Submitter user agent
+                            </Typography>
+                            <Typography variant="body2" className="text-break">
+                              {formatAuditValue(
+                                question.submitterUserAgent,
+                                "Not collected",
+                              )}
+                            </Typography>
+                          </Box>
+                        </Stack>
+
+                        <Stack spacing={1}>
+                          <Typography variant="caption" color="text.secondary">
+                            Full question
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ whiteSpace: "pre-wrap" }}
+                            className="text-break"
+                          >
+                            {question.content}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {question.imageUrl ? "Question image attached" : "Question has no image"}
+                          </Typography>
+                        </Stack>
+
+                        <Stack spacing={1}>
+                          <Typography variant="caption" color="text.secondary">
+                            Full answer
+                          </Typography>
+                          {!question.answer ? (
+                            <Typography variant="body2" color="text.secondary">
+                              No answer saved.
+                            </Typography>
+                          ) : question.answer.deletedAt ? (
+                            <Typography variant="body2" color="text.secondary">
+                              Answer removed by moderation.
+                            </Typography>
+                          ) : (
+                            <>
+                              <Typography
+                                variant="body2"
+                                sx={{ whiteSpace: "pre-wrap" }}
+                                className="text-break"
+                              >
+                                {question.answer.content}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {question.answer.imageUrl
+                                  ? "Answer image attached"
+                                  : "Answer has no image"}
+                              </Typography>
+                            </>
+                          )}
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              </Fragment>
             ))}
           </TableBody>
         </Table>

@@ -1,23 +1,20 @@
 import { QuestionStatus } from "@prisma/client";
 import { listAdminQuestions } from "@/features/admin/service";
+import { withApiHandler } from "@/lib/api";
 import { requireAdminApi } from "@/lib/auth/guards";
-import { errorResponse, getPageFromSearchParams, ok } from "@/lib/http";
+import { getPageFromSearchParams, ok } from "@/lib/http";
 
-export async function GET(request: Request) {
-  try {
-    await requireAdminApi();
-    const { searchParams } = new URL(request.url);
+export const GET = withApiHandler(async (request: Request) => {
+  await requireAdminApi();
+  const { searchParams } = new URL(request.url);
 
-    return ok(
-      await listAdminQuestions({
-        q: searchParams.get("q") ?? undefined,
-        status:
-          (searchParams.get("status") as QuestionStatus | "ALL" | null) ?? "ALL",
-        page: getPageFromSearchParams(searchParams.get("page") ?? undefined),
-        pageSize: 20,
-      }),
-    );
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+  return ok(
+    await listAdminQuestions({
+      q: searchParams.get("q") ?? undefined,
+      status:
+        (searchParams.get("status") as QuestionStatus | "ALL" | null) ?? "ALL",
+      page: getPageFromSearchParams(searchParams.get("page") ?? undefined),
+      pageSize: 20,
+    }),
+  );
+});

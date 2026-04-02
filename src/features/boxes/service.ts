@@ -6,14 +6,14 @@ import {
 } from "@prisma/client";
 import { addMinutes } from "date-fns";
 import { createHash } from "node:crypto";
-import { prisma } from "@/lib/db";
+import { prisma, runSerializableTransaction } from "@/lib/db";
 import { getEnv } from "@/lib/env";
 import { AppError } from "@/lib/http";
 import {
   RATE_LIMIT_SUBMISSIONS_PER_WINDOW,
   RATE_LIMIT_WINDOW_MINUTES,
 } from "@/lib/constants";
-import { uploadImage } from "@/lib/storage/minio";
+import { removeImageByUrl, uploadImage } from "@/lib/storage/minio";
 import {
   answerTextSchema,
   boxInputSchema,
@@ -222,40 +222,57 @@ export async function saveAnswerForQuestion(
   }
 
   const content = answerTextSchema.parse(payload.content);
-  const imageUrl = payload.image
-    ? await uploadImage(payload.image, `answers/${boxId}`)
-    : question.answer?.deletedAt
-      ? null
-      : question.answer?.imageUrl ?? null;
+  const fallbackImageUrl = question.answer?.deletedAt
+    ? null
+    : question.answer?.imageUrl ?? null;
+  let uploadedImageUrl: string | null = null;
 
-  const answer = await prisma.answer.upsert({
-    where: {
-      questionId,
-    },
-    update: {
-      content,
-      imageUrl,
-      deletedAt: null,
-    },
-    create: {
-      questionId,
-      content,
-      imageUrl,
-      deletedAt: null,
-    },
-  });
+  try {
+    uploadedImageUrl = payload.image
+      ? await uploadImage(payload.image, `answers/${boxId}`)
+      : null;
 
-  await prisma.question.update({
-    where: { id: questionId },
-    data: {
-      status:
-        question.status === QuestionStatus.PUBLISHED
-          ? QuestionStatus.PUBLISHED
-          : QuestionStatus.ANSWERED,
-    },
-  });
+    const imageUrl = uploadedImageUrl ?? fallbackImageUrl;
 
-  return answer;
+    const answer = await prisma.$transaction(async (tx) => {
+      const savedAnswer = await tx.answer.upsert({
+        where: {
+          questionId,
+        },
+        update: {
+          content,
+          imageUrl,
+          deletedAt: null,
+        },
+        create: {
+          questionId,
+          content,
+          imageUrl,
+          deletedAt: null,
+        },
+      });
+
+      await tx.question.update({
+        where: { id: questionId },
+        data: {
+          status:
+            question.status === QuestionStatus.PUBLISHED
+              ? QuestionStatus.PUBLISHED
+              : QuestionStatus.ANSWERED,
+        },
+      });
+
+      return savedAnswer;
+    });
+
+    return answer;
+  } catch (error) {
+    if (uploadedImageUrl) {
+      await removeImageByUrl(uploadedImageUrl);
+    }
+
+    throw error;
+  }
 }
 
 export async function publishQuestionForOwner(
@@ -368,6 +385,7 @@ export async function submitPublicQuestion(input: {
   content: string;
   image?: File | null;
   ipAddress: string;
+  userAgent: string;
 }) {
   const box = await prisma.questionBox.findUnique({
     where: {
@@ -386,37 +404,51 @@ export async function submitPublicQuestion(input: {
   const submitterIpHash = hashSubmitterIp(input.ipAddress || "unknown");
   const windowStart = addMinutes(new Date(), -RATE_LIMIT_WINDOW_MINUTES);
 
-  const recentSubmissions = await prisma.question.count({
-    where: {
-      boxId: box.id,
-      submitterIpHash,
-      submittedAt: {
-        gte: windowStart,
-      },
-    },
-  });
-
-  if (recentSubmissions >= RATE_LIMIT_SUBMISSIONS_PER_WINDOW) {
-    throw new AppError(
-      429,
-      "Too many submissions from this address. Please try again later.",
-      "RATE_LIMITED",
-    );
-  }
-
   const content = questionTextSchema.parse(input.content);
-  const imageUrl = input.image
-    ? await uploadImage(input.image, `questions/${box.id}`)
-    : null;
+  let uploadedImageUrl: string | null = null;
 
-  return prisma.question.create({
-    data: {
-      boxId: box.id,
-      content,
-      imageUrl,
-      submitterIpHash,
-    },
-  });
+  try {
+    uploadedImageUrl = input.image
+      ? await uploadImage(input.image, `questions/${box.id}`)
+      : null;
+
+    return await runSerializableTransaction(async (tx) => {
+      const recentSubmissions = await tx.question.count({
+        where: {
+          boxId: box.id,
+          submitterIpHash,
+          submittedAt: {
+            gte: windowStart,
+          },
+        },
+      });
+
+      if (recentSubmissions >= RATE_LIMIT_SUBMISSIONS_PER_WINDOW) {
+        throw new AppError(
+          429,
+          "Too many submissions from this address. Please try again later.",
+          "RATE_LIMITED",
+        );
+      }
+
+      return tx.question.create({
+        data: {
+          boxId: box.id,
+          content,
+          imageUrl: uploadedImageUrl,
+          submitterIpHash,
+          submitterIp: input.ipAddress || null,
+          submitterUserAgent: input.userAgent || null,
+        },
+      });
+    });
+  } catch (error) {
+    if (uploadedImageUrl) {
+      await removeImageByUrl(uploadedImageUrl);
+    }
+
+    throw error;
+  }
 }
 
 export function isBoxVisibleToViewer(

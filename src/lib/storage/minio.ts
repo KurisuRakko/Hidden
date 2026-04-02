@@ -91,3 +91,30 @@ export async function uploadImage(file: File, prefix: string) {
 
   return `${env.MINIO_PUBLIC_URL}/${env.MINIO_BUCKET}/${objectName}`;
 }
+
+export async function removeImageByUrl(imageUrl: string) {
+  const env = getEnv();
+  const publicBaseUrl = `${env.MINIO_PUBLIC_URL}/${env.MINIO_BUCKET}/`;
+
+  if (!imageUrl.startsWith(publicBaseUrl)) {
+    return;
+  }
+
+  const objectName = imageUrl.slice(publicBaseUrl.length);
+
+  if (!objectName) {
+    return;
+  }
+
+  try {
+    await getClient().removeObject(env.MINIO_BUCKET, objectName);
+  } catch (error) {
+    console.error("Failed to remove uploaded image after rollback.", error);
+  }
+}
+
+export async function checkStorageHealth() {
+  const env = getEnv();
+
+  await getClient().bucketExists(env.MINIO_BUCKET);
+}

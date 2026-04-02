@@ -3,15 +3,11 @@ import {
   clearSessionCookieOnResponse,
   destroyCurrentSession,
 } from "@/lib/auth/session";
-import { errorResponse } from "@/lib/http";
+import { withApiHandler } from "@/lib/api";
 
-export async function POST() {
-  try {
-    await destroyCurrentSession();
-    const response = NextResponse.json({ success: true });
-    clearSessionCookieOnResponse(response);
-    return response;
-  } catch (error) {
-    return errorResponse(error);
-  }
-}
+export const POST = withApiHandler(async () => {
+  await destroyCurrentSession();
+  const response = NextResponse.json({ success: true });
+  clearSessionCookieOnResponse(response);
+  return response;
+});
