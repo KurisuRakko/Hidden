@@ -28,11 +28,11 @@ export default async function AdminLoginPage({
   );
 
   if (viewer?.role === "ADMIN") {
-    redirect(getAdminAppUrl("/admin"));
+    redirect(await getAdminAppUrl("/admin"));
   }
 
   if (viewer?.role === "USER") {
-    redirect(getPublicAppUrl("/dashboard"));
+    redirect(await getPublicAppUrl("/dashboard"));
   }
 
   const params = await searchParams;

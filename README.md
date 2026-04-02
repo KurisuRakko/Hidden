@@ -40,6 +40,14 @@ docker compose up --build
 
 - Web app: [http://localhost:3000](http://localhost:3000)
 - MinIO console: [http://localhost:9001](http://localhost:9001)
+- Admin portal from the same computer: [http://localhost:3001/admin-login](http://localhost:3001/admin-login)
+- Admin portal from another device on the same LAN: `http://<your-computer-lan-ip>:3001/admin-login`
+
+To make the admin portal usable from other devices on the same LAN:
+
+- keep `ADMIN_BIND_HOST=0.0.0.0` in `.env`
+- set `ADMIN_APP_URL` to your computer's LAN address, for example `http://192.168.1.20:3001`
+- restart the stack with `docker compose up --build`
 
 On container startup, Hidden will automatically:
 
@@ -75,6 +83,7 @@ The default sample values in `.env.example` are:
 - `/admin/boxes`
 - `/admin/questions`
 - `/admin/invites`
+- `/admin-login`
 
 ## Development Notes
 

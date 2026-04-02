@@ -128,7 +128,7 @@ export async function getCurrentSession() {
   return payload;
 }
 
-export async function requireSessionUser() {
+export async function requireActiveSession() {
   const payload = await getCurrentSession();
 
   if (!payload) {
@@ -142,6 +142,12 @@ export async function requireSessionUser() {
       "USER_DISABLED",
     );
   }
+
+  return payload;
+}
+
+export async function requireSessionUser() {
+  const payload = await requireActiveSession();
 
   return payload.user;
 }

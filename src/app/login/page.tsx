@@ -21,7 +21,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   );
 
   if (viewer) {
-    redirect(viewer.role === "ADMIN" ? getAdminAppUrl("/admin") : "/dashboard");
+    redirect(
+      viewer.role === "ADMIN" ? await getAdminAppUrl("/admin") : "/dashboard",
+    );
   }
 
   const params = await searchParams;

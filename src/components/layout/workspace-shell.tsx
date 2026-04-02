@@ -3,8 +3,6 @@
 import Link from "next/link";
 import {
   Box,
-  BottomNavigation,
-  BottomNavigationAction,
   Button,
   Card,
   CardContent,
@@ -13,12 +11,11 @@ import {
 } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { LogoutButton } from "@/components/common/logout-button";
-
-type WorkspaceNavItem = {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-};
+import {
+  getActiveWorkspaceNavItem,
+  isWorkspaceNavItemActive,
+  type WorkspaceNavItem,
+} from "@/components/layout/workspace-navigation";
 
 type WorkspaceShellProps = {
   title: string;
@@ -29,8 +26,6 @@ type WorkspaceShellProps = {
   };
   navigation: WorkspaceNavItem[];
   children: React.ReactNode;
-  mobileNavigation?: boolean;
-  mobileNavigationVariant?: "tabs" | "bottom";
   logoutRedirectTo?: string;
 };
 
@@ -40,19 +35,14 @@ export function WorkspaceShell({
   viewer,
   navigation,
   children,
-  mobileNavigation = false,
-  mobileNavigationVariant = "tabs",
   logoutRedirectTo = "/",
 }: WorkspaceShellProps) {
   const pathname = usePathname();
-  const showBottomNavigation = mobileNavigation && mobileNavigationVariant === "bottom";
-  const activeNavigation =
-    navigation.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
-      ?.href ?? navigation[0]?.href;
+  const activeNavigation = getActiveWorkspaceNavItem(navigation, pathname);
 
   return (
     <Box
-      className={`safe-shell${showBottomNavigation ? " safe-bottom-nav" : ""}`}
+      className="safe-shell"
       sx={{
         px: { xs: 1.5, sm: 2, md: 4 },
         py: { xs: 1.5, sm: 2.5, md: 5 },
@@ -94,55 +84,21 @@ export function WorkspaceShell({
           </CardContent>
         </Card>
 
-        {mobileNavigation && mobileNavigationVariant === "tabs" ? (
-          <Box sx={{ display: { xs: "block", lg: "none" } }} className="touch-scroll-x">
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ minWidth: "max-content", pb: 0.5, px: 0.25 }}
-              className="motion-enter-soft motion-delay-1"
-            >
-              {navigation.map((item) => {
-                const active =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-                return (
-                  <Button
-                    key={item.href}
-                    component={Link}
-                    href={item.href}
-                    color={active ? "primary" : "inherit"}
-                    variant={active ? "contained" : "outlined"}
-                    startIcon={item.icon}
-                    sx={{
-                      whiteSpace: "nowrap",
-                      flexShrink: 0,
-                      minHeight: 42,
-                    }}
-                  >
-                    {item.label}
-                  </Button>
-                );
-              })}
-            </Stack>
-          </Box>
-        ) : null}
-
         <Stack direction={{ xs: "column", lg: "row" }} spacing={3} alignItems="flex-start">
           <Card
+            className="workspace-sidebar motion-enter-soft motion-delay-1"
             sx={{
-              display: { xs: mobileNavigation ? "none" : "block", lg: "block" },
               width: { xs: "100%", lg: 280 },
               position: { xl: "sticky" },
               top: { xl: "calc(env(safe-area-inset-top) + 24px)" },
             }}
-            className="motion-enter-soft motion-delay-1"
           >
             <CardContent sx={{ p: 2 }}>
               <Stack spacing={1}>
                 {navigation.map((item) => {
                   const active =
-                    pathname === item.href || pathname.startsWith(`${item.href}/`);
+                    activeNavigation?.href === item.href &&
+                    isWorkspaceNavItemActive(item, pathname);
 
                   return (
                     <Button
@@ -167,23 +123,6 @@ export function WorkspaceShell({
           </Box>
         </Stack>
       </Stack>
-
-      {showBottomNavigation ? (
-        <Box sx={{ display: { xs: "block", lg: "none" } }} className="mobile-bottom-nav surface-glass">
-          <BottomNavigation showLabels value={activeNavigation ?? false}>
-            {navigation.map((item) => (
-              <BottomNavigationAction
-                key={item.href}
-                component={Link}
-                href={item.href}
-                value={item.href}
-                label={item.label}
-                icon={item.icon}
-              />
-            ))}
-          </BottomNavigation>
-        </Box>
-      ) : null}
     </Box>
   );
 }

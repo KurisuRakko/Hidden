@@ -34,15 +34,15 @@ export async function requireAdminPage() {
   const viewer = await getViewer();
 
   if (!viewer) {
-    redirect(getAdminAppUrl("/admin-login"));
+    redirect(await getAdminAppUrl("/admin-login"));
   }
 
   if (viewer.status !== "ACTIVE") {
-    redirect(getAdminAppUrl("/admin-login?disabled=1"));
+    redirect(await getAdminAppUrl("/admin-login?disabled=1"));
   }
 
   if (viewer.role !== UserRole.ADMIN) {
-    redirect(getPublicAppUrl("/dashboard"));
+    redirect(await getPublicAppUrl("/dashboard"));
   }
 
   return viewer;

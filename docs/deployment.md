@@ -54,6 +54,7 @@ Important variables:
 ```env
 APP_URL=https://hidden.example.com
 ADMIN_APP_URL=https://admin.hidden.internal
+ADMIN_BIND_HOST=127.0.0.1
 DATABASE_URL=postgresql://hidden:<strong-db-password>@db:5432/hidden?schema=public
 
 SESSION_SECRET=<long-random-secret>
@@ -80,6 +81,7 @@ Notes:
 
 - `APP_URL` should be the final public site URL.
 - `ADMIN_APP_URL` should be the internal-only admin login URL, for example `https://admin.hidden.internal` or `http://127.0.0.1:3001`.
+- `ADMIN_BIND_HOST` controls which host interface exposes port `3001`. Use `127.0.0.1` for loopback-only access, a specific private IP for one NIC, or `0.0.0.0` to allow the whole LAN to reach it.
 - `DATABASE_URL` should keep `db` as the hostname when using the included `docker-compose.yml`.
 - `MINIO_PUBLIC_URL` must be the public base URL that browsers can actually access.
 - Change every default secret before deployment.
@@ -129,10 +131,11 @@ The included Compose stack now puts Nginx in front of the Next app:
 - public site: host port `3000`
 - admin portal: host port `3001`
 
-By default, the admin port is bound to `127.0.0.1`, which keeps it off public interfaces on the same host. For production, either:
+The admin port binding comes from `ADMIN_BIND_HOST`. For production, either:
 
 - keep the admin listener bound to loopback and reach it through SSH/VPN, or
-- bind it to a private interface that is only reachable from your internal network
+- bind it to a private interface that is only reachable from your internal network, or
+- use `0.0.0.0` only when the surrounding LAN is trusted and host-level firewall rules are in place
 
 The proxy config lives at `docker/nginx/hidden.conf` and enforces:
 
@@ -145,6 +148,16 @@ If you place another reverse proxy in front of this stack, keep the same split:
 - public host -> proxy port `3000`
 - internal admin host -> proxy port `3001`
 - MinIO public host -> `MINIO_PUBLIC_URL`
+
+For home or office LAN testing without DNS, a practical setup is:
+
+```env
+APP_URL=http://192.168.1.20:3000
+ADMIN_APP_URL=http://192.168.1.20:3001
+ADMIN_BIND_HOST=0.0.0.0
+```
+
+Replace `192.168.1.20` with the Linux host's actual LAN IP.
 
 ## 7. Verify the Deployment
 

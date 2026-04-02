@@ -120,7 +120,7 @@ export async function loginUser(input: {
       "Administrator accounts must sign in through the internal admin portal.",
       "ADMIN_PORTAL_REQUIRED",
       {
-        adminLoginUrl: getAdminAppUrl("/admin-login"),
+        adminLoginUrl: await getAdminAppUrl("/admin-login"),
       },
     );
   }
@@ -146,5 +146,76 @@ export async function loginUser(input: {
   return {
     user,
     session,
+  };
+}
+
+export async function changePassword(input: {
+  userId: string;
+  sessionId: string;
+  currentPassword: string;
+  newPassword: string;
+}) {
+  const currentPassword = passwordSchema.parse(input.currentPassword);
+  const newPassword = passwordSchema.parse(input.newPassword);
+
+  const user = await prisma.user.findUnique({
+    where: { id: input.userId },
+    select: {
+      id: true,
+      passwordHash: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError(401, "Authentication required", "UNAUTHORIZED");
+  }
+
+  const currentPasswordMatches = await bcrypt.compare(
+    currentPassword,
+    user.passwordHash,
+  );
+
+  if (!currentPasswordMatches) {
+    throw new AppError(
+      400,
+      "Current password is incorrect.",
+      "CURRENT_PASSWORD_INCORRECT",
+    );
+  }
+
+  const isSamePassword = await bcrypt.compare(newPassword, user.passwordHash);
+
+  if (isSamePassword) {
+    throw new AppError(
+      400,
+      "New password must be different from your current password.",
+      "PASSWORD_UNCHANGED",
+    );
+  }
+
+  const newPasswordHash = await bcrypt.hash(newPassword, 12);
+
+  const signedOutSessions = await runSerializableTransaction(async (tx) => {
+    await tx.user.update({
+      where: { id: input.userId },
+      data: {
+        passwordHash: newPasswordHash,
+      },
+    });
+
+    const result = await tx.session.deleteMany({
+      where: {
+        userId: input.userId,
+        id: {
+          not: input.sessionId,
+        },
+      },
+    });
+
+    return result.count;
+  });
+
+  return {
+    signedOutOtherSessions: signedOutSessions,
   };
 }

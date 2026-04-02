@@ -15,7 +15,9 @@ export default async function RegisterPage() {
   );
 
   if (viewer) {
-    redirect(viewer.role === "ADMIN" ? getAdminAppUrl("/admin") : "/dashboard");
+    redirect(
+      viewer.role === "ADMIN" ? await getAdminAppUrl("/admin") : "/dashboard",
+    );
   }
 
   return (

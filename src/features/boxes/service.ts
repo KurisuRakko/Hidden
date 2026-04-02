@@ -176,6 +176,28 @@ export async function getBoxDetailForOwner(boxId: string, ownerId: string) {
   };
 }
 
+export async function getBoxSummaryForOwner(boxId: string, ownerId: string) {
+  const box = await prisma.questionBox.findFirst({
+    where: {
+      id: boxId,
+      ownerId,
+    },
+    include: {
+      _count: {
+        select: {
+          questions: true,
+        },
+      },
+    },
+  });
+
+  if (!box) {
+    throw new AppError(404, "Question box not found.", "BOX_NOT_FOUND");
+  }
+
+  return box;
+}
+
 export async function listQuestionsForOwnerBox(boxId: string, ownerId: string) {
   await getOwnedBoxOrThrow(boxId, ownerId);
 

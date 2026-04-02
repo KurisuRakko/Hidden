@@ -8,16 +8,77 @@ export const ADMIN_PORTAL_HEADER_VALUE = "1";
 
 export type AuthPortal = "PUBLIC" | "ADMIN";
 
+const LOOPBACK_HOSTNAMES = new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1"]);
+
 function joinAppUrl(baseUrl: string, pathname: string) {
   return new URL(pathname, `${baseUrl}/`).toString();
 }
 
-export function getAdminAppUrl(pathname = "/admin") {
-  return joinAppUrl(getEnv().ADMIN_APP_URL, pathname);
+function isLoopbackHostname(hostname: string) {
+  return LOOPBACK_HOSTNAMES.has(hostname.replace(/^\[(.*)\]$/, "$1"));
 }
 
-export function getPublicAppUrl(pathname = "/") {
-  return joinAppUrl(getEnv().APP_URL, pathname);
+function getRequestOrigin(headerStore: Headers) {
+  const host =
+    headerStore.get("x-forwarded-host") ??
+    headerStore.get("host") ??
+    headerStore.get(":authority");
+
+  if (!host) {
+    return null;
+  }
+
+  const protocol = headerStore.get("x-forwarded-proto") ?? "http";
+  return `${protocol}://${host}`;
+}
+
+function resolvePortalBaseUrl(baseUrl: string, requestOrigin: string | null) {
+  if (!requestOrigin) {
+    return baseUrl;
+  }
+
+  const resolvedBaseUrl = new URL(baseUrl);
+  const resolvedRequestOrigin = new URL(requestOrigin);
+
+  if (!isLoopbackHostname(resolvedBaseUrl.hostname)) {
+    return resolvedBaseUrl.toString();
+  }
+
+  if (isLoopbackHostname(resolvedRequestOrigin.hostname)) {
+    return resolvedBaseUrl.toString();
+  }
+
+  // Keep the configured port, but reuse the active LAN host so redirects stay reachable.
+  resolvedBaseUrl.protocol = resolvedRequestOrigin.protocol;
+  resolvedBaseUrl.hostname = resolvedRequestOrigin.hostname;
+
+  return resolvedBaseUrl.toString();
+}
+
+export async function getAdminAppUrl(pathname = "/admin") {
+  const headerStore = await headers();
+  const requestOrigin = getRequestOrigin(headerStore);
+  const isAdminPortalRequest = isAdminPortalHeaderValue(
+    headerStore.get(ADMIN_PORTAL_HEADER),
+  );
+  const baseUrl = isAdminPortalRequest
+    ? requestOrigin ?? getEnv().ADMIN_APP_URL
+    : resolvePortalBaseUrl(getEnv().ADMIN_APP_URL, requestOrigin);
+
+  return joinAppUrl(baseUrl, pathname);
+}
+
+export async function getPublicAppUrl(pathname = "/") {
+  const headerStore = await headers();
+  const requestOrigin = getRequestOrigin(headerStore);
+  const isAdminPortalRequest = isAdminPortalHeaderValue(
+    headerStore.get(ADMIN_PORTAL_HEADER),
+  );
+  const baseUrl = isAdminPortalRequest
+    ? resolvePortalBaseUrl(getEnv().APP_URL, requestOrigin)
+    : requestOrigin ?? getEnv().APP_URL;
+
+  return joinAppUrl(baseUrl, pathname);
 }
 
 export function isAdminPortalHeaderValue(value: string | null) {

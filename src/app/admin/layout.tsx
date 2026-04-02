@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       title="Admin console"
       description="Review users, boxes, questions, and invite codes across the whole platform."
       viewer={viewer}
-      logoutRedirectTo={getAdminAppUrl("/admin-login")}
+      logoutRedirectTo={await getAdminAppUrl("/admin-login")}
       navigation={[
         {
           href: "/admin",

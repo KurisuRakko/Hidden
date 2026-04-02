@@ -25,9 +25,15 @@ type BoxFormValues = {
 
 type BoxFormProps = {
   initialValues?: BoxFormValues;
+  createRedirectMode?: "detail" | "created";
+  submitLabel?: string;
 };
 
-export function BoxForm({ initialValues }: BoxFormProps) {
+export function BoxForm({
+  initialValues,
+  createRedirectMode = "detail",
+  submitLabel,
+}: BoxFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -69,7 +75,11 @@ export function BoxForm({ initialValues }: BoxFormProps) {
       }
 
       if (!initialValues?.id) {
-        router.push(`/dashboard/boxes/${result.id}`);
+        router.push(
+          createRedirectMode === "created"
+            ? `/dashboard/boxes/${result.id}/created`
+            : `/dashboard/boxes/${result.id}`,
+        );
       } else {
         router.refresh();
       }
@@ -118,13 +128,13 @@ export function BoxForm({ initialValues }: BoxFormProps) {
         <MenuItem value="HIDDEN">Hidden</MenuItem>
       </TextField>
       <Box
-        sx={{
+        sx={(theme) => ({
           px: 1.5,
           py: 1,
           borderRadius: "14px",
-          bgcolor: "rgba(255, 255, 255, 0.52)",
-          border: "1px solid rgba(32, 34, 39, 0.06)",
-        }}
+          bgcolor: theme.palette.action.hover,
+          border: `1px solid ${theme.palette.divider}`,
+        })}
       >
         <FormControlLabel
           control={
@@ -144,7 +154,9 @@ export function BoxForm({ initialValues }: BoxFormProps) {
         size="large"
         sx={{ width: { xs: "100%", sm: "auto" } }}
       >
-        {submitting ? "Saving..." : initialValues?.id ? "Save changes" : "Create box"}
+        {submitting
+          ? "Saving..."
+          : submitLabel ?? (initialValues?.id ? "Save changes" : "Create box")}
       </Button>
     </Stack>
   );

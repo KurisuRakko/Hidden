@@ -38,7 +38,9 @@ export const POST = withApiHandler(async (request: Request) => {
     portal,
   });
   const redirectTo =
-    result.user.role === "ADMIN" ? getAdminAppUrl("/admin") : "/dashboard";
+    result.user.role === "ADMIN"
+      ? await getAdminAppUrl("/admin")
+      : "/dashboard";
   const response = NextResponse.json({
     user: serializeUser(result.user),
     redirectTo,
