@@ -2,8 +2,9 @@
 
 This document describes the recommended production deployment flow for Hidden on a single Linux host with Docker Compose.
 
-Hidden currently ships as three services:
+Hidden currently ships as four services:
 
+- `proxy`: Nginx reverse proxy with separate public and admin listeners
 - `web`: Next.js application
 - `db`: PostgreSQL
 - `storage`: MinIO
@@ -21,8 +22,9 @@ The existing container startup flow already does the following automatically:
 - A domain or subdomain for the web app
 - A public URL for MinIO object access, or a reverse proxy route that exposes the bucket publicly
 - Open ports for:
-  - `80` and `443` for the reverse proxy
-  - internal access between `web`, `db`, and `storage`
+  - the public app listener
+  - a private admin listener
+  - internal access between `proxy`, `web`, `db`, and `storage`
 
 Recommended minimum:
 
@@ -51,6 +53,7 @@ Important variables:
 
 ```env
 APP_URL=https://hidden.example.com
+ADMIN_APP_URL=https://admin.hidden.internal
 DATABASE_URL=postgresql://hidden:<strong-db-password>@db:5432/hidden?schema=public
 
 SESSION_SECRET=<long-random-secret>
@@ -76,6 +79,7 @@ SEED_DEFAULT_INVITE=HIDDEN-MVP
 Notes:
 
 - `APP_URL` should be the final public site URL.
+- `ADMIN_APP_URL` should be the internal-only admin login URL, for example `https://admin.hidden.internal` or `http://127.0.0.1:3001`.
 - `DATABASE_URL` should keep `db` as the hostname when using the included `docker-compose.yml`.
 - `MINIO_PUBLIC_URL` must be the public base URL that browsers can actually access.
 - Change every default secret before deployment.
@@ -113,42 +117,51 @@ docker compose ps
 Watch logs during first boot:
 
 ```bash
-docker compose logs -f web
+docker compose logs -f proxy web
 ```
 
 On the first startup, the `web` container will wait for PostgreSQL, apply migrations, seed default data, initialize MinIO, and then start the app.
 
-## 6. Configure the Reverse Proxy
+## 6. Public and Admin Port Split
 
-Hidden listens on port `3000` inside the `web` container. In production, place a reverse proxy such as Nginx, Caddy, or Traefik in front of it.
+The included Compose stack now puts Nginx in front of the Next app:
 
-Your proxy should:
+- public site: host port `3000`
+- admin portal: host port `3001`
 
-- terminate TLS
-- forward the public site to `http://127.0.0.1:3000`
-- expose the MinIO public endpoint used by `MINIO_PUBLIC_URL`
+By default, the admin port is bound to `127.0.0.1`, which keeps it off public interfaces on the same host. For production, either:
 
-Example routing layout:
+- keep the admin listener bound to loopback and reach it through SSH/VPN, or
+- bind it to a private interface that is only reachable from your internal network
 
-- `https://hidden.example.com` -> Hidden web app
-- `https://media.example.com` -> MinIO object endpoint
+The proxy config lives at `docker/nginx/hidden.conf` and enforces:
 
-If you do not expose MinIO through a separate public host, make sure whatever URL you use in `MINIO_PUBLIC_URL` is reachable by browser clients and serves the bucket objects correctly.
+- public listener blocks `/admin`, `/admin-login`, and `/api/admin`
+- admin listener serves `/admin-login`, `/admin`, `/api/admin`, shared assets, and auth endpoints
+- admin listener injects the `x-hidden-admin-portal: 1` header required by the app
+
+If you place another reverse proxy in front of this stack, keep the same split:
+
+- public host -> proxy port `3000`
+- internal admin host -> proxy port `3001`
+- MinIO public host -> `MINIO_PUBLIC_URL`
 
 ## 7. Verify the Deployment
 
 After startup, verify:
 
 1. The site opens at your public `APP_URL`
-2. Registration works with the configured invite code
-3. The seeded admin can sign in
-4. A user can create a box
-5. A visitor can submit a question
-6. An uploaded image is publicly visible through `MINIO_PUBLIC_URL`
+2. The admin login opens only at `ADMIN_APP_URL`
+3. Registration works with the configured invite code
+4. The seeded admin can sign in through `ADMIN_APP_URL/admin-login`
+5. A user can create a box
+6. A visitor can submit a question
+7. An uploaded image is publicly visible through `MINIO_PUBLIC_URL`
 
 Useful checks:
 
 ```bash
+docker compose logs --tail=200 proxy
 docker compose logs --tail=200 web
 docker compose logs --tail=200 db
 docker compose logs --tail=200 storage
@@ -176,7 +189,7 @@ docker compose restart
 Restart only the app:
 
 ```bash
-docker compose restart web
+docker compose restart proxy web
 ```
 
 Stop without removing volumes:
@@ -217,6 +230,7 @@ Usually one of these is wrong:
 Check:
 
 ```bash
+docker compose logs proxy
 docker compose logs web
 docker compose logs storage
 ```

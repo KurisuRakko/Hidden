@@ -80,7 +80,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                           src={question.imageUrl}
                           alt="Question attachment"
                           sx={{
-                            borderRadius: 16,
+                            borderRadius: "14px",
                             maxHeight: 360,
                             width: "100%",
                             objectFit: "cover",
@@ -100,7 +100,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                             src={question.answer.imageUrl}
                             alt="Answer attachment"
                             sx={{
-                              borderRadius: 16,
+                              borderRadius: "14px",
                               maxHeight: 360,
                               width: "100%",
                               objectFit: "cover",

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowForwardRounded,
-  DashboardRounded,
   LockOpenRounded,
   PublicRounded,
   SecurityRounded,
@@ -21,30 +20,44 @@ import { PublicShell } from "@/components/layout/public-shell";
 export default function Home() {
   return (
     <PublicShell>
-      <Box sx={{ py: { xs: 6, md: 10 } }}>
-        <Stack spacing={6}>
+      <Box sx={{ py: { xs: 4.5, sm: 6, md: 10 } }}>
+        <Stack spacing={{ xs: 4, sm: 5, md: 6 }}>
           <Box
             className="motion-enter"
             sx={{
-              borderRadius: 7,
-              px: { xs: 3, md: 6 },
-              py: { xs: 4, md: 7 },
+              borderRadius: "24px",
+              px: { xs: 2.5, sm: 3.5, md: 6 },
+              py: { xs: 3.5, sm: 5, md: 7 },
               bgcolor: "rgba(255, 255, 255, 0.9)",
               boxShadow: 4,
               border: "1px solid rgba(30, 31, 36, 0.06)",
             }}
           >
-            <Stack spacing={3}>
+            <Stack spacing={{ xs: 2.5, sm: 3 }}>
               <Chip
                 label="Invite-only anonymous Q&A"
                 color="primary"
                 sx={{ width: "fit-content", fontWeight: 600 }}
               />
-              <Stack spacing={2} maxWidth={760}>
-                <Typography variant="h2" sx={{ fontSize: { xs: 34, md: 54 } }} className="text-break">
+              <Stack spacing={1.5} maxWidth={{ xs: 560, md: 760 }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontSize: { xs: 30, sm: 40, md: 54 },
+                    lineHeight: { xs: 1.12, md: 1.05 },
+                  }}
+                  className="text-break"
+                >
                   Hidden gives every creator a calm, moderated anonymous inbox.
                 </Typography>
-                <Typography variant="h6" color="text.secondary">
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{
+                    fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" },
+                    maxWidth: 640,
+                  }}
+                >
                   Visitors ask freely. Owners review first, answer on their own
                   pace, and publish only what deserves a place on the public page.
                 </Typography>
@@ -70,21 +83,11 @@ export default function Home() {
                 >
                   Sign in
                 </Button>
-                <Button
-                  component={Link}
-                  href="/dashboard"
-                  variant="text"
-                  size="large"
-                  startIcon={<DashboardRounded />}
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
-                >
-                  Open dashboard
-                </Button>
               </Stack>
             </Stack>
           </Box>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={{ xs: 2, md: 3 }}>
             {[
               {
                 title: "Public question boxes",
@@ -111,8 +114,8 @@ export default function Home() {
                 className={`motion-enter motion-delay-${Math.min(4, index + 1)}`}
               >
                 <Card sx={{ height: "100%" }} className="interactive-panel">
-                  <CardContent sx={{ p: 3.5 }}>
-                    <Stack spacing={2}>
+                  <CardContent sx={{ p: { xs: 2.5, sm: 3, md: 3.5 } }}>
+                    <Stack spacing={{ xs: 1.5, sm: 2 }}>
                       {item.icon}
                       <Typography variant="h5">{item.title}</Typography>
                       <Typography color="text.secondary">

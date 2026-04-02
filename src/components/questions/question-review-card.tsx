@@ -138,15 +138,19 @@ export function QuestionReviewCard({
 
   return (
     <Card className="motion-enter interactive-panel">
-      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
-        <Stack spacing={2.5}>
+      <CardContent sx={{ p: { xs: 2.25, sm: 3 } }}>
+        <Stack spacing={{ xs: 2.25, sm: 2.5 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
             spacing={1}
           >
             <Stack spacing={0.75}>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+              >
                 <Typography variant="h6">Anonymous question</Typography>
                 <StatusChip status={question.status} />
               </Stack>
@@ -168,7 +172,7 @@ export function QuestionReviewCard({
               src={question.imageUrl}
               alt="Question attachment"
               sx={{
-                borderRadius: 3,
+                borderRadius: "12px",
                 maxHeight: 320,
                 width: "100%",
                 objectFit: "cover",
@@ -209,14 +213,14 @@ export function QuestionReviewCard({
                 src={question.answer.imageUrl}
                 alt="Answer attachment"
                 sx={{
-                  borderRadius: 3,
+                  borderRadius: "12px",
                   maxHeight: 320,
                   width: "100%",
                   objectFit: "cover",
                 }}
               />
             ) : null}
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1.5}>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={1.25}>
               <Button
                 type="submit"
                 variant="contained"

@@ -10,8 +10,8 @@ type MetricCardProps = {
 export function MetricCard({ label, value, supporting, className }: MetricCardProps) {
   return (
     <Card className={className}>
-      <CardContent sx={{ p: { xs: 2.5, sm: 3 } }}>
-        <Stack spacing={1}>
+      <CardContent sx={{ p: { xs: 2.25, sm: 2.75, md: 3 } }}>
+        <Stack spacing={0.9}>
           <Typography variant="overline" color="text.secondary">
             {label}
           </Typography>

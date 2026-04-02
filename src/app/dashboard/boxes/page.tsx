@@ -12,7 +12,7 @@ export default async function DashboardBoxesPage() {
   const boxes = await listBoxesForOwner(viewer.id);
 
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={{ xs: 2, md: 3 }}>
       <Grid size={{ xs: 12, xl: 4 }}>
         <SectionCard
           className="motion-enter"
@@ -36,21 +36,25 @@ export default async function DashboardBoxesPage() {
               />
             ) : (
               boxes.map((box) => (
-              <Stack
-                key={box.id}
-                direction={{ xs: "column", md: "row" }}
-                justifyContent="space-between"
-                spacing={2}
-                className="interactive-panel"
-                sx={{
-                  px: 2.5,
-                  py: 2.5,
-                    borderRadius: 3,
+                <Stack
+                  key={box.id}
+                  direction={{ xs: "column", md: "row" }}
+                  justifyContent="space-between"
+                  spacing={{ xs: 1.75, md: 2 }}
+                  className="interactive-panel"
+                  sx={{
+                    px: { xs: 1.75, sm: 2.25, md: 2.5 },
+                    py: { xs: 1.75, sm: 2.25, md: 2.5 },
+                    borderRadius: "16px",
                     bgcolor: "rgba(255, 255, 255, 0.7)",
                   }}
                 >
                   <Stack spacing={1}>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1}
+                      alignItems={{ xs: "flex-start", sm: "center" }}
+                    >
                       <Typography variant="h6">{box.title}</Typography>
                       <StatusChip status={box.status} />
                     </Stack>
@@ -68,7 +72,7 @@ export default async function DashboardBoxesPage() {
                       {box._count.questions} total questions
                     </Typography>
                   </Stack>
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+                  <Stack direction={{ xs: "column", md: "row" }} spacing={1.25}>
                     <Button
                       component={Link}
                       href={`/b/${box.slug}`}

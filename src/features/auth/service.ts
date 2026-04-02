@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
+import { AuthPortal, getAdminAppUrl } from "@/lib/admin-portal";
 import { prisma } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { createSession } from "@/lib/auth/session";
@@ -74,7 +75,11 @@ export async function registerUser(input: {
   };
 }
 
-export async function loginUser(input: { phone: string; password: string }) {
+export async function loginUser(input: {
+  phone: string;
+  password: string;
+  portal: AuthPortal;
+}) {
   const phone = phoneSchema.parse(input.phone);
   const password = passwordSchema.parse(input.password);
 
@@ -90,6 +95,25 @@ export async function loginUser(input: { phone: string; password: string }) {
 
   if (!passwordMatches) {
     throw new AppError(401, "Phone number or password is incorrect.", "LOGIN_FAILED");
+  }
+
+  if (input.portal === "PUBLIC" && user.role === UserRole.ADMIN) {
+    throw new AppError(
+      403,
+      "Administrator accounts must sign in through the internal admin portal.",
+      "ADMIN_PORTAL_REQUIRED",
+      {
+        adminLoginUrl: getAdminAppUrl("/admin-login"),
+      },
+    );
+  }
+
+  if (input.portal === "ADMIN" && user.role !== UserRole.ADMIN) {
+    throw new AppError(
+      403,
+      "This login is reserved for administrator accounts.",
+      "ADMIN_ONLY_PORTAL",
+    );
   }
 
   if (user.status !== "ACTIVE") {

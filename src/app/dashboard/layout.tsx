@@ -19,6 +19,7 @@ export default async function DashboardLayout({
       title="User dashboard"
       description="Manage your question boxes, review submissions, and publish the Q&A you want to keep public."
       viewer={viewer}
+      mobileNavigation
       navigation={[
         {
           href: "/dashboard",

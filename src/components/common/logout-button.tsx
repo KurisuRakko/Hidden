@@ -10,12 +10,14 @@ type LogoutButtonProps = {
   variant?: "text" | "outlined" | "contained";
   size?: "small" | "medium" | "large";
   sx?: SxProps<Theme>;
+  redirectTo?: string;
 };
 
 export function LogoutButton({
   variant = "text",
   size = "medium",
   sx,
+  redirectTo = "/",
 }: LogoutButtonProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -28,7 +30,12 @@ export function LogoutButton({
         method: "POST",
       });
 
-      router.push("/");
+      if (/^https?:\/\//.test(redirectTo)) {
+        window.location.assign(redirectTo);
+        return;
+      }
+
+      router.push(redirectTo);
       router.refresh();
     } finally {
       setSubmitting(false);

@@ -26,6 +26,7 @@ export async function POST(request: Request) {
     const response = NextResponse.json(
       {
         user: serializeUser(result.user),
+        redirectTo: "/dashboard",
       },
       { status: 201 },
     );

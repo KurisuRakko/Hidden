@@ -16,17 +16,25 @@ import { useState } from "react";
 
 type AuthFormProps = {
   mode: "login" | "register";
+  portal?: "PUBLIC" | "ADMIN";
   notice?: string;
 };
 
-export function AuthForm({ mode, notice }: AuthFormProps) {
+export function AuthForm({
+  mode,
+  portal = "PUBLIC",
+  notice,
+}: AuthFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [errorActionUrl, setErrorActionUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const isAdminLogin = mode === "login" && portal === "ADMIN";
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
     setError(null);
+    setErrorActionUrl(null);
 
     const body =
       mode === "register"
@@ -38,6 +46,7 @@ export function AuthForm({ mode, notice }: AuthFormProps) {
         : {
             phone: String(formData.get("phone") ?? ""),
             password: String(formData.get("password") ?? ""),
+            portal,
           };
 
     try {
@@ -53,10 +62,27 @@ export function AuthForm({ mode, notice }: AuthFormProps) {
 
       if (!response.ok) {
         setError(result.error ?? "Request failed.");
+        setErrorActionUrl(
+          typeof result.details?.adminLoginUrl === "string"
+            ? result.details.adminLoginUrl
+            : null,
+        );
         return;
       }
 
-      router.push(result.user?.role === "ADMIN" ? "/admin" : "/dashboard");
+      const redirectTo =
+        typeof result.redirectTo === "string"
+          ? result.redirectTo
+          : result.user?.role === "ADMIN"
+            ? "/admin"
+            : "/dashboard";
+
+      if (/^https?:\/\//.test(redirectTo)) {
+        window.location.assign(redirectTo);
+        return;
+      }
+
+      router.push(redirectTo);
       router.refresh();
     } catch {
       setError("Network request failed. Please try again.");
@@ -66,19 +92,28 @@ export function AuthForm({ mode, notice }: AuthFormProps) {
   }
 
   return (
-    <Card className="motion-enter motion-delay-1" sx={{ maxWidth: 520, mx: "auto", overflow: "hidden" }}>
-      <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-        <Stack spacing={3}>
+    <Card
+      className="motion-enter motion-delay-1"
+      sx={{ maxWidth: 520, mx: "auto", overflow: "hidden" }}
+    >
+      <CardContent sx={{ p: { xs: 2.5, sm: 3.5, md: 4 } }}>
+        <Stack spacing={{ xs: 2.5, sm: 3 }}>
           <Box>
             <Typography
               variant="h4"
               gutterBottom
-              sx={{ fontSize: { xs: "1.85rem", sm: "2.125rem" } }}
+              sx={{ fontSize: { xs: "1.65rem", sm: "2rem", md: "2.125rem" } }}
             >
-              {mode === "login" ? "Sign in" : "Create your Hidden account"}
+              {isAdminLogin
+                ? "Admin sign in"
+                : mode === "login"
+                  ? "Sign in"
+                  : "Create your Hidden account"}
             </Typography>
             <Typography color="text.secondary">
-              {mode === "login"
+              {isAdminLogin
+                ? "Use the internal admin portal to review users, questions, and moderation logs."
+                : mode === "login"
                 ? "Use your phone number and password to continue."
                 : "Registration is invite-only in the first release."}
             </Typography>
@@ -88,11 +123,20 @@ export function AuthForm({ mode, notice }: AuthFormProps) {
             {notice ? <Alert severity="info">{notice}</Alert> : null}
           </Collapse>
           <Collapse in={Boolean(error)} unmountOnExit>
-            {error ? <Alert severity="error">{error}</Alert> : null}
+            {error ? (
+              <Stack spacing={1.25}>
+                <Alert severity="error">{error}</Alert>
+                {errorActionUrl ? (
+                  <Button component="a" href={errorActionUrl} variant="outlined">
+                    Open admin portal
+                  </Button>
+                ) : null}
+              </Stack>
+            ) : null}
           </Collapse>
 
           <Box component="form" action={handleSubmit}>
-            <Stack spacing={2.5}>
+            <Stack spacing={{ xs: 2, sm: 2.5 }}>
               <TextField
                 label="Phone number"
                 name="phone"
@@ -129,7 +173,9 @@ export function AuthForm({ mode, notice }: AuthFormProps) {
               >
                 {submitting
                   ? "Submitting..."
-                  : mode === "login"
+                  : isAdminLogin
+                    ? "Sign in to admin"
+                    : mode === "login"
                     ? "Sign in"
                     : "Register"}
               </Button>

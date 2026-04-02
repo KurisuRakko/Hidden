@@ -25,7 +25,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
 
   return (
     <Stack spacing={3}>
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, md: 4 }}>
           <MetricCard label="Pending" value={pendingCount} className="motion-enter" />
         </Grid>
@@ -48,7 +48,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, xl: 4 }}>
           <SectionCard
             className="motion-enter motion-delay-1"

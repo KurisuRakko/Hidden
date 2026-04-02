@@ -37,7 +37,7 @@ export default async function DashboardOverviewPage() {
 
   return (
     <Stack spacing={3}>
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, md: 4 }}>
           <MetricCard
             label="Question boxes"
@@ -77,12 +77,12 @@ export default async function DashboardOverviewPage() {
                 key={box.id}
                 direction={{ xs: "column", md: "row" }}
                 justifyContent="space-between"
-                spacing={2}
+                spacing={{ xs: 1.5, md: 2 }}
                 className="interactive-panel"
                 sx={{
-                  px: 2,
-                  py: 2.25,
-                  borderRadius: 3,
+                  px: { xs: 1.75, sm: 2 },
+                  py: { xs: 1.75, sm: 2.25 },
+                  borderRadius: "16px",
                   bgcolor: "rgba(255, 255, 255, 0.6)",
                 }}
               >

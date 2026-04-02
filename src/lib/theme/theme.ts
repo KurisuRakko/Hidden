@@ -35,7 +35,7 @@ export const appTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 12,
+    borderRadius: 4,
   },
   typography: {
     fontFamily: "var(--font-roboto), Roboto, sans-serif",
@@ -118,7 +118,7 @@ export const appTheme = createTheme({
         root: {
           minHeight: 42,
           paddingInline: 18,
-          borderRadius: 10,
+          borderRadius: 8,
           transition:
             "transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard)",
           "&:active": {
@@ -138,7 +138,7 @@ export const appTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 20,
+          borderRadius: 12,
           boxShadow:
             "0px 8px 24px rgba(15, 22, 36, 0.08), 0px 2px 6px rgba(15, 22, 36, 0.05)",
           border: "1px solid rgba(32, 34, 39, 0.06)",

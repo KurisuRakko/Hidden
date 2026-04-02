@@ -48,7 +48,7 @@ export default async function AdminOverviewPage() {
                 spacing={2}
                 sx={{
                   p: 2,
-                  borderRadius: 3,
+                  borderRadius: "16px",
                   bgcolor: "rgba(255, 255, 255, 0.65)",
                 }}
               >

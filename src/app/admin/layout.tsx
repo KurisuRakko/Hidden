@@ -7,6 +7,7 @@ import {
   QuestionAnswerRounded,
 } from "@mui/icons-material";
 import { WorkspaceShell } from "@/components/layout/workspace-shell";
+import { getAdminAppUrl } from "@/lib/admin-portal";
 import { requireAdminPage } from "@/lib/auth/guards";
 
 type AdminLayoutProps = {
@@ -21,6 +22,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       title="Admin console"
       description="Review users, boxes, questions, and invite codes across the whole platform."
       viewer={viewer}
+      logoutRedirectTo={getAdminAppUrl("/admin-login")}
       navigation={[
         {
           href: "/admin",

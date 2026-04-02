@@ -1,26 +1,29 @@
 import Link from "next/link";
 import {
-  DashboardRounded,
-  SecurityRounded,
   SendRounded,
 } from "@mui/icons-material";
 import {
   AppBar,
   Box,
-  Button,
   Container,
   Stack,
   Toolbar,
   Typography,
 } from "@mui/material";
 import { getViewer } from "@/lib/auth/guards";
-import { LogoutButton } from "@/components/common/logout-button";
+import { PublicHeaderActions } from "@/components/layout/public-header-actions";
 
 type PublicShellProps = {
   children: React.ReactNode;
+  hideGuestActions?: boolean;
+  homeHref?: string;
 };
 
-export async function PublicShell({ children }: PublicShellProps) {
+export async function PublicShell({
+  children,
+  hideGuestActions = false,
+  homeHref = "/",
+}: PublicShellProps) {
   const viewer = await getViewer();
 
   return (
@@ -28,31 +31,34 @@ export async function PublicShell({ children }: PublicShellProps) {
       <AppBar position="static" elevation={0}>
         <Toolbar
           sx={{
-            minHeight: { xs: "auto", sm: 72 },
+            minHeight: { xs: 70, md: 72 },
             px: 0,
-            py: { xs: 1.5, sm: 0 },
+            py: { xs: 1.25, md: 0 },
           }}
         >
-          <Container maxWidth="lg" sx={{ px: { xs: "16px !important", sm: "0 !important" } }}>
+          <Container
+            maxWidth="lg"
+            sx={{ px: { xs: "16px !important", sm: "24px !important" } }}
+          >
             <Stack
-              direction={{ xs: "column", sm: "row" }}
-              alignItems={{ xs: "stretch", sm: "center" }}
+              direction="row"
+              alignItems="center"
               justifyContent="space-between"
-              spacing={{ xs: 2.25, sm: 2 }}
+              spacing={2}
             >
               <Stack
                 component={Link}
-                href="/"
+                href={homeHref}
                 direction="row"
                 spacing={1.5}
                 alignItems="center"
-                sx={{ minWidth: 0, width: { xs: "100%", sm: "auto" } }}
+                sx={{ minWidth: 0, flex: "1 1 auto" }}
               >
                 <Box
                   sx={{
                     width: 38,
                     height: 38,
-                    borderRadius: 2.5,
+                    borderRadius: "12px",
                     display: "grid",
                     placeItems: "center",
                     bgcolor: "primary.main",
@@ -73,59 +79,10 @@ export async function PublicShell({ children }: PublicShellProps) {
                   </Typography>
                 </Box>
               </Stack>
-
-              <Stack
-                direction="row"
-                spacing={1.25}
-                alignItems="center"
-                flexWrap="wrap"
-                justifyContent={{ xs: "stretch", sm: "flex-end" }}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                {viewer ? (
-                  <>
-                    <Button
-                      component={Link}
-                      href={viewer.role === "ADMIN" ? "/admin" : "/dashboard"}
-                      startIcon={
-                        viewer.role === "ADMIN" ? (
-                          <SecurityRounded />
-                        ) : (
-                          <DashboardRounded />
-                        )
-                      }
-                      size="small"
-                      sx={{ flex: { xs: "1 1 160px", sm: "0 0 auto" } }}
-                    >
-                      {viewer.role === "ADMIN" ? "Admin" : "Dashboard"}
-                    </Button>
-                    <LogoutButton
-                      size="small"
-                      sx={{ flex: { xs: "1 1 140px", sm: "0 0 auto" } }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      component={Link}
-                      href="/login"
-                      size="small"
-                      sx={{ flex: { xs: "1 1 120px", sm: "0 0 auto" } }}
-                    >
-                      Sign in
-                    </Button>
-                    <Button
-                      component={Link}
-                      href="/register"
-                      variant="contained"
-                      size="small"
-                      sx={{ flex: { xs: "1 1 140px", sm: "0 0 auto" } }}
-                    >
-                      Register
-                    </Button>
-                  </>
-                )}
-              </Stack>
+              <PublicHeaderActions
+                viewer={viewer ? { role: viewer.role } : null}
+                hideGuestActions={hideGuestActions}
+              />
             </Stack>
           </Container>
         </Toolbar>

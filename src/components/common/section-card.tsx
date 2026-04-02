@@ -15,10 +15,12 @@ export function SectionCard({
 }: SectionCardProps) {
   return (
     <Card className={className}>
-      <CardContent sx={{ p: { xs: 2.5, sm: 3.5 } }}>
-        <Stack spacing={3}>
-          <Stack spacing={1}>
-            <Typography variant="h5">{title}</Typography>
+      <CardContent sx={{ p: { xs: 2.25, sm: 3, md: 3.5 } }}>
+        <Stack spacing={{ xs: 2.5, sm: 3 }}>
+          <Stack spacing={0.75}>
+            <Typography variant="h5" sx={{ fontSize: { xs: "1.35rem", sm: "1.5rem" } }}>
+              {title}
+            </Typography>
             {description ? (
               <Typography color="text.secondary">{description}</Typography>
             ) : null}

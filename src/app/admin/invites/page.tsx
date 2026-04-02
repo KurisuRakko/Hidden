@@ -79,7 +79,7 @@ export default async function AdminInvitesPage({
                   spacing={2.5}
                   sx={{
                     p: 2,
-                    borderRadius: 3,
+                    borderRadius: "16px",
                     bgcolor: "rgba(255, 255, 255, 0.72)",
                   }}
                 >
