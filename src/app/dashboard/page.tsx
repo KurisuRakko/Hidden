@@ -1,0 +1,117 @@
+import Link from "next/link";
+import { Button, Grid, Stack, Typography } from "@mui/material";
+import { MetricCard } from "@/components/common/metric-card";
+import { SectionCard } from "@/components/common/section-card";
+import { requireUserPage } from "@/lib/auth/guards";
+import { prisma } from "@/lib/db";
+
+export default async function DashboardOverviewPage() {
+  const viewer = await requireUserPage();
+
+  const [boxCount, pendingCount, publishedCount, latestBoxes] = await Promise.all([
+    prisma.questionBox.count({
+      where: { ownerId: viewer.id },
+    }),
+    prisma.question.count({
+      where: {
+        box: {
+          ownerId: viewer.id,
+        },
+        status: "PENDING",
+      },
+    }),
+    prisma.question.count({
+      where: {
+        box: {
+          ownerId: viewer.id,
+        },
+        status: "PUBLISHED",
+      },
+    }),
+    prisma.questionBox.findMany({
+      where: { ownerId: viewer.id },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
+  ]);
+
+  return (
+    <Stack spacing={3}>
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricCard
+            label="Question boxes"
+            value={boxCount}
+            className="motion-enter"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricCard
+            label="Pending questions"
+            value={pendingCount}
+            className="motion-enter motion-delay-1"
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricCard
+            label="Published answers"
+            value={publishedCount}
+            className="motion-enter motion-delay-2"
+          />
+        </Grid>
+      </Grid>
+
+      <SectionCard
+        className="motion-enter motion-delay-2"
+        title="Recently updated boxes"
+        description="Open any box to review pending questions and publish answers."
+      >
+        <Stack spacing={2}>
+          {latestBoxes.length === 0 ? (
+            <Typography color="text.secondary">
+              You have not created any question boxes yet.
+            </Typography>
+          ) : (
+            latestBoxes.map((box) => (
+              <Stack
+                key={box.id}
+                direction={{ xs: "column", md: "row" }}
+                justifyContent="space-between"
+                spacing={2}
+                className="interactive-panel"
+                sx={{
+                  px: 2,
+                  py: 2.25,
+                  borderRadius: 3,
+                  bgcolor: "rgba(255, 255, 255, 0.6)",
+                }}
+              >
+                <Stack spacing={0.75}>
+                  <Typography variant="h6">{box.title}</Typography>
+                  <Typography color="text.secondary" className="text-break">
+                    /b/{box.slug}
+                  </Typography>
+                </Stack>
+                <Button
+                  component={Link}
+                  href={`/dashboard/boxes/${box.id}`}
+                  sx={{ width: { xs: "100%", md: "auto" } }}
+                >
+                  Open box
+                </Button>
+              </Stack>
+            ))
+          )}
+          <Button
+            component={Link}
+            href="/dashboard/boxes"
+            variant="contained"
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
+            Manage all boxes
+          </Button>
+        </Stack>
+      </SectionCard>
+    </Stack>
+  );
+}

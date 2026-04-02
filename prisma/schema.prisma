@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+  BANNED
+}
+
+enum InviteCodeStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum QuestionBoxStatus {
+  ACTIVE
+  HIDDEN
+  DISABLED
+}
+
+enum QuestionStatus {
+  PENDING
+  ANSWERED
+  PUBLISHED
+  REJECTED
+  DELETED
+}
+
+enum AdminTargetType {
+  USER
+  QUESTION_BOX
+  QUESTION
+  ANSWER
+  INVITE_CODE
+}
+
+model User {
+  id              String           @id @default(cuid())
+  phone           String           @unique
+  passwordHash    String
+  role            UserRole         @default(USER)
+  status          UserStatus       @default(ACTIVE)
+  phoneVerifiedAt DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  boxes           QuestionBox[]
+  sessions        Session[]
+  createdInvites  InviteCode[]     @relation("InviteCreatedBy")
+  adminLogs       AdminActionLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model InviteCode {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  maxUses     Int?
+  usedCount   Int              @default(0)
+  status      InviteCodeStatus @default(ACTIVE)
+  expiresAt   DateTime?
+  createdById String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  createdBy   User?            @relation("InviteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+}
+
+model QuestionBox {
+  id                 String            @id @default(cuid())
+  ownerId            String
+  title              String
+  slug               String            @unique
+  description        String?
+  status             QuestionBoxStatus @default(ACTIVE)
+  acceptingQuestions Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  owner              User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  questions          Question[]
+
+  @@index([ownerId, createdAt])
+  @@index([status, createdAt])
+}
+
+model Question {
+  id              String         @id @default(cuid())
+  boxId           String
+  content         String
+  imageUrl        String?
+  status          QuestionStatus @default(PENDING)
+  submitterIpHash String
+  submittedAt     DateTime       @default(now())
+  publishedAt     DateTime?
+  deletedAt       DateTime?
+  updatedAt       DateTime       @updatedAt
+  box             QuestionBox    @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  answer          Answer?
+
+  @@index([boxId, status, submittedAt])
+  @@index([submitterIpHash, submittedAt])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  questionId String   @unique
+  content    String
+  imageUrl   String?
+  deletedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model AdminActionLog {
+  id         String          @id @default(cuid())
+  adminId    String
+  targetType AdminTargetType
+  targetId   String
+  action     String
+  reason     String?
+  metadata   Json?
+  createdAt  DateTime        @default(now())
+  admin      User            @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+}

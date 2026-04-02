@@ -1,0 +1,433 @@
+import {
+  Prisma,
+  QuestionBoxStatus,
+  QuestionStatus,
+  UserRole,
+} from "@prisma/client";
+import { addMinutes } from "date-fns";
+import { createHash } from "node:crypto";
+import { prisma } from "@/lib/db";
+import { getEnv } from "@/lib/env";
+import { AppError } from "@/lib/http";
+import {
+  RATE_LIMIT_SUBMISSIONS_PER_WINDOW,
+  RATE_LIMIT_WINDOW_MINUTES,
+} from "@/lib/constants";
+import { uploadImage } from "@/lib/storage/minio";
+import {
+  answerTextSchema,
+  boxInputSchema,
+  normalizeSlug,
+  questionTextSchema,
+} from "@/lib/validation/common";
+
+const questionInclude = {
+  answer: true,
+} satisfies Prisma.QuestionInclude;
+
+function withoutDeletedAnswer<
+  T extends {
+    answer: {
+      deletedAt: Date | null;
+    } | null;
+  },
+>(question: T): T {
+  if (!question.answer?.deletedAt) {
+    return question;
+  }
+
+  return {
+    ...question,
+    answer: null,
+  } as T;
+}
+
+async function getOwnedBoxOrThrow(boxId: string, ownerId: string) {
+  const box = await prisma.questionBox.findFirst({
+    where: {
+      id: boxId,
+      ownerId,
+    },
+  });
+
+  if (!box) {
+    throw new AppError(404, "Question box not found.", "BOX_NOT_FOUND");
+  }
+
+  return box;
+}
+
+function hashSubmitterIp(ip: string) {
+  return createHash("sha256")
+    .update(ip)
+    .update(getEnv().IP_HASH_SECRET)
+    .digest("hex");
+}
+
+export async function listBoxesForOwner(ownerId: string) {
+  return prisma.questionBox.findMany({
+    where: { ownerId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      _count: {
+        select: {
+          questions: true,
+        },
+      },
+    },
+  });
+}
+
+export async function createBoxForOwner(
+  ownerId: string,
+  input: {
+    title: string;
+    description?: string;
+    slug: string;
+    acceptingQuestions: boolean;
+    status?: "ACTIVE" | "HIDDEN";
+  },
+) {
+  const parsed = boxInputSchema.parse(input);
+
+  try {
+    return await prisma.questionBox.create({
+      data: {
+        ownerId,
+        title: parsed.title,
+        description: parsed.description || null,
+        slug: parsed.slug,
+        acceptingQuestions: parsed.acceptingQuestions,
+        status: parsed.status,
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw new AppError(409, "Slug is already taken.", "SLUG_TAKEN");
+    }
+
+    throw error;
+  }
+}
+
+export async function updateBoxForOwner(
+  boxId: string,
+  ownerId: string,
+  input: {
+    title: string;
+    description?: string;
+    slug: string;
+    acceptingQuestions: boolean;
+    status?: "ACTIVE" | "HIDDEN";
+  },
+) {
+  await getOwnedBoxOrThrow(boxId, ownerId);
+  const parsed = boxInputSchema.parse(input);
+
+  try {
+    return await prisma.questionBox.update({
+      where: { id: boxId },
+      data: {
+        title: parsed.title,
+        description: parsed.description || null,
+        slug: parsed.slug,
+        acceptingQuestions: parsed.acceptingQuestions,
+        status: parsed.status,
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw new AppError(409, "Slug is already taken.", "SLUG_TAKEN");
+    }
+
+    throw error;
+  }
+}
+
+export async function getBoxDetailForOwner(boxId: string, ownerId: string) {
+  const box = await prisma.questionBox.findFirst({
+    where: {
+      id: boxId,
+      ownerId,
+    },
+    include: {
+      questions: {
+        include: questionInclude,
+        orderBy: {
+          submittedAt: "desc",
+        },
+      },
+    },
+  });
+
+  if (!box) {
+    throw new AppError(404, "Question box not found.", "BOX_NOT_FOUND");
+  }
+
+  return {
+    ...box,
+    questions: box.questions.map(withoutDeletedAnswer),
+  };
+}
+
+export async function listQuestionsForOwnerBox(boxId: string, ownerId: string) {
+  await getOwnedBoxOrThrow(boxId, ownerId);
+
+  const questions = await prisma.question.findMany({
+    where: {
+      boxId,
+    },
+    include: questionInclude,
+    orderBy: {
+      submittedAt: "desc",
+    },
+  });
+
+  return questions.map(withoutDeletedAnswer);
+}
+
+export async function saveAnswerForQuestion(
+  boxId: string,
+  questionId: string,
+  ownerId: string,
+  payload: {
+    content: string;
+    image?: File | null;
+  },
+) {
+  await getOwnedBoxOrThrow(boxId, ownerId);
+
+  const question = await prisma.question.findFirst({
+    where: {
+      id: questionId,
+      boxId,
+    },
+    include: {
+      answer: true,
+    },
+  });
+
+  if (!question || question.status === QuestionStatus.DELETED) {
+    throw new AppError(404, "Question not found.", "QUESTION_NOT_FOUND");
+  }
+
+  if (question.status === QuestionStatus.REJECTED) {
+    throw new AppError(400, "Rejected questions cannot be answered.", "QUESTION_REJECTED");
+  }
+
+  const content = answerTextSchema.parse(payload.content);
+  const imageUrl = payload.image
+    ? await uploadImage(payload.image, `answers/${boxId}`)
+    : question.answer?.deletedAt
+      ? null
+      : question.answer?.imageUrl ?? null;
+
+  const answer = await prisma.answer.upsert({
+    where: {
+      questionId,
+    },
+    update: {
+      content,
+      imageUrl,
+      deletedAt: null,
+    },
+    create: {
+      questionId,
+      content,
+      imageUrl,
+      deletedAt: null,
+    },
+  });
+
+  await prisma.question.update({
+    where: { id: questionId },
+    data: {
+      status:
+        question.status === QuestionStatus.PUBLISHED
+          ? QuestionStatus.PUBLISHED
+          : QuestionStatus.ANSWERED,
+    },
+  });
+
+  return answer;
+}
+
+export async function publishQuestionForOwner(
+  boxId: string,
+  questionId: string,
+  ownerId: string,
+) {
+  await getOwnedBoxOrThrow(boxId, ownerId);
+
+  const question = await prisma.question.findFirst({
+    where: {
+      id: questionId,
+      boxId,
+    },
+    include: {
+      answer: true,
+    },
+  });
+
+  if (!question || question.status === QuestionStatus.DELETED) {
+    throw new AppError(404, "Question not found.", "QUESTION_NOT_FOUND");
+  }
+
+  if (!question.answer || question.answer.deletedAt) {
+    throw new AppError(400, "Add an answer before publishing.", "ANSWER_REQUIRED");
+  }
+
+  if (question.status === QuestionStatus.REJECTED) {
+    throw new AppError(400, "Rejected questions cannot be published.", "QUESTION_REJECTED");
+  }
+
+  return prisma.question.update({
+    where: {
+      id: questionId,
+    },
+    data: {
+      status: QuestionStatus.PUBLISHED,
+      publishedAt: question.publishedAt ?? new Date(),
+    },
+  });
+}
+
+export async function updateQuestionStatusForOwner(
+  boxId: string,
+  questionId: string,
+  ownerId: string,
+  status: "REJECTED" | "DELETED",
+) {
+  await getOwnedBoxOrThrow(boxId, ownerId);
+
+  const question = await prisma.question.findFirst({
+    where: {
+      id: questionId,
+      boxId,
+    },
+  });
+
+  if (!question) {
+    throw new AppError(404, "Question not found.", "QUESTION_NOT_FOUND");
+  }
+
+  return prisma.question.update({
+    where: {
+      id: questionId,
+    },
+    data: {
+      status,
+      deletedAt: status === QuestionStatus.DELETED ? new Date() : null,
+    },
+  });
+}
+
+export async function getPublicBoxBySlug(slug: string) {
+  const normalizedSlug = normalizeSlug(slug);
+
+  const box = await prisma.questionBox.findUnique({
+    where: {
+      slug: normalizedSlug,
+    },
+    include: {
+      questions: {
+        where: {
+          status: QuestionStatus.PUBLISHED,
+        },
+        include: questionInclude,
+        orderBy: {
+          publishedAt: "desc",
+        },
+      },
+      owner: {
+        select: {
+          phone: true,
+        },
+      },
+    },
+  });
+
+  if (!box || box.status !== QuestionBoxStatus.ACTIVE) {
+    throw new AppError(404, "Public question box not found.", "BOX_NOT_FOUND");
+  }
+
+  return {
+    ...box,
+    questions: box.questions.map(withoutDeletedAnswer),
+  };
+}
+
+export async function submitPublicQuestion(input: {
+  slug: string;
+  content: string;
+  image?: File | null;
+  ipAddress: string;
+}) {
+  const box = await prisma.questionBox.findUnique({
+    where: {
+      slug: normalizeSlug(input.slug),
+    },
+  });
+
+  if (!box || box.status !== QuestionBoxStatus.ACTIVE) {
+    throw new AppError(404, "Question box not found.", "BOX_NOT_FOUND");
+  }
+
+  if (!box.acceptingQuestions) {
+    throw new AppError(400, "This box is not accepting new questions.", "BOX_CLOSED");
+  }
+
+  const submitterIpHash = hashSubmitterIp(input.ipAddress || "unknown");
+  const windowStart = addMinutes(new Date(), -RATE_LIMIT_WINDOW_MINUTES);
+
+  const recentSubmissions = await prisma.question.count({
+    where: {
+      boxId: box.id,
+      submitterIpHash,
+      submittedAt: {
+        gte: windowStart,
+      },
+    },
+  });
+
+  if (recentSubmissions >= RATE_LIMIT_SUBMISSIONS_PER_WINDOW) {
+    throw new AppError(
+      429,
+      "Too many submissions from this address. Please try again later.",
+      "RATE_LIMITED",
+    );
+  }
+
+  const content = questionTextSchema.parse(input.content);
+  const imageUrl = input.image
+    ? await uploadImage(input.image, `questions/${box.id}`)
+    : null;
+
+  return prisma.question.create({
+    data: {
+      boxId: box.id,
+      content,
+      imageUrl,
+      submitterIpHash,
+    },
+  });
+}
+
+export function isBoxVisibleToViewer(
+  boxStatus: QuestionBoxStatus,
+  role: UserRole,
+  ownerId: string,
+  viewerId: string,
+) {
+  if (role === UserRole.ADMIN) {
+    return true;
+  }
+
+  return boxStatus !== QuestionBoxStatus.DISABLED && ownerId === viewerId;
+}
