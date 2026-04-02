@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const envSchema = z.object({
+const envShape = {
   DATABASE_URL: z.string().min(1),
   APP_URL: z.string().url(),
   ADMIN_APP_URL: z.string().url(),
@@ -19,25 +19,46 @@ const envSchema = z.object({
   SEED_ADMIN_PHONE: z.string().min(1),
   SEED_ADMIN_PASSWORD: z.string().min(8),
   SEED_DEFAULT_INVITE: z.string().min(1),
-});
+} satisfies Record<string, z.ZodType>;
 
-let cachedEnv: z.infer<typeof envSchema> | null = null;
+type Env = {
+  [Key in keyof typeof envShape]: z.infer<(typeof envShape)[Key]>;
+};
+
+let cachedEnv: Env | null = null;
+const cachedEnvValues = new Map<keyof Env, Env[keyof Env]>();
+
+export function getEnvValue<Key extends keyof Env>(key: Key): Env[Key] {
+  if (cachedEnvValues.has(key)) {
+    return cachedEnvValues.get(key) as Env[Key];
+  }
+
+  const parsed = (envShape[key] as unknown as z.ZodType<Env[Key]>).safeParse(
+    process.env[key],
+  );
+
+  if (!parsed.success) {
+    throw new Error(`Invalid environment configuration: ${key}`);
+  }
+
+  cachedEnvValues.set(key, parsed.data);
+
+  return parsed.data;
+}
 
 export function getEnv() {
   if (cachedEnv) {
     return cachedEnv;
   }
 
-  const parsed = envSchema.safeParse(process.env);
+  const nextEnv = {} as Env;
+  const nextEnvRecord = nextEnv as Record<keyof Env, Env[keyof Env]>;
 
-  if (!parsed.success) {
-    throw new Error(
-      `Invalid environment configuration: ${parsed.error.issues
-        .map((issue) => issue.path.join("."))
-        .join(", ")}`,
-    );
+  for (const key of Object.keys(envShape) as Array<keyof Env>) {
+    nextEnvRecord[key] = getEnvValue(key);
   }
 
-  cachedEnv = parsed.data;
+  cachedEnv = nextEnv;
+
   return cachedEnv;
 }

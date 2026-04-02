@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { FileUploadField } from "@/components/common/file-upload-field";
+import { useI18n } from "@/components/providers/i18n-provider";
 
 type PublicQuestionFormProps = {
   slug: string;
@@ -19,6 +20,7 @@ export function PublicQuestionForm({
   slug,
   disabled,
 }: PublicQuestionFormProps) {
+  const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,15 +40,15 @@ export function PublicQuestionForm({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "Unable to submit question.");
+        setError(result.error ?? t("publicQuestionForm.submitError"));
         return;
       }
 
       setContent("");
       setUploadResetToken((current) => current + 1);
-      setSuccess("Question received. It will stay private until the owner reviews it.");
+      setSuccess(t("publicQuestionForm.success"));
     } catch {
-      setError("Network request failed. Please try again.");
+      setError(t("common.feedback.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -79,7 +81,7 @@ export function PublicQuestionForm({
         ) : null}
       </Box>
       <TextField
-        label="Your anonymous question"
+        label={t("publicQuestionForm.questionLabel")}
         name="content"
         multiline
         minRows={4}
@@ -121,8 +123,8 @@ export function PublicQuestionForm({
               setSuccess(null);
             }
           }}
-          helperText="Optional image, up to 5 MB. JPG, PNG, and WEBP are supported."
-          buttonLabel="Attach image"
+          helperText={t("publicQuestionForm.imageHelper")}
+          buttonLabel={t("publicQuestionForm.attachImage")}
         />
       </Box>
       <Button
@@ -133,7 +135,9 @@ export function PublicQuestionForm({
         aria-busy={submitting}
         sx={{ width: { xs: "100%", sm: "auto" }, alignSelf: "flex-start", mt: 0.25 }}
       >
-        {submitting ? "Submitting..." : "Send anonymously"}
+        {submitting
+          ? t("publicQuestionForm.submitting")
+          : t("publicQuestionForm.submit")}
       </Button>
     </Stack>
   );

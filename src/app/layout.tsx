@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Noto_Sans_SC, Roboto } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
+import { getMessages } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n/server";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -9,20 +11,31 @@ const roboto = Roboto({
   subsets: ["latin"],
 });
 
+const notoSansSC = Noto_Sans_SC({
+  variable: "--font-noto-sans-sc",
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Hidden",
   description: "Anonymous question boxes with moderation and invite-only registration.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
+  const messages = getMessages(locale);
+
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang={locale} className={`${roboto.variable} ${notoSansSC.variable}`}>
       <body>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders locale={locale} messages={messages}>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

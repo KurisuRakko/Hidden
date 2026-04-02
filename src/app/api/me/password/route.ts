@@ -15,4 +15,4 @@ export const PATCH = withApiHandler(async (request: Request) => {
       newPassword: String(body.newPassword ?? ""),
     }),
   );
-});
+}, { localizeErrors: true });

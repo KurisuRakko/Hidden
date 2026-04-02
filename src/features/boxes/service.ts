@@ -7,7 +7,7 @@ import {
 import { addMinutes } from "date-fns";
 import { createHash } from "node:crypto";
 import { prisma, runSerializableTransaction } from "@/lib/db";
-import { getEnv } from "@/lib/env";
+import { getEnvValue } from "@/lib/env";
 import { AppError } from "@/lib/http";
 import {
   RATE_LIMIT_SUBMISSIONS_PER_WINDOW,
@@ -60,7 +60,7 @@ async function getOwnedBoxOrThrow(boxId: string, ownerId: string) {
 function hashSubmitterIp(ip: string) {
   return createHash("sha256")
     .update(ip)
-    .update(getEnv().IP_HASH_SECRET)
+    .update(getEnvValue("IP_HASH_SECRET"))
     .digest("hex");
 }
 

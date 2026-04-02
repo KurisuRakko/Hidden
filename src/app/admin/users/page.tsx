@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Button,
   MenuItem,
@@ -106,7 +105,6 @@ export default async function AdminUsersPage({
           </Typography>
           <Stack direction="row" spacing={1.5}>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/users", {
                 q: params.q,
                 status: params.status,
@@ -117,7 +115,6 @@ export default async function AdminUsersPage({
               Previous
             </Button>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/users", {
                 q: params.q,
                 status: params.status,

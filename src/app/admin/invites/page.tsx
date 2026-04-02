@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button, Grid, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import { InviteCreateForm } from "@/components/admin/invite-create-form";
 import { InviteEditForm } from "@/components/admin/invite-edit-form";
@@ -122,7 +121,6 @@ export default async function AdminInvitesPage({
               </Typography>
               <Stack direction="row" spacing={1.5}>
                 <Button
-                  component={Link}
                   href={buildPathWithQuery("/admin/invites", {
                     q: params.q,
                     status: params.status,
@@ -133,7 +131,6 @@ export default async function AdminInvitesPage({
                   Previous
                 </Button>
                 <Button
-                  component={Link}
                   href={buildPathWithQuery("/admin/invites", {
                     q: params.q,
                     status: params.status,

@@ -2,11 +2,13 @@
 
 import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import { useI18n } from "@/components/providers/i18n-provider";
 
 export function ChangePasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useI18n();
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
@@ -18,25 +20,25 @@ export function ChangePasswordForm() {
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (!currentPassword.trim()) {
-      setError("Enter your current password.");
+      setError(t("dashboard.changePassword.validation.currentPasswordRequired"));
       setSubmitting(false);
       return;
     }
 
     if (!newPassword.trim()) {
-      setError("Enter a new password.");
+      setError(t("dashboard.changePassword.validation.newPasswordRequired"));
       setSubmitting(false);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("New password and confirmation do not match.");
+      setError(t("dashboard.changePassword.validation.passwordMismatch"));
       setSubmitting(false);
       return;
     }
 
     if (currentPassword === newPassword) {
-      setError("Choose a different password from your current one.");
+      setError(t("dashboard.changePassword.validation.passwordUnchanged"));
       setSubmitting(false);
       return;
     }
@@ -56,21 +58,21 @@ export function ChangePasswordForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "Request failed.");
+        setError(result.error ?? t("common.feedback.requestFailed"));
         return;
       }
 
       setSuccess(
         result.signedOutOtherSessions > 0
-          ? "Password updated. Other signed-in devices were signed out."
-          : "Password updated successfully.",
+          ? t("dashboard.changePassword.successSignedOut")
+          : t("dashboard.changePassword.success"),
       );
       const form = document.getElementById(
         "change-password-form",
       ) as HTMLFormElement | null;
       form?.reset();
     } catch {
-      setError("Network request failed. Please try again.");
+      setError(t("common.feedback.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -80,11 +82,10 @@ export function ChangePasswordForm() {
     <Stack spacing={2.25}>
       <Stack spacing={0.75}>
         <Typography variant="body1">
-          Update your password to keep this account secure.
+          {t("dashboard.changePassword.intro")}
         </Typography>
         <Typography color="text.secondary" sx={{ fontSize: "0.95rem" }}>
-          After the change, Hidden keeps this device signed in and signs out your
-          other active sessions.
+          {t("dashboard.changePassword.description")}
         </Typography>
       </Stack>
 
@@ -105,7 +106,7 @@ export function ChangePasswordForm() {
         }}
       >
         <TextField
-          label="Current password"
+          label={t("dashboard.changePassword.currentPassword")}
           name="currentPassword"
           type="password"
           autoComplete="current-password"
@@ -114,17 +115,17 @@ export function ChangePasswordForm() {
           disabled={submitting}
         />
         <TextField
-          label="New password"
+          label={t("dashboard.changePassword.newPassword")}
           name="newPassword"
           type="password"
           autoComplete="new-password"
           fullWidth
           required
           disabled={submitting}
-          helperText="Use 8 to 72 characters."
+          helperText={t("dashboard.changePassword.newPasswordHelper")}
         />
         <TextField
-          label="Confirm new password"
+          label={t("dashboard.changePassword.confirmPassword")}
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
@@ -139,7 +140,9 @@ export function ChangePasswordForm() {
           disabled={submitting}
           sx={{ width: { xs: "100%", sm: "auto" } }}
         >
-          {submitting ? "Updating..." : "Update password"}
+          {submitting
+            ? t("dashboard.changePassword.updating")
+            : t("dashboard.changePassword.update")}
         </Button>
       </Stack>
     </Stack>

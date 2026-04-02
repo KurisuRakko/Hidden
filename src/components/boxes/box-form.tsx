@@ -14,6 +14,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FileUploadField } from "@/components/common/file-upload-field";
+import { useI18n } from "@/components/providers/i18n-provider";
+import { getStatusLabel } from "@/lib/i18n";
 
 type BoxFormValues = {
   id?: string;
@@ -36,6 +38,7 @@ export function BoxForm({
   createRedirectMode = "detail",
   submitLabel,
 }: BoxFormProps) {
+  const { locale, t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -66,7 +69,7 @@ export function BoxForm({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "Unable to save the box.");
+        setError(result.error ?? t("dashboard.boxForm.saveError"));
         return;
       }
 
@@ -80,7 +83,7 @@ export function BoxForm({
         router.refresh();
       }
     } catch {
-      setError("Network request failed. Please try again.");
+      setError(t("common.feedback.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -94,14 +97,14 @@ export function BoxForm({
       </Collapse>
       <TextField
         name="title"
-        label="Box title"
+        label={t("dashboard.boxForm.title")}
         required
         fullWidth
         defaultValue={initialValues?.title ?? ""}
       />
       <TextField
         name="description"
-        label="Description"
+        label={t("dashboard.boxForm.description")}
         fullWidth
         multiline
         minRows={3}
@@ -109,10 +112,10 @@ export function BoxForm({
       />
       <TextField
         name="slug"
-        label="Public slug"
+        label={t("dashboard.boxForm.slug")}
         required
         fullWidth
-        helperText="Public URLs use /b/[slug]."
+        helperText={t("dashboard.boxForm.slugHelper")}
         defaultValue={initialValues?.slug ?? ""}
       />
       <Stack spacing={1.5}>
@@ -128,7 +131,7 @@ export function BoxForm({
             <Box
               component="img"
               src={initialValues.wallpaperUrl}
-              alt="当前提问箱壁纸"
+              alt={t("dashboard.boxForm.wallpaperAlt")}
               sx={{
                 width: "100%",
                 maxHeight: 220,
@@ -142,12 +145,12 @@ export function BoxForm({
         <FileUploadField
           name="wallpaper"
           accept="image/png,image/jpeg,image/webp"
-          helperText="可选上传一张提问箱壁纸，它会显示在公开提问页顶部。上传新图会替换旧图。"
-          buttonLabel="上传壁纸"
+          helperText={t("dashboard.boxForm.wallpaperHelper")}
+          buttonLabel={t("dashboard.boxForm.uploadWallpaper")}
           emptyLabel={
             initialValues?.wallpaperUrl && !removeWallpaper
-              ? "当前保留已有壁纸"
-              : "暂未选择壁纸"
+              ? t("dashboard.boxForm.keepWallpaper")
+              : t("dashboard.boxForm.noWallpaper")
           }
           onFileChange={() => {
             setRemoveWallpaper(false);
@@ -166,18 +169,20 @@ export function BoxForm({
             }}
             sx={{ width: { xs: "100%", sm: "auto" } }}
           >
-            {removeWallpaper ? "恢复当前壁纸" : "移除当前壁纸"}
+            {removeWallpaper
+              ? t("dashboard.boxForm.restoreWallpaper")
+              : t("dashboard.boxForm.removeWallpaper")}
           </Button>
         ) : null}
       </Stack>
       <TextField
         select
-        label="Visibility"
+        label={t("dashboard.boxForm.visibility")}
         value={status}
         onChange={(event) => setStatus(event.target.value as "ACTIVE" | "HIDDEN")}
       >
-        <MenuItem value="ACTIVE">Active</MenuItem>
-        <MenuItem value="HIDDEN">Hidden</MenuItem>
+        <MenuItem value="ACTIVE">{getStatusLabel("ACTIVE", locale)}</MenuItem>
+        <MenuItem value="HIDDEN">{getStatusLabel("HIDDEN", locale)}</MenuItem>
       </TextField>
       <Box
         sx={(theme) => ({
@@ -195,7 +200,7 @@ export function BoxForm({
               onChange={(event) => setAcceptingQuestions(event.target.checked)}
             />
           }
-          label="Accept new anonymous questions"
+          label={t("dashboard.boxForm.acceptQuestions")}
           sx={{ m: 0, width: "100%", justifyContent: "space-between" }}
         />
       </Box>
@@ -207,8 +212,11 @@ export function BoxForm({
         sx={{ width: { xs: "100%", sm: "auto" } }}
       >
         {submitting
-          ? "Saving..."
-          : submitLabel ?? (initialValues?.id ? "Save changes" : "Create box")}
+          ? t("common.actions.saving")
+          : submitLabel ??
+            (initialValues?.id
+              ? t("common.actions.saveChanges")
+              : t("dashboard.boxForm.create"))}
       </Button>
     </Stack>
   );

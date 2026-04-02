@@ -3,6 +3,7 @@
 import { CloudUploadRounded } from "@mui/icons-material";
 import { Button, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import { useI18n } from "@/components/providers/i18n-provider";
 
 type FileUploadFieldProps = {
   name: string;
@@ -18,12 +19,16 @@ export function FileUploadField({
   name,
   accept,
   helperText,
-  buttonLabel = "Choose image",
-  emptyLabel = "No file selected",
+  buttonLabel,
+  emptyLabel,
   disabled = false,
   onFileChange,
 }: FileUploadFieldProps) {
   const [selectedName, setSelectedName] = useState<string | null>(null);
+  const { t } = useI18n();
+
+  const resolvedButtonLabel = buttonLabel ?? t("common.actions.uploadImage");
+  const resolvedEmptyLabel = emptyLabel ?? t("common.fileUpload.noFileSelected");
 
   return (
     <Stack spacing={1.25}>
@@ -42,7 +47,7 @@ export function FileUploadField({
           disabled={disabled}
           sx={{ alignSelf: { xs: "stretch", sm: "flex-start" } }}
         >
-          {buttonLabel}
+          {resolvedButtonLabel}
           <input
             hidden
             type="file"
@@ -61,7 +66,9 @@ export function FileUploadField({
           className="text-break"
           aria-live="polite"
         >
-          {selectedName ? `Selected: ${selectedName}` : emptyLabel}
+          {selectedName
+            ? t("common.fileUpload.selectedFile", { name: selectedName })
+            : resolvedEmptyLabel}
         </Typography>
       </Stack>
     </Stack>

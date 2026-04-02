@@ -1,41 +1,53 @@
 import { Client } from "minio";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { getEnv } from "@/lib/env";
+import { getEnvValue } from "@/lib/env";
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from "@/lib/constants";
 import { AppError } from "@/lib/http";
 
 let cachedClient: Client | null = null;
+
+function getStorageEnv() {
+  return {
+    endpoint: getEnvValue("MINIO_ENDPOINT"),
+    port: getEnvValue("MINIO_PORT"),
+    useSSL: getEnvValue("MINIO_USE_SSL"),
+    accessKey: getEnvValue("MINIO_ACCESS_KEY"),
+    secretKey: getEnvValue("MINIO_SECRET_KEY"),
+    bucket: getEnvValue("MINIO_BUCKET"),
+    publicUrl: getEnvValue("MINIO_PUBLIC_URL"),
+  };
+}
 
 function getClient() {
   if (cachedClient) {
     return cachedClient;
   }
 
-  const env = getEnv();
+  const env = getStorageEnv();
 
   cachedClient = new Client({
-    endPoint: env.MINIO_ENDPOINT,
-    port: env.MINIO_PORT,
-    useSSL: env.MINIO_USE_SSL,
-    accessKey: env.MINIO_ACCESS_KEY,
-    secretKey: env.MINIO_SECRET_KEY,
+    endPoint: env.endpoint,
+    port: env.port,
+    useSSL: env.useSSL,
+    accessKey: env.accessKey,
+    secretKey: env.secretKey,
   });
 
   return cachedClient;
 }
 
 export async function ensureStorageBucket() {
-  const env = getEnv();
+  const env = getStorageEnv();
   const client = getClient();
-  const exists = await client.bucketExists(env.MINIO_BUCKET);
+  const exists = await client.bucketExists(env.bucket);
 
   if (!exists) {
-    await client.makeBucket(env.MINIO_BUCKET);
+    await client.makeBucket(env.bucket);
   }
 
   await client.setBucketPolicy(
-    env.MINIO_BUCKET,
+    env.bucket,
     JSON.stringify({
       Version: "2012-10-17",
       Statement: [
@@ -43,7 +55,7 @@ export async function ensureStorageBucket() {
           Effect: "Allow",
           Principal: { AWS: ["*"] },
           Action: ["s3:GetObject"],
-          Resource: [`arn:aws:s3:::${env.MINIO_BUCKET}/*`],
+          Resource: [`arn:aws:s3:::${env.bucket}/*`],
         },
       ],
     }),
@@ -73,14 +85,14 @@ export async function uploadImage(file: File, prefix: string) {
   }
 
   const client = getClient();
-  const env = getEnv();
+  const env = getStorageEnv();
   const extension = getExtensionFromMimeType(file.type);
   const objectName = path
     .posix
     .join(prefix, `${Date.now()}-${randomUUID()}${extension}`);
 
   await client.putObject(
-    env.MINIO_BUCKET,
+    env.bucket,
     objectName,
     Buffer.from(await file.arrayBuffer()),
     file.size,
@@ -89,12 +101,12 @@ export async function uploadImage(file: File, prefix: string) {
     },
   );
 
-  return `${env.MINIO_PUBLIC_URL}/${env.MINIO_BUCKET}/${objectName}`;
+  return `${env.publicUrl}/${env.bucket}/${objectName}`;
 }
 
 export async function removeImageByUrl(imageUrl: string) {
-  const env = getEnv();
-  const publicBaseUrl = `${env.MINIO_PUBLIC_URL}/${env.MINIO_BUCKET}/`;
+  const env = getStorageEnv();
+  const publicBaseUrl = `${env.publicUrl}/${env.bucket}/`;
 
   if (!imageUrl.startsWith(publicBaseUrl)) {
     return;
@@ -107,14 +119,14 @@ export async function removeImageByUrl(imageUrl: string) {
   }
 
   try {
-    await getClient().removeObject(env.MINIO_BUCKET, objectName);
+    await getClient().removeObject(env.bucket, objectName);
   } catch (error) {
     console.error("Failed to remove uploaded image after rollback.", error);
   }
 }
 
 export async function checkStorageHealth() {
-  const env = getEnv();
+  const env = getStorageEnv();
 
-  await getClient().bucketExists(env.MINIO_BUCKET);
+  await getClient().bucketExists(env.bucket);
 }

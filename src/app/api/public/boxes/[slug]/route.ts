@@ -13,4 +13,5 @@ export const GET = withApiHandler(
     const { slug } = await context.params;
     return ok(await getPublicBoxBySlug(slug));
   },
+  { localizeErrors: true },
 );

@@ -30,4 +30,5 @@ export const POST = withApiHandler(
       201,
     );
   },
+  { localizeErrors: true },
 );

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowForwardRounded,
   LockOpenRounded,
@@ -16,8 +15,13 @@ import {
   Typography,
 } from "@mui/material";
 import { PublicShell } from "@/components/layout/public-shell";
+import { createTranslator } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n/server";
 
-export default function Home() {
+export default async function Home() {
+  const locale = await getRequestLocale();
+  const t = createTranslator(locale);
+
   return (
     <PublicShell>
       <Box sx={{ py: { xs: 2.25, sm: 5.5, md: 9 } }}>
@@ -33,7 +37,7 @@ export default function Home() {
           >
             <Stack spacing={{ xs: 2, sm: 3 }}>
               <Chip
-                label="Invite-only anonymous Q&A"
+                label={t("home.badge")}
                 color="primary"
                 className="motion-fade"
                 sx={{ width: "fit-content", fontWeight: 600 }}
@@ -47,7 +51,7 @@ export default function Home() {
                   }}
                   className="text-break"
                 >
-                  Hidden gives every creator a calm, moderated anonymous inbox.
+                  {t("home.title")}
                 </Typography>
                 <Typography
                   variant="h6"
@@ -57,13 +61,11 @@ export default function Home() {
                     maxWidth: 640,
                   }}
                 >
-                  Visitors ask freely. Owners review first, answer on their own
-                  pace, and publish only what deserves a place on the public page.
+                  {t("home.description")}
                 </Typography>
               </Stack>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 1.25, sm: 2 }}>
                 <Button
-                  component={Link}
                   href="/register"
                   variant="contained"
                   size="large"
@@ -71,10 +73,9 @@ export default function Home() {
                   className="motion-enter-soft motion-delay-1"
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
-                  Create account
+                  {t("common.actions.createAccount")}
                 </Button>
                 <Button
-                  component={Link}
                   href="/login"
                   variant="outlined"
                   size="large"
@@ -82,7 +83,7 @@ export default function Home() {
                   className="motion-enter-soft motion-delay-2"
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
-                  Sign in
+                  {t("common.actions.signIn")}
                 </Button>
               </Stack>
             </Stack>
@@ -91,21 +92,18 @@ export default function Home() {
           <Grid container spacing={{ xs: 2, md: 3 }}>
             {[
               {
-                title: "Public question boxes",
-                description:
-                  "Each box gets a clean public page at /b/[slug] with published answers and a one-image anonymous submission form.",
+                title: t("home.features.publicBoxesTitle"),
+                description: t("home.features.publicBoxesDescription"),
                 icon: <PublicRounded color="primary" />,
               },
               {
-                title: "Moderation-first workflow",
-                description:
-                  "Every new question starts pending. Users can reject, delete, answer, and publish without exposing drafts.",
+                title: t("home.features.moderationTitle"),
+                description: t("home.features.moderationDescription"),
                 icon: <SecurityRounded color="primary" />,
               },
               {
-                title: "Invite-only growth",
-                description:
-                  "Registration uses phone number, password, and invite code so the first version stays controlled and operable.",
+                title: t("home.features.inviteOnlyTitle"),
+                description: t("home.features.inviteOnlyDescription"),
                 icon: <LockOpenRounded color="primary" />,
               },
             ].map((item, index) => (

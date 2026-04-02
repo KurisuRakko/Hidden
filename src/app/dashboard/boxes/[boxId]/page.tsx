@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SettingsRounded } from "@mui/icons-material";
 import { Grid, IconButton, Stack } from "@mui/material";
 import { EmptyState } from "@/components/common/empty-state";
@@ -8,6 +7,8 @@ import { OwnerQuestionCard } from "@/components/questions/owner-question-card";
 import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
 import { getBoxDetailForOwner } from "@/features/boxes/service";
 import { requireUserPage } from "@/lib/auth/guards";
+import { createTranslator } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 type BoxDetailPageProps = {
   params: Promise<{
@@ -19,6 +20,8 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
   const viewer = await requireUserPage();
   const { boxId } = await params;
   const box = await getBoxDetailForOwner(boxId, viewer.id);
+  const locale = await getRequestLocale();
+  const t = createTranslator(locale);
   const visibleQuestions = box.questions.filter((item) => item.status !== "DELETED");
 
   const pendingCount = visibleQuestions.filter((item) => item.status === "PENDING").length;
@@ -30,9 +33,8 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
       pageTitle={box.title}
       pageAction={
         <IconButton
-          component={Link}
           href={`/dashboard/boxes/${box.id}/settings`}
-          aria-label="提问箱设置"
+          aria-label={t("dashboard.detailSettingsAria")}
         >
           <SettingsRounded />
         </IconButton>
@@ -42,23 +44,27 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
         <Grid container spacing={{ xs: 2, md: 3 }}>
           <Grid size={{ xs: 12, md: 4 }}>
             <MetricCard
-              label="问题总数"
+              label={t("dashboard.metricTotalQuestions")}
               value={visibleQuestions.length}
               className="motion-enter-soft"
             />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <MetricCard
-              label="未审核提问"
+              label={t("dashboard.metricPendingQuestions")}
               value={pendingCount}
               className="motion-enter-soft motion-delay-1"
             />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <MetricCard
-              label="已发布提问"
+              label={t("dashboard.metricPublishedQuestions")}
               value={publishedCount}
-              supporting={box.acceptingQuestions ? "当前仍可继续接收提问" : "当前暂停接收提问"}
+              supporting={
+                box.acceptingQuestions
+                  ? t("dashboard.metricAccepting")
+                  : t("dashboard.metricPaused")
+              }
               className="motion-enter-soft motion-delay-2"
             />
           </Grid>
@@ -66,15 +72,15 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
 
         <SectionCard
           className="motion-enter-soft motion-delay-2"
-          title="提问"
-          description="这里会展示这个提问箱里当前收到的内容，你可以回复并决定是否屏蔽。"
+          title={t("dashboard.detailQuestionsTitle")}
+          description={t("dashboard.detailQuestionsDescription")}
         >
           <Stack spacing={2}>
             {visibleQuestions.length === 0 ? (
               <EmptyState
                 className="motion-enter motion-delay-3"
-                title="还没有提问"
-                description="当有人向这个提问箱提交内容后，它们会出现在这里。"
+                title={t("dashboard.noQuestionsTitle")}
+                description={t("dashboard.noQuestionsDescription")}
               />
             ) : (
               visibleQuestions.map((question) => (

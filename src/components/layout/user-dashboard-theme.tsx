@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { PaletteMode, ThemeProvider } from "@mui/material";
+import { useI18n } from "@/components/providers/i18n-provider";
 import { createAppTheme } from "@/lib/theme/theme";
 
 const STORAGE_KEY = "hidden-user-dashboard-theme";
@@ -34,6 +35,7 @@ export function UserDashboardThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { locale } = useI18n();
   const [mode, setMode] = useState<PaletteMode>(() => getStoredMode() ?? "light");
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export function UserDashboardThemeProvider({
     window.localStorage.setItem(STORAGE_KEY, mode);
   }, [mode]);
 
-  const theme = useMemo(() => createAppTheme(mode), [mode]);
+  const theme = useMemo(() => createAppTheme(mode, locale), [locale, mode]);
 
   const value = useMemo(
     () => ({

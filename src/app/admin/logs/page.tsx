@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { AdminTargetType } from "@prisma/client";
 import {
   Button,
@@ -123,7 +122,6 @@ export default async function AdminLogsPage({
           </Typography>
           <Stack direction="row" spacing={1.5}>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/logs", {
                 q: params.q,
                 targetType: params.targetType,
@@ -134,7 +132,6 @@ export default async function AdminLogsPage({
               Previous
             </Button>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/logs", {
                 q: params.q,
                 targetType: params.targetType,

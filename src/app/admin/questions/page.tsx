@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Fragment } from "react";
 import {
   Box,
@@ -140,7 +139,7 @@ export default async function AdminQuestionsPage({
                     {question.box.owner.phone}
                   </TableCell>
                   <TableCell sx={{ borderBottom: "none" }}>
-                    <Button component={Link} href={`/b/${question.box.slug}`} target="_blank">
+                    <Button href={`/b/${question.box.slug}`} target="_blank">
                       /b/{question.box.slug}
                     </Button>
                   </TableCell>
@@ -306,7 +305,6 @@ export default async function AdminQuestionsPage({
           </Typography>
           <Stack direction="row" spacing={1.5}>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/questions", {
                 q: params.q,
                 status: params.status,
@@ -317,7 +315,6 @@ export default async function AdminQuestionsPage({
               Previous
             </Button>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/questions", {
                 q: params.q,
                 status: params.status,

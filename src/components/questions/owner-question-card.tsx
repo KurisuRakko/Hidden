@@ -22,7 +22,9 @@ import {
 import { useRouter } from "next/navigation";
 import { FileUploadField } from "@/components/common/file-upload-field";
 import { StatusChip } from "@/components/common/status-chip";
+import { useI18n } from "@/components/providers/i18n-provider";
 import { formatDateTime } from "@/lib/format";
+import { getStatusLabel } from "@/lib/i18n";
 
 type OwnerQuestionCardProps = {
   boxId: string;
@@ -45,6 +47,7 @@ export function OwnerQuestionCard({
   question,
 }: OwnerQuestionCardProps) {
   const router = useRouter();
+  const { locale, t } = useI18n();
   const [expanded, setExpanded] = useState(
     Boolean(question.answer?.content || question.answer?.imageUrl),
   );
@@ -70,14 +73,14 @@ export function OwnerQuestionCard({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "保存回复失败。");
+        setError(result.error ?? t("dashboard.ownerQuestion.saveReplyError"));
         return;
       }
 
-      setSuccess("回复已保存。");
+      setSuccess(t("dashboard.ownerQuestion.saveReplySuccess"));
       router.refresh();
     } catch {
-      setError("网络请求失败，请稍后再试。");
+      setError(t("common.feedback.networkError"));
     } finally {
       setSaving(false);
     }
@@ -98,14 +101,14 @@ export function OwnerQuestionCard({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "发布失败。");
+        setError(result.error ?? t("dashboard.ownerQuestion.publishError"));
         return;
       }
 
-      setSuccess("提问已发布。");
+      setSuccess(t("dashboard.ownerQuestion.publishSuccess"));
       router.refresh();
     } catch {
-      setError("网络请求失败，请稍后再试。");
+      setError(t("common.feedback.networkError"));
     } finally {
       setSaving(false);
     }
@@ -130,14 +133,14 @@ export function OwnerQuestionCard({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "屏蔽失败。");
+        setError(result.error ?? t("dashboard.ownerQuestion.blockError"));
         return;
       }
 
-      setSuccess("提问已屏蔽。");
+      setSuccess(t("dashboard.ownerQuestion.blockedSuccess"));
       router.refresh();
     } catch {
-      setError("网络请求失败，请稍后再试。");
+      setError(t("common.feedback.networkError"));
     } finally {
       setSaving(false);
     }
@@ -163,13 +166,22 @@ export function OwnerQuestionCard({
                 spacing={1}
                 alignItems={{ xs: "flex-start", sm: "center" }}
               >
-                <Typography variant="h6">匿名提问</Typography>
-                <StatusChip status={question.status} />
+                <Typography variant="h6">
+                  {t("dashboard.ownerQuestion.anonymousQuestion")}
+                </Typography>
+                <StatusChip
+                  status={question.status}
+                  label={getStatusLabel(question.status, locale)}
+                />
               </Stack>
               <Typography variant="body2" color="text.secondary">
-                提交于 {formatDateTime(question.submittedAt)}
+                {t("dashboard.ownerQuestion.submittedAt", {
+                  value: formatDateTime(question.submittedAt, locale),
+                })}
                 {question.publishedAt
-                  ? ` · 发布于 ${formatDateTime(question.publishedAt)}`
+                  ? ` · ${t("dashboard.ownerQuestion.publishedAt", {
+                      value: formatDateTime(question.publishedAt, locale),
+                    })}`
                   : ""}
               </Typography>
             </Stack>
@@ -192,7 +204,7 @@ export function OwnerQuestionCard({
                 <Box
                   component="img"
                   src={question.imageUrl}
-                  alt="Question attachment"
+                  alt={t("publicBox.questionAttachmentAlt")}
                   sx={{
                     borderRadius: "16px",
                     width: "100%",
@@ -203,7 +215,7 @@ export function OwnerQuestionCard({
               ) : null}
               {question.answer && !expanded ? (
                 <Typography color="text.secondary" sx={{ fontSize: "0.95rem" }}>
-                  已有回复草稿，点击“回复”继续编辑。
+                  {t("dashboard.ownerQuestion.draftHint")}
                 </Typography>
               ) : null}
             </Stack>
@@ -218,7 +230,9 @@ export function OwnerQuestionCard({
               onClick={() => setExpanded((value) => !value)}
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              {expanded ? "收起回复" : "回复"}
+              {expanded
+                ? t("dashboard.ownerQuestion.collapseReply")
+                : t("common.actions.reply")}
             </Button>
             <Button
               type="button"
@@ -229,7 +243,9 @@ export function OwnerQuestionCard({
               onClick={blockQuestion}
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              {isBlocked ? "已屏蔽" : "屏蔽"}
+              {isBlocked
+                ? t("dashboard.ownerQuestion.blocked")
+                : t("dashboard.ownerQuestion.block")}
             </Button>
           </Stack>
 
@@ -244,7 +260,7 @@ export function OwnerQuestionCard({
             <Stack component="form" action={saveAnswer} spacing={1.75}>
               <Divider className="list-divider-soft" />
               <TextField
-                label="回复内容"
+                label={t("dashboard.ownerQuestion.replyContent")}
                 name="content"
                 multiline
                 minRows={4}
@@ -257,14 +273,14 @@ export function OwnerQuestionCard({
                 name="image"
                 accept="image/png,image/jpeg,image/webp"
                 disabled={isBlocked || saving}
-                helperText="可选上传一张回复图片，新图会覆盖旧图。"
-                buttonLabel="上传回复图片"
+                helperText={t("dashboard.ownerQuestion.replyImageHelper")}
+                buttonLabel={t("dashboard.ownerQuestion.uploadReplyImage")}
               />
               {question.answer?.imageUrl ? (
                 <Box
                   component="img"
                   src={question.answer.imageUrl}
-                  alt="Answer attachment"
+                  alt={t("publicBox.answerAttachmentAlt")}
                   sx={{
                     borderRadius: "16px",
                     width: "100%",
@@ -281,7 +297,7 @@ export function OwnerQuestionCard({
                   startIcon={<SendRounded />}
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
-                  保存回复
+                  {t("dashboard.ownerQuestion.saveReply")}
                 </Button>
                 <Button
                   type="button"
@@ -290,7 +306,7 @@ export function OwnerQuestionCard({
                   onClick={publishQuestion}
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
-                  发布该提问
+                  {t("dashboard.ownerQuestion.publishQuestion")}
                 </Button>
               </Stack>
             </Stack>

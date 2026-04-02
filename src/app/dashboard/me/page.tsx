@@ -6,39 +6,63 @@ import {
 import { ChangePasswordForm } from "@/components/auth/change-password-form";
 import { LogoutButton } from "@/components/common/logout-button";
 import { SectionCard } from "@/components/common/section-card";
+import { DashboardLanguageSettingsCard } from "@/components/layout/dashboard-language-settings-card";
 import { DashboardThemeSettingsCard } from "@/components/layout/dashboard-theme-settings-card";
 import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
 import { requireUserPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import {
+  createTranslator,
+  getRoleLabel,
+} from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 export default async function DashboardMePage() {
   const viewer = await requireUserPage();
+  const locale = await getRequestLocale();
+  const t = createTranslator(locale);
 
   return (
-    <UserDashboardShell viewer={viewer} pageTitle="我的">
+    <UserDashboardShell viewer={viewer} pageTitle={t("common.nav.me")}>
       <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, xl: 5 }}>
           <Stack spacing={3}>
             <SectionCard
               className="motion-enter-soft"
-              title="账号信息"
-              description="这里放的是当前登录账号的基础信息。"
+              title={t("dashboard.accountInfoTitle")}
+              description={t("dashboard.accountInfoDescription")}
             >
               <Stack spacing={1.25}>
-                <Typography>手机号：{viewer.phone}</Typography>
-                <Typography color="text.secondary">角色：{viewer.role}</Typography>
+                <Typography>
+                  {t("dashboard.accountPhone", { phone: viewer.phone })}
+                </Typography>
                 <Typography color="text.secondary">
-                  注册时间：{formatDateTime(viewer.createdAt)}
+                  {t("dashboard.accountRole", {
+                    role: getRoleLabel(viewer.role, locale),
+                  })}
+                </Typography>
+                <Typography color="text.secondary">
+                  {t("dashboard.accountCreatedAt", {
+                    value: formatDateTime(viewer.createdAt, locale),
+                  })}
                 </Typography>
               </Stack>
             </SectionCard>
 
             <SectionCard
               className="motion-enter-soft motion-delay-1"
-              title="主题"
-              description="你可以随时在白天和夜间之间切换用户中心。"
+              title={t("dashboard.themeTitle")}
+              description={t("dashboard.themeDescription")}
             >
               <DashboardThemeSettingsCard />
+            </SectionCard>
+
+            <SectionCard
+              className="motion-enter-soft motion-delay-2"
+              title={t("dashboard.languageTitle")}
+              description={t("dashboard.languageDescription")}
+            >
+              <DashboardLanguageSettingsCard />
             </SectionCard>
           </Stack>
         </Grid>
@@ -47,20 +71,21 @@ export default async function DashboardMePage() {
           <Stack spacing={3}>
             <SectionCard
               className="motion-enter-soft motion-delay-1"
-              title="修改密码"
-              description="更新密码后，其他设备上的旧会话会被登出。"
+              title={t("dashboard.passwordTitle")}
+              description={t("dashboard.passwordDescription")}
             >
               <ChangePasswordForm />
             </SectionCard>
 
             <SectionCard
-              className="motion-enter-soft motion-delay-2"
-              title="退出登录"
-              description="如果你要离开当前设备，可以在这里安全退出。"
+              className="motion-enter-soft motion-delay-3"
+              title={t("dashboard.logoutTitle")}
+              description={t("dashboard.logoutDescription")}
             >
               <LogoutButton
                 variant="outlined"
                 redirectTo="/"
+                label={t("common.actions.signOut")}
                 sx={{ width: { xs: "100%", sm: "auto" } }}
               />
             </SectionCard>

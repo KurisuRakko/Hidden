@@ -16,4 +16,5 @@ export const POST = withApiHandler(
     const { id, questionId } = await context.params;
     return ok(await publishQuestionForOwner(id, questionId, viewer.id));
   },
+  { localizeErrors: true },
 );

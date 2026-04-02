@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { isIP } from "node:net";
-import { getEnv } from "@/lib/env";
+import { getEnvValue } from "@/lib/env";
 
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9._:-]{1,128}$/;
 
@@ -65,7 +65,7 @@ export function hashIpAddress(ipAddress: string) {
 
   return createHash("sha256")
     .update(ipAddress)
-    .update(getEnv().IP_HASH_SECRET)
+    .update(getEnvValue("IP_HASH_SECRET"))
     .digest("hex");
 }
 

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button, Grid, Stack, Typography } from "@mui/material";
 import { MetricCard } from "@/components/common/metric-card";
 import { SectionCard } from "@/components/common/section-card";
@@ -33,7 +32,7 @@ export default async function AdminOverviewPage() {
       >
         <Stack spacing={2}>
           <Stack direction="row" justifyContent="flex-end">
-            <Button component={Link} href="/admin/logs">
+            <Button href="/admin/logs">
               View all logs
             </Button>
           </Stack>

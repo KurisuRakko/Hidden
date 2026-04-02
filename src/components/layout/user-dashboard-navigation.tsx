@@ -7,7 +7,7 @@ import {
 export type UserDashboardNavItem = {
   key: "questions" | "create" | "me";
   href: string;
-  label: string;
+  labelKey: string;
   icon: React.ReactNode;
   matches: (pathname: string) => boolean;
   mobileOnlyPrimaryAction?: boolean;
@@ -17,7 +17,7 @@ export const userDashboardNavigation: UserDashboardNavItem[] = [
   {
     key: "questions",
     href: "/dashboard/questions",
-    label: "我的问题",
+    labelKey: "common.nav.questions",
     icon: <QuestionAnswerRounded />,
     matches: (pathname) =>
       pathname === "/dashboard/questions" ||
@@ -28,7 +28,7 @@ export const userDashboardNavigation: UserDashboardNavItem[] = [
   {
     key: "create",
     href: "/dashboard/boxes/new",
-    label: "新增",
+    labelKey: "common.nav.create",
     icon: <AddRounded />,
     mobileOnlyPrimaryAction: true,
     matches: (pathname) =>
@@ -38,7 +38,7 @@ export const userDashboardNavigation: UserDashboardNavItem[] = [
   {
     key: "me",
     href: "/dashboard/me",
-    label: "我的",
+    labelKey: "common.nav.me",
     icon: <PersonRounded />,
     matches: (pathname) => pathname === "/dashboard/me",
   },

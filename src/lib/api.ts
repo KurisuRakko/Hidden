@@ -1,4 +1,5 @@
 import { errorResponse, getErrorCode } from "@/lib/http";
+import { getRequestLocaleFromRequest } from "@/lib/i18n/server";
 import { logApiRequest } from "@/lib/logger";
 import { getClientIp, getRequestId, hashIpAddress } from "@/lib/request";
 
@@ -14,12 +15,15 @@ type WrappedRouteHandler<TContext> = (
 
 export function withApiHandler(
   handler: (request: Request) => Promise<Response> | Response,
+  options?: { localizeErrors?: boolean },
 ): (request: Request) => Promise<Response>;
 export function withApiHandler<TContext>(
   handler: RouteHandler<TContext>,
+  options?: { localizeErrors?: boolean },
 ): WrappedRouteHandler<TContext>;
 export function withApiHandler<TContext>(
   handler: RouteHandler<TContext>,
+  options?: { localizeErrors?: boolean },
 ) {
   return async function wrappedHandler(request: Request, context: TContext) {
     const startedAt = Date.now();
@@ -39,7 +43,11 @@ export function withApiHandler<TContext>(
         requestId,
         method: request.method,
         path,
-      });
+      }, options?.localizeErrors
+        ? {
+            locale: getRequestLocaleFromRequest(request),
+          }
+        : undefined);
     }
 
     response.headers.set("x-request-id", requestId);

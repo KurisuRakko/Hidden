@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { createHash, randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getEnv } from "@/lib/env";
+import { getEnvValue } from "@/lib/env";
 import { AppError } from "@/lib/http";
 import { SESSION_COOKIE_NAME, SESSION_TTL_DAYS } from "@/lib/constants";
 
@@ -25,7 +25,7 @@ export type SessionPayload = {
 function hashToken(token: string) {
   return createHash("sha256")
     .update(token)
-    .update(getEnv().SESSION_SECRET)
+    .update(getEnvValue("SESSION_SECRET"))
     .digest("hex");
 }
 

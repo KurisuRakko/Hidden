@@ -13,6 +13,7 @@ import {
   LaunchRounded,
   SettingsRounded,
 } from "@mui/icons-material";
+import { useI18n } from "@/components/providers/i18n-provider";
 
 type BoxShareActionsProps = {
   shareUrl: string;
@@ -23,14 +24,15 @@ export function BoxShareActions({
   shareUrl,
   manageHref,
 }: BoxShareActionsProps) {
+  const { t } = useI18n();
   const [message, setMessage] = useState<string | null>(null);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setMessage("提问箱链接已复制。");
+      setMessage(t("dashboard.share.copied"));
     } catch {
-      setMessage("复制失败，请手动复制链接。");
+      setMessage(t("dashboard.share.copyFailed"));
     }
   }
 
@@ -38,7 +40,7 @@ export function BoxShareActions({
     <Stack spacing={2}>
       {message ? <Alert severity="success">{message}</Alert> : null}
       <TextField
-        label="提问箱链接"
+        label={t("dashboard.share.shareUrl")}
         value={shareUrl}
         fullWidth
         slotProps={{
@@ -55,7 +57,7 @@ export function BoxShareActions({
           onClick={handleCopy}
           sx={{ width: { xs: "100%", sm: "auto" } }}
         >
-          分享提问箱
+          {t("dashboard.share.share")}
         </Button>
         <Button
           component={Link}
@@ -65,7 +67,7 @@ export function BoxShareActions({
           startIcon={<LaunchRounded />}
           sx={{ width: { xs: "100%", sm: "auto" } }}
         >
-          打开公开页
+          {t("dashboard.share.open")}
         </Button>
         {manageHref ? (
           <Button
@@ -75,7 +77,7 @@ export function BoxShareActions({
             startIcon={<SettingsRounded />}
             sx={{ width: { xs: "100%", sm: "auto" } }}
           >
-            管理该提问箱
+            {t("dashboard.share.manage")}
           </Button>
         ) : null}
       </Stack>

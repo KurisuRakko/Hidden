@@ -25,4 +25,5 @@ export const PATCH = withApiHandler(
       await updateQuestionStatusForOwner(id, questionId, viewer.id, body.status),
     );
   },
+  { localizeErrors: true },
 );

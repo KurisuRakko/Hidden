@@ -16,8 +16,11 @@ import { useState } from "react";
 import {
   DIAL_CODE_OPTIONS,
   type DialCode,
+  getDialCodeOptions,
   normalizeLocalPhoneNumber,
 } from "@/lib/phone";
+import { useI18n } from "@/components/providers/i18n-provider";
+import { getLocalizedErrorMessage } from "@/lib/i18n";
 
 type AuthFormProps = {
   mode: "login" | "register";
@@ -32,6 +35,7 @@ export function AuthForm({
   notice,
   defaultDialCode,
 }: AuthFormProps) {
+  const { locale, t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [errorActionUrl, setErrorActionUrl] = useState<string | null>(null);
@@ -39,6 +43,7 @@ export function AuthForm({
   const isAdminLogin = mode === "login" && portal === "ADMIN";
   const feedbackSeverity = error ? "error" : notice ? "info" : null;
   const feedbackMessage = error ?? notice ?? null;
+  const dialCodeOptions = isAdminLogin ? DIAL_CODE_OPTIONS : getDialCodeOptions(locale);
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
@@ -54,19 +59,27 @@ export function AuthForm({
     const phone = `${dialCode}${localPhone}`;
 
     if (!localPhone) {
-      setError("Enter a valid local phone number before continuing.");
+      setError(
+        isAdminLogin
+          ? "Enter a valid local phone number before continuing."
+          : t("auth.validation.localPhoneRequired"),
+      );
       setSubmitting(false);
       return;
     }
 
     if (!password.trim()) {
-      setError("Enter your password before continuing.");
+      setError(
+        isAdminLogin
+          ? "Enter your password before continuing."
+          : t("auth.validation.passwordRequired"),
+      );
       setSubmitting(false);
       return;
     }
 
     if (mode === "register" && !inviteCode.trim()) {
-      setError("Enter your invite code before creating an account.");
+      setError(t("auth.validation.inviteCodeRequired"));
       setSubmitting(false);
       return;
     }
@@ -96,7 +109,19 @@ export function AuthForm({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "Request failed.");
+        setError(
+          isAdminLogin
+            ? result.error ?? "Request failed."
+            : getLocalizedErrorMessage({
+                locale,
+                code:
+                  typeof result.code === "string" ? result.code : undefined,
+                message:
+                  typeof result.error === "string"
+                    ? result.error
+                    : t("common.feedback.requestFailed"),
+              }),
+        );
         setErrorActionUrl(
           typeof result.details?.adminLoginUrl === "string"
             ? result.details.adminLoginUrl
@@ -120,7 +145,11 @@ export function AuthForm({
       router.push(redirectTo);
       router.refresh();
     } catch {
-      setError("Network request failed. Please try again.");
+      setError(
+        isAdminLogin
+          ? "Network request failed. Please try again."
+          : t("common.feedback.networkError"),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -142,15 +171,15 @@ export function AuthForm({
               {isAdminLogin
                 ? "Admin sign in"
                 : mode === "login"
-                  ? "Sign in"
-                  : "Create your Hidden account"}
+                  ? t("auth.loginTitle")
+                  : t("auth.registerTitle")}
             </Typography>
             <Typography color="text.secondary">
               {isAdminLogin
                 ? "Use the internal admin portal to review users, questions, and moderation logs."
                 : mode === "login"
-                ? "Use your phone number and password to continue."
-                : "Registration is invite-only in the first release."}
+                ? t("auth.loginDescription")
+                : t("auth.registerDescription")}
             </Typography>
           </Box>
 
@@ -190,31 +219,37 @@ export function AuthForm({
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                 <TextField
                   select
-                  label="Country code"
+                  label={isAdminLogin ? "Country code" : t("auth.countryCode")}
                   name="dialCode"
                   defaultValue={defaultDialCode}
                   disabled={submitting}
                   sx={{ width: { xs: "100%", sm: 190 } }}
                 >
-                  {DIAL_CODE_OPTIONS.map((option) => (
+                  {dialCodeOptions.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
                     </MenuItem>
                   ))}
                 </TextField>
                 <TextField
-                  label="Phone number"
+                  label={isAdminLogin ? "Phone number" : t("auth.phoneNumber")}
                   name="localPhone"
                   autoComplete="tel-national"
                   fullWidth
                   required
                   disabled={submitting}
-                  placeholder="138 0013 8000"
-                  helperText="Enter the local number without the international prefix."
+                  placeholder={
+                    isAdminLogin ? "138 0013 8000" : t("auth.phonePlaceholder")
+                  }
+                  helperText={
+                    isAdminLogin
+                      ? "Enter the local number without the international prefix."
+                      : t("auth.phoneHelper")
+                  }
                 />
               </Stack>
               <TextField
-                label="Password"
+                label={isAdminLogin ? "Password" : t("auth.password")}
                 name="password"
                 type="password"
                 autoComplete={
@@ -226,7 +261,7 @@ export function AuthForm({
               />
               {mode === "register" ? (
                 <TextField
-                  label="Invite code"
+                  label={t("auth.inviteCode")}
                   name="inviteCode"
                   autoCapitalize="characters"
                   fullWidth
@@ -243,12 +278,14 @@ export function AuthForm({
                 sx={{ width: { xs: "100%", sm: "auto" }, mt: 0.25 }}
               >
                 {submitting
-                  ? "Submitting..."
+                  ? isAdminLogin
+                    ? "Submitting..."
+                    : t("auth.submit")
                   : isAdminLogin
                     ? "Sign in to admin"
                     : mode === "login"
-                    ? "Sign in"
-                    : "Register"}
+                    ? t("common.actions.signIn")
+                    : t("auth.registerAction")}
               </Button>
             </Stack>
           </Box>

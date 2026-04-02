@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Button,
   Card,
@@ -8,6 +7,8 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { StatusChip } from "@/components/common/status-chip";
+import { useI18n } from "@/components/providers/i18n-provider";
+import { getStatusLabel } from "@/lib/i18n";
 
 type DashboardBoxCardProps = {
   box: {
@@ -24,6 +25,8 @@ type DashboardBoxCardProps = {
 };
 
 export function DashboardBoxCard({ box }: DashboardBoxCardProps) {
+  const { locale, t } = useI18n();
+
   return (
     <Card
       className="interactive-panel"
@@ -40,38 +43,41 @@ export function DashboardBoxCard({ box }: DashboardBoxCardProps) {
               alignItems={{ xs: "flex-start", sm: "center" }}
             >
               <Typography variant="h6">{box.title}</Typography>
-              <StatusChip status={box.status} />
+              <StatusChip
+                status={box.status}
+                label={getStatusLabel(box.status, locale)}
+              />
             </Stack>
             <Typography color="text.secondary" className="text-break">
               /b/{box.slug}
             </Typography>
             <Typography color="text.secondary" className="text-break">
-              {box.description || "还没有写简介。"}
+              {box.description || t("dashboard.boxCard.noDescription")}
             </Typography>
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
-            {box.acceptingQuestions ? "正在接收提问" : "已暂停接收提问"} ·{" "}
-            {box._count.questions} 个问题
+            {box.acceptingQuestions
+              ? t("dashboard.boxCard.accepting")
+              : t("dashboard.boxCard.paused")}{" "}
+            · {t("dashboard.boxCard.questionCount", { count: box._count.questions })}
           </Typography>
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
             <Button
-              component={Link}
               href={`/dashboard/boxes/${box.id}`}
               variant="contained"
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              进入
+              {t("dashboard.boxCard.open")}
             </Button>
             <Button
-              component={Link}
               href={`/b/${box.slug}`}
               target="_blank"
               variant="text"
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              分享页
+              {t("dashboard.boxCard.sharePage")}
             </Button>
           </Stack>
         </Stack>

@@ -12,6 +12,7 @@ type LogoutButtonProps = {
   sx?: SxProps<Theme>;
   redirectTo?: string;
   onLoggedOut?: () => void;
+  label?: string;
 };
 
 export function LogoutButton({
@@ -20,6 +21,7 @@ export function LogoutButton({
   sx,
   redirectTo = "/",
   onLoggedOut,
+  label = "Sign out",
 }: LogoutButtonProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -56,7 +58,7 @@ export function LogoutButton({
       aria-busy={submitting}
       sx={sx}
     >
-      Sign out
+      {label}
     </Button>
   );
 }

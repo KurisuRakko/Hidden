@@ -17,6 +17,7 @@ import {
 import { useId, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LogoutButton } from "@/components/common/logout-button";
+import { useI18n } from "@/components/providers/i18n-provider";
 
 type PublicHeaderViewer = {
   role: string;
@@ -35,6 +36,7 @@ export function PublicHeaderActions({
   const [open, setOpen] = useState(false);
   const [drawerPathname, setDrawerPathname] = useState(pathname);
   const drawerId = useId();
+  const { t } = useI18n();
   const isAdminViewer = viewer?.role === "ADMIN";
   const showGuestActions = !viewer && !hideGuestActions;
   const showUserDashboard = viewer && !isAdminViewer;
@@ -57,26 +59,26 @@ export function PublicHeaderActions({
         {showUserDashboard ? (
           <>
             <Button component={Link} href="/dashboard" startIcon={<DashboardRounded />} size="small">
-              Dashboard
+              {t("common.actions.dashboard")}
             </Button>
-            <LogoutButton size="small" />
+            <LogoutButton size="small" label={t("common.actions.signOut")} />
           </>
         ) : null}
         {isAdminViewer ? (
           <>
             <Typography variant="body2" color="text.secondary">
-              Admin session active
+              {t("common.adminSessionActive")}
             </Typography>
-            <LogoutButton size="small" />
+            <LogoutButton size="small" label={t("common.actions.signOut")} />
           </>
         ) : null}
         {showGuestActions ? (
           <>
             <Button component={Link} href="/login" size="small">
-              Sign in
+              {t("common.actions.signIn")}
             </Button>
             <Button component={Link} href="/register" variant="contained" size="small">
-              Register
+              {t("common.actions.register")}
             </Button>
           </>
         ) : null}
@@ -84,7 +86,7 @@ export function PublicHeaderActions({
 
       <Box sx={{ display: { xs: hasMobileActions ? "block" : "none", md: "none" } }}>
         <IconButton
-          aria-label="Open navigation menu"
+          aria-label={t("common.menu")}
           aria-controls={drawerId}
           aria-expanded={drawerOpen}
           aria-haspopup="dialog"
@@ -127,8 +129,8 @@ export function PublicHeaderActions({
           >
             <Stack spacing={2.5}>
               <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Typography variant="h6">Menu</Typography>
-                <IconButton aria-label="Close navigation menu" onClick={closeDrawer} size="small">
+                <Typography variant="h6">{t("common.menu")}</Typography>
+                <IconButton aria-label={t("common.actions.close")} onClick={closeDrawer} size="small">
                   <CloseRounded />
                 </IconButton>
               </Stack>
@@ -143,7 +145,7 @@ export function PublicHeaderActions({
                     onClick={closeDrawer}
                     sx={{ width: "100%" }}
                   >
-                    Register
+                    {t("common.actions.register")}
                   </Button>
                   <Button
                     component={Link}
@@ -153,7 +155,7 @@ export function PublicHeaderActions({
                     onClick={closeDrawer}
                     sx={{ width: "100%" }}
                   >
-                    Sign in
+                    {t("common.actions.signIn")}
                   </Button>
                 </Stack>
               ) : null}
@@ -168,12 +170,13 @@ export function PublicHeaderActions({
                     onClick={closeDrawer}
                     sx={{ width: "100%" }}
                   >
-                    Dashboard
+                    {t("common.actions.dashboard")}
                   </Button>
                   <LogoutButton
                     variant="outlined"
                     sx={{ width: "100%" }}
                     onLoggedOut={closeDrawer}
+                    label={t("common.actions.signOut")}
                   />
                 </Stack>
               ) : null}
@@ -181,12 +184,13 @@ export function PublicHeaderActions({
               {isAdminViewer ? (
                 <Stack spacing={1.25}>
                   <Typography variant="body2" color="text.secondary">
-                    Admin session active on the public site.
+                    {t("common.adminSessionOnPublicSite")}
                   </Typography>
                   <LogoutButton
                     variant="outlined"
                     sx={{ width: "100%" }}
                     onLoggedOut={closeDrawer}
+                    label={t("common.actions.signOut")}
                   />
                 </Stack>
               ) : null}

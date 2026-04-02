@@ -32,10 +32,10 @@ async function parseBoxPayload(request: Request) {
 export const GET = withApiHandler(async () => {
   const viewer = await requireUserApi();
   return ok(await listBoxesForOwner(viewer.id));
-});
+}, { localizeErrors: true });
 
 export const POST = withApiHandler(async (request: Request) => {
   const viewer = await requireUserApi();
   const body = await parseBoxPayload(request);
   return ok(await createBoxForOwner(viewer.id, body), 201);
-});
+}, { localizeErrors: true });

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Button,
   MenuItem,
@@ -88,7 +87,7 @@ export default async function AdminBoxesPage({
               <TableRow key={box.id}>
                 <TableCell>{box.title}</TableCell>
                 <TableCell>
-                  <Button component={Link} href={`/b/${box.slug}`} target="_blank">
+                  <Button href={`/b/${box.slug}`} target="_blank">
                     /b/{box.slug}
                   </Button>
                 </TableCell>
@@ -112,7 +111,6 @@ export default async function AdminBoxesPage({
           </Typography>
           <Stack direction="row" spacing={1.5}>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/boxes", {
                 q: params.q,
                 status: params.status,
@@ -123,7 +121,6 @@ export default async function AdminBoxesPage({
               Previous
             </Button>
             <Button
-              component={Link}
               href={buildPathWithQuery("/admin/boxes", {
                 q: params.q,
                 status: params.status,

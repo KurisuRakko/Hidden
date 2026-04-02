@@ -2,6 +2,7 @@ import { Chip } from "@mui/material";
 
 type StatusChipProps = {
   status: string;
+  label?: string;
 };
 
 const colorMap: Record<
@@ -19,10 +20,10 @@ const colorMap: Record<
   DELETED: "error",
 };
 
-export function StatusChip({ status }: StatusChipProps) {
+export function StatusChip({ status, label }: StatusChipProps) {
   return (
     <Chip
-      label={status.replaceAll("_", " ")}
+      label={label ?? status.replaceAll("_", " ")}
       color={colorMap[status] ?? "default"}
       size="small"
       variant={status === "REJECTED" ? "outlined" : "filled"}

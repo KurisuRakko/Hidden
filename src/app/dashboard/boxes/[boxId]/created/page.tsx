@@ -8,6 +8,8 @@ import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
 import { getBoxSummaryForOwner } from "@/features/boxes/service";
 import { getPublicAppUrl } from "@/lib/admin-portal";
 import { requireUserPage } from "@/lib/auth/guards";
+import { createTranslator } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 type CreatedPageProps = {
   params: Promise<{
@@ -20,18 +22,20 @@ export default async function BoxCreatedPage({ params }: CreatedPageProps) {
   const { boxId } = await params;
   const box = await getBoxSummaryForOwner(boxId, viewer.id);
   const shareUrl = await getPublicAppUrl(`/b/${box.slug}`);
+  const locale = await getRequestLocale();
+  const t = createTranslator(locale);
 
   return (
-    <UserDashboardShell viewer={viewer} pageTitle="提问箱创建成功">
+    <UserDashboardShell viewer={viewer} pageTitle={t("dashboard.createdPageTitle")}>
       <SectionCard
         className="motion-enter-soft"
         title={box.title}
-        description="提问箱已经准备好了。现在你可以把链接分享出去，或者继续进入后台管理。"
+        description={t("dashboard.createdDescription")}
       >
         <Stack spacing={2.5}>
           <Stack direction="row" spacing={1.25} alignItems="center">
             <CheckCircleRounded color="success" />
-            <span>创建成功</span>
+            <span>{t("dashboard.createdSuccess")}</span>
           </Stack>
           <BoxShareActions
             shareUrl={shareUrl}

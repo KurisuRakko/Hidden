@@ -42,4 +42,5 @@ export const PATCH = withApiHandler(
     const { id } = await context.params;
     return ok(await updateBoxForOwner(id, viewer.id, body));
   },
+  { localizeErrors: true },
 );

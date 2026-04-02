@@ -25,6 +25,8 @@ import {
   UserDashboardThemeProvider,
   useUserDashboardTheme,
 } from "@/components/layout/user-dashboard-theme";
+import { useI18n } from "@/components/providers/i18n-provider";
+import { getRoleLabel } from "@/lib/i18n";
 
 type UserDashboardShellProps = {
   viewer: {
@@ -64,6 +66,7 @@ function UserDashboardShellInner({
   const pathname = usePathname();
   const activeNavigation = getActiveUserDashboardItem(pathname);
   const { mode, toggleMode } = useUserDashboardTheme();
+  const { locale, t } = useI18n();
 
   return (
     <Box
@@ -158,7 +161,11 @@ function UserDashboardShellInner({
                 {pageAction}
                 <IconButton
                   onClick={toggleMode}
-                  aria-label={mode === "light" ? "切换到夜间模式" : "切换到白天模式"}
+                  aria-label={
+                    mode === "light"
+                      ? t("dashboard.switchToDark")
+                      : t("dashboard.switchToLight")
+                  }
                   sx={(theme) => ({
                     width: 44,
                     height: 44,
@@ -191,7 +198,9 @@ function UserDashboardShellInner({
                         color={active ? "primary" : "inherit"}
                         sx={{ justifyContent: "flex-start", width: "100%" }}
                       >
-                        {item.key === "create" ? "新增提问箱" : item.label}
+                        {item.key === "create"
+                          ? t("common.nav.createBox")
+                          : t(item.labelKey)}
                       </Button>
                     );
                   })}
@@ -207,7 +216,7 @@ function UserDashboardShellInner({
                   >
                     <Typography variant="subtitle2">{viewer.phone}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {viewer.role}
+                      {getRoleLabel(viewer.role, locale)}
                     </Typography>
                   </Box>
                 </Stack>
@@ -277,7 +286,7 @@ function UserDashboardShellInner({
                     }}
                   >
                     {item.icon}
-                    {item.label}
+                    {t(item.labelKey)}
                   </Button>
                 );
               })}
@@ -286,7 +295,7 @@ function UserDashboardShellInner({
               <IconButton
                 component={Link}
                 href="/dashboard/boxes/new"
-                aria-label="新增提问箱"
+                aria-label={t("common.nav.createBox")}
                 className="dashboard-fab-animate"
                 sx={(theme) => ({
                   width: 72,

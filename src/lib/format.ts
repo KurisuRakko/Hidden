@@ -1,13 +1,25 @@
-import { format } from "date-fns";
+import { type Locale, translate } from "@/lib/i18n";
 
-export function formatDateTime(value: Date | string | null | undefined) {
+export function formatDateTime(
+  value: Date | string | null | undefined,
+  locale: Locale = "en",
+) {
   if (!value) {
-    return "Not set";
+    return translate(locale, "common.notSet");
   }
 
-  return format(new Date(value), "yyyy-MM-dd HH:mm");
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(value));
 }
 
-export function formatRelativeState(value: boolean) {
-  return value ? "Enabled" : "Disabled";
+export function formatRelativeState(value: boolean, locale: Locale = "en") {
+  return value
+    ? translate(locale, "common.enabled")
+    : translate(locale, "common.disabled");
 }

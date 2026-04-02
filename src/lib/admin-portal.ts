@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { getEnv } from "@/lib/env";
+import { getEnvValue } from "@/lib/env";
 import { AppError } from "@/lib/http";
 
 export const ADMIN_PORTAL_HEADER = "x-hidden-admin-portal";
@@ -62,8 +62,8 @@ export async function getAdminAppUrl(pathname = "/admin") {
     headerStore.get(ADMIN_PORTAL_HEADER),
   );
   const baseUrl = isAdminPortalRequest
-    ? requestOrigin ?? getEnv().ADMIN_APP_URL
-    : resolvePortalBaseUrl(getEnv().ADMIN_APP_URL, requestOrigin);
+    ? requestOrigin ?? getEnvValue("ADMIN_APP_URL")
+    : resolvePortalBaseUrl(getEnvValue("ADMIN_APP_URL"), requestOrigin);
 
   return joinAppUrl(baseUrl, pathname);
 }
@@ -75,8 +75,8 @@ export async function getPublicAppUrl(pathname = "/") {
     headerStore.get(ADMIN_PORTAL_HEADER),
   );
   const baseUrl = isAdminPortalRequest
-    ? resolvePortalBaseUrl(getEnv().APP_URL, requestOrigin)
-    : requestOrigin ?? getEnv().APP_URL;
+    ? resolvePortalBaseUrl(getEnvValue("APP_URL"), requestOrigin)
+    : requestOrigin ?? getEnvValue("APP_URL");
 
   return joinAppUrl(baseUrl, pathname);
 }

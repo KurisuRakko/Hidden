@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { getLocalizedErrorMessage, type Locale } from "@/lib/i18n";
 import { logApiError } from "@/lib/logger";
 
 export class AppError extends Error {
@@ -54,30 +55,65 @@ function getErrorStatus(error: unknown) {
   return 500;
 }
 
-function getErrorBody(error: unknown) {
+function getErrorBody(error: unknown, locale?: Locale) {
   if (error instanceof AppError) {
     return {
-      error: error.message,
+      error: locale
+        ? getLocalizedErrorMessage({
+            locale,
+            code: error.code,
+            message: error.message,
+          })
+        : error.message,
       code: error.code,
       details: error.details,
     };
   }
 
   if (error instanceof ZodError) {
+    const firstIssue = error.issues[0];
+
     return {
-      error: "Request validation failed",
+      error: locale
+        ? getLocalizedErrorMessage({
+            locale,
+            code: "VALIDATION_ERROR",
+            message: firstIssue?.message ?? "Request validation failed",
+          })
+        : "Request validation failed",
       code: "VALIDATION_ERROR",
       details: error.issues.map((issue) => ({
         path: issue.path.join("."),
-        message: issue.message,
+        message: locale
+          ? getLocalizedErrorMessage({
+              locale,
+              code: "VALIDATION_ERROR",
+              message: issue.message,
+            })
+          : issue.message,
       })),
     };
   }
 
-  return { error: "Internal server error", code: "INTERNAL_SERVER_ERROR" };
+  return {
+    error: locale
+      ? getLocalizedErrorMessage({
+          locale,
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Internal server error",
+        })
+      : "Internal server error",
+    code: "INTERNAL_SERVER_ERROR",
+  };
 }
 
-export function errorResponse(error: unknown, context?: ErrorResponseContext) {
+export function errorResponse(
+  error: unknown,
+  context?: ErrorResponseContext,
+  options?: {
+    locale?: Locale;
+  },
+) {
   const status = getErrorStatus(error);
   const code = getErrorCode(error);
 
@@ -94,7 +130,7 @@ export function errorResponse(error: unknown, context?: ErrorResponseContext) {
     console.error(error);
   }
 
-  return NextResponse.json(getErrorBody(error), { status });
+  return NextResponse.json(getErrorBody(error, options?.locale), { status });
 }
 
 export function getPageFromSearchParams(
