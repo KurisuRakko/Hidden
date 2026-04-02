@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { Box } from "@mui/material";
 import {
   getAdminAppUrl,
@@ -8,6 +9,7 @@ import {
 import { getViewer } from "@/lib/auth/guards";
 import { AuthForm } from "@/components/auth/auth-form";
 import { PublicShell } from "@/components/layout/public-shell";
+import { getDefaultDialCodeFromAcceptLanguage } from "@/lib/phone";
 
 type AdminLoginPageProps = {
   searchParams: Promise<{
@@ -20,6 +22,10 @@ export default async function AdminLoginPage({
 }: AdminLoginPageProps) {
   await requireAdminPortalPage();
   const viewer = await getViewer();
+  const headerStore = await headers();
+  const defaultDialCode = getDefaultDialCodeFromAcceptLanguage(
+    headerStore.get("accept-language"),
+  );
 
   if (viewer?.role === "ADMIN") {
     redirect(getAdminAppUrl("/admin"));
@@ -37,6 +43,7 @@ export default async function AdminLoginPage({
         <AuthForm
           mode="login"
           portal="ADMIN"
+          defaultDialCode={defaultDialCode}
           notice={
             params.disabled
               ? "This admin account is not active right now. Please contact another administrator."

@@ -7,23 +7,31 @@ import {
   Card,
   CardContent,
   Collapse,
+  MenuItem,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  DIAL_CODE_OPTIONS,
+  type DialCode,
+  normalizeLocalPhoneNumber,
+} from "@/lib/phone";
 
 type AuthFormProps = {
   mode: "login" | "register";
   portal?: "PUBLIC" | "ADMIN";
   notice?: string;
+  defaultDialCode: DialCode;
 };
 
 export function AuthForm({
   mode,
   portal = "PUBLIC",
   notice,
+  defaultDialCode,
 }: AuthFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -36,15 +44,21 @@ export function AuthForm({
     setError(null);
     setErrorActionUrl(null);
 
+    const dialCode = String(formData.get("dialCode") ?? defaultDialCode);
+    const localPhone = normalizeLocalPhoneNumber(
+      String(formData.get("localPhone") ?? ""),
+    );
+    const phone = `${dialCode}${localPhone}`;
+
     const body =
       mode === "register"
         ? {
-            phone: String(formData.get("phone") ?? ""),
+            phone,
             password: String(formData.get("password") ?? ""),
             inviteCode: String(formData.get("inviteCode") ?? ""),
           }
         : {
-            phone: String(formData.get("phone") ?? ""),
+            phone,
             password: String(formData.get("password") ?? ""),
             portal,
           };
@@ -137,14 +151,30 @@ export function AuthForm({
 
           <Box component="form" action={handleSubmit}>
             <Stack spacing={{ xs: 2, sm: 2.5 }}>
-              <TextField
-                label="Phone number"
-                name="phone"
-                autoComplete="tel"
-                fullWidth
-                required
-                placeholder="+8613800138000"
-              />
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+                <TextField
+                  select
+                  label="Country code"
+                  name="dialCode"
+                  defaultValue={defaultDialCode}
+                  sx={{ width: { xs: "100%", sm: 220 } }}
+                >
+                  {DIAL_CODE_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label="Phone number"
+                  name="localPhone"
+                  autoComplete="tel-national"
+                  fullWidth
+                  required
+                  placeholder="138 0013 8000"
+                  helperText="Enter the local number without the international prefix."
+                />
+              </Stack>
               <TextField
                 label="Password"
                 name="password"
