@@ -14,7 +14,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useId, useState } from "react";
+import { usePathname } from "next/navigation";
 import { LogoutButton } from "@/components/common/logout-button";
 
 type PublicHeaderViewer = {
@@ -30,12 +31,16 @@ export function PublicHeaderActions({
   viewer,
   hideGuestActions = false,
 }: PublicHeaderActionsProps) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [drawerPathname, setDrawerPathname] = useState(pathname);
+  const drawerId = useId();
   const isAdminViewer = viewer?.role === "ADMIN";
   const showGuestActions = !viewer && !hideGuestActions;
   const showUserDashboard = viewer && !isAdminViewer;
   const hasMobileActions =
     showGuestActions || Boolean(showUserDashboard) || isAdminViewer;
+  const drawerOpen = open && drawerPathname === pathname;
 
   function closeDrawer() {
     setOpen(false);
@@ -80,7 +85,13 @@ export function PublicHeaderActions({
       <Box sx={{ display: { xs: hasMobileActions ? "block" : "none", md: "none" } }}>
         <IconButton
           aria-label="Open navigation menu"
-          onClick={() => setOpen(true)}
+          aria-controls={drawerId}
+          aria-expanded={drawerOpen}
+          aria-haspopup="dialog"
+          onClick={() => {
+            setDrawerPathname(pathname);
+            setOpen(true);
+          }}
           size="small"
           sx={{
             border: "1px solid rgba(32, 34, 39, 0.08)",
@@ -91,8 +102,9 @@ export function PublicHeaderActions({
           <MenuRounded />
         </IconButton>
         <Drawer
+          id={drawerId}
           anchor="right"
-          open={open}
+          open={drawerOpen}
           onClose={closeDrawer}
           PaperProps={{
             sx: {
@@ -158,7 +170,11 @@ export function PublicHeaderActions({
                   >
                     Dashboard
                   </Button>
-                  <LogoutButton variant="outlined" sx={{ width: "100%" }} />
+                  <LogoutButton
+                    variant="outlined"
+                    sx={{ width: "100%" }}
+                    onLoggedOut={closeDrawer}
+                  />
                 </Stack>
               ) : null}
 
@@ -167,7 +183,11 @@ export function PublicHeaderActions({
                   <Typography variant="body2" color="text.secondary">
                     Admin session active on the public site.
                   </Typography>
-                  <LogoutButton variant="outlined" sx={{ width: "100%" }} />
+                  <LogoutButton
+                    variant="outlined"
+                    sx={{ width: "100%" }}
+                    onLoggedOut={closeDrawer}
+                  />
                 </Stack>
               ) : null}
             </Stack>

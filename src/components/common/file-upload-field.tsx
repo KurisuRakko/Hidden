@@ -11,6 +11,7 @@ type FileUploadFieldProps = {
   buttonLabel?: string;
   emptyLabel?: string;
   disabled?: boolean;
+  onFileChange?: () => void;
 };
 
 export function FileUploadField({
@@ -20,6 +21,7 @@ export function FileUploadField({
   buttonLabel = "Choose image",
   emptyLabel = "No file selected",
   disabled = false,
+  onFileChange,
 }: FileUploadFieldProps) {
   const [selectedName, setSelectedName] = useState<string | null>(null);
 
@@ -47,12 +49,18 @@ export function FileUploadField({
             name={name}
             accept={accept}
             disabled={disabled}
-            onChange={(event) =>
-              setSelectedName(event.target.files?.[0]?.name ?? null)
-            }
+            onChange={(event) => {
+              setSelectedName(event.target.files?.[0]?.name ?? null);
+              onFileChange?.();
+            }}
           />
         </Button>
-        <Typography variant="body2" color="text.secondary" className="text-break">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          className="text-break"
+          aria-live="polite"
+        >
           {selectedName ? `Selected: ${selectedName}` : emptyLabel}
         </Typography>
       </Stack>

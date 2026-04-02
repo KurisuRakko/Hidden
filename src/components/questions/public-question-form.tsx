@@ -4,7 +4,6 @@ import {
   Alert,
   Box,
   Button,
-  Collapse,
   Stack,
   TextField,
 } from "@mui/material";
@@ -57,22 +56,28 @@ export function PublicQuestionForm({
     <Stack
       component="form"
       action={handleSubmit}
+      aria-busy={submitting}
       spacing={{ xs: 2, md: 2.25 }}
       className="motion-enter-soft motion-delay-2"
     >
-      <Collapse in={disabled} unmountOnExit>
-        {disabled ? (
-          <Alert severity="warning" className="status-feedback">
-            This box is currently closed for new submissions.
+      <Box
+        aria-live="polite"
+        aria-atomic="true"
+        sx={{
+          minHeight: { xs: error || success ? "auto" : 72, sm: error || success ? "auto" : 56 },
+        }}
+      >
+        {error ? (
+          <Alert severity="error" className="status-feedback">
+            {error}
           </Alert>
         ) : null}
-      </Collapse>
-      <Collapse in={Boolean(error)} unmountOnExit>
-        {error ? <Alert severity="error" className="status-feedback">{error}</Alert> : null}
-      </Collapse>
-      <Collapse in={Boolean(success)} unmountOnExit>
-        {success ? <Alert severity="success" className="status-feedback">{success}</Alert> : null}
-      </Collapse>
+        {!error && success ? (
+          <Alert severity="success" className="status-feedback">
+            {success}
+          </Alert>
+        ) : null}
+      </Box>
       <TextField
         label="Your anonymous question"
         name="content"
@@ -82,7 +87,17 @@ export function PublicQuestionForm({
         required
         disabled={disabled || submitting}
         value={content}
-        onChange={(event) => setContent(event.target.value)}
+        onChange={(event) => {
+          setContent(event.target.value);
+
+          if (error) {
+            setError(null);
+          }
+
+          if (success) {
+            setSuccess(null);
+          }
+        }}
       />
       <Box
         sx={{
@@ -97,6 +112,15 @@ export function PublicQuestionForm({
           name="image"
           accept="image/png,image/jpeg,image/webp"
           disabled={disabled || submitting}
+          onFileChange={() => {
+            if (error) {
+              setError(null);
+            }
+
+            if (success) {
+              setSuccess(null);
+            }
+          }}
           helperText="Optional image, up to 5 MB. JPG, PNG, and WEBP are supported."
           buttonLabel="Attach image"
         />
@@ -106,6 +130,7 @@ export function PublicQuestionForm({
         variant="contained"
         disabled={disabled || submitting}
         size="large"
+        aria-busy={submitting}
         sx={{ width: { xs: "100%", sm: "auto" }, alignSelf: "flex-start", mt: 0.25 }}
       >
         {submitting ? "Submitting..." : "Send anonymously"}

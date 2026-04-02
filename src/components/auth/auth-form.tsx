@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardContent,
-  Collapse,
   MenuItem,
   Stack,
   TextField,
@@ -38,6 +37,8 @@ export function AuthForm({
   const [errorActionUrl, setErrorActionUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const isAdminLogin = mode === "login" && portal === "ADMIN";
+  const feedbackSeverity = error ? "error" : notice ? "info" : null;
+  const feedbackMessage = error ?? notice ?? null;
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
@@ -45,21 +46,41 @@ export function AuthForm({
     setErrorActionUrl(null);
 
     const dialCode = String(formData.get("dialCode") ?? defaultDialCode);
+    const password = String(formData.get("password") ?? "");
+    const inviteCode = String(formData.get("inviteCode") ?? "");
     const localPhone = normalizeLocalPhoneNumber(
       String(formData.get("localPhone") ?? ""),
     );
     const phone = `${dialCode}${localPhone}`;
 
+    if (!localPhone) {
+      setError("Enter a valid local phone number before continuing.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!password.trim()) {
+      setError("Enter your password before continuing.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (mode === "register" && !inviteCode.trim()) {
+      setError("Enter your invite code before creating an account.");
+      setSubmitting(false);
+      return;
+    }
+
     const body =
       mode === "register"
         ? {
             phone,
-            password: String(formData.get("password") ?? ""),
-            inviteCode: String(formData.get("inviteCode") ?? ""),
+            password,
+            inviteCode,
           }
         : {
             phone,
-            password: String(formData.get("password") ?? ""),
+            password,
             portal,
           };
 
@@ -133,13 +154,18 @@ export function AuthForm({
             </Typography>
           </Box>
 
-          <Collapse in={Boolean(notice)} unmountOnExit>
-            {notice ? <Alert severity="info" className="status-feedback">{notice}</Alert> : null}
-          </Collapse>
-          <Collapse in={Boolean(error)} unmountOnExit>
-            {error ? (
+          <Box
+            aria-live="polite"
+            aria-atomic="true"
+            sx={{
+              minHeight: { xs: feedbackMessage ? "auto" : 72, sm: feedbackMessage ? "auto" : 56 },
+            }}
+          >
+            {feedbackMessage && feedbackSeverity ? (
               <Stack spacing={1.25} sx={{ pb: 0.25 }}>
-                <Alert severity="error" className="status-feedback">{error}</Alert>
+                <Alert severity={feedbackSeverity} className="status-feedback">
+                  {feedbackMessage}
+                </Alert>
                 {errorActionUrl ? (
                   <Button component="a" href={errorActionUrl} variant="outlined">
                     Open admin portal
@@ -147,9 +173,19 @@ export function AuthForm({
                 ) : null}
               </Stack>
             ) : null}
-          </Collapse>
+          </Box>
 
-          <Box component="form" action={handleSubmit}>
+          <Box
+            component="form"
+            action={handleSubmit}
+            aria-busy={submitting}
+            onChange={() => {
+              if (error) {
+                setError(null);
+                setErrorActionUrl(null);
+              }
+            }}
+          >
             <Stack spacing={{ xs: 1.75, sm: 2.25 }}>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                 <TextField
@@ -157,6 +193,7 @@ export function AuthForm({
                   label="Country code"
                   name="dialCode"
                   defaultValue={defaultDialCode}
+                  disabled={submitting}
                   sx={{ width: { xs: "100%", sm: 190 } }}
                 >
                   {DIAL_CODE_OPTIONS.map((option) => (
@@ -171,6 +208,7 @@ export function AuthForm({
                   autoComplete="tel-national"
                   fullWidth
                   required
+                  disabled={submitting}
                   placeholder="138 0013 8000"
                   helperText="Enter the local number without the international prefix."
                 />
@@ -184,6 +222,7 @@ export function AuthForm({
                 }
                 fullWidth
                 required
+                disabled={submitting}
               />
               {mode === "register" ? (
                 <TextField
@@ -192,6 +231,7 @@ export function AuthForm({
                   autoCapitalize="characters"
                   fullWidth
                   required
+                  disabled={submitting}
                 />
               ) : null}
               <Button
@@ -199,6 +239,7 @@ export function AuthForm({
                 variant="contained"
                 disabled={submitting}
                 size="large"
+                aria-busy={submitting}
                 sx={{ width: { xs: "100%", sm: "auto" }, mt: 0.25 }}
               >
                 {submitting

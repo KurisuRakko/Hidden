@@ -11,6 +11,7 @@ type LogoutButtonProps = {
   size?: "small" | "medium" | "large";
   sx?: SxProps<Theme>;
   redirectTo?: string;
+  onLoggedOut?: () => void;
 };
 
 export function LogoutButton({
@@ -18,12 +19,14 @@ export function LogoutButton({
   size = "medium",
   sx,
   redirectTo = "/",
+  onLoggedOut,
 }: LogoutButtonProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
   async function handleLogout() {
     setSubmitting(true);
+    onLoggedOut?.();
 
     try {
       await fetch("/api/auth/logout", {
@@ -50,6 +53,7 @@ export function LogoutButton({
       size={size}
       startIcon={<ExitToAppRounded />}
       disabled={submitting}
+      aria-busy={submitting}
       sx={sx}
     >
       Sign out

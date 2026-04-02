@@ -140,6 +140,20 @@ export const appTheme = createTheme({
         },
       },
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          transition:
+            "transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard)",
+          "&:focus-visible": {
+            boxShadow: "0 0 0 3px rgba(31, 93, 168, 0.18)",
+          },
+          "&:active": {
+            transform: "scale(0.96)",
+          },
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         root: {
