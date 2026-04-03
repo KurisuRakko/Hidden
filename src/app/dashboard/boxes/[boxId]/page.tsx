@@ -10,6 +10,7 @@ import { SectionCard } from "@/components/common/section-card";
 import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
 import { getBoxDetailForOwner } from "@/features/boxes/service";
 import { requireUserPage } from "@/lib/auth/guards";
+import { formatDateTime } from "@/lib/format";
 import { createTranslator } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
 
@@ -26,9 +27,29 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
   const visibleQuestions = box.questions.filter((item) => item.status !== "DELETED");
+  const safeQuestions = visibleQuestions.map((item) => ({
+    id: item.id,
+    content: item.content,
+    imageUrl: item.imageUrl,
+    status: item.status,
+    submittedAtLabel: t("dashboard.ownerQuestion.submittedAt", {
+      value: formatDateTime(item.submittedAt, locale),
+    }),
+    publishedAtLabel: item.publishedAt
+      ? t("dashboard.ownerQuestion.publishedAt", {
+          value: formatDateTime(item.publishedAt, locale),
+        })
+      : null,
+    answer: item.answer
+      ? {
+          content: item.answer.content,
+          imageUrl: item.answer.imageUrl,
+        }
+      : null,
+  }));
 
-  const pendingCount = visibleQuestions.filter((item) => item.status === "PENDING").length;
-  const publishedCount = visibleQuestions.filter((item) => item.status === "PUBLISHED").length;
+  const pendingCount = safeQuestions.filter((item) => item.status === "PENDING").length;
+  const publishedCount = safeQuestions.filter((item) => item.status === "PUBLISHED").length;
   const summaryItems = [
     {
       label: t("dashboard.summaryAcceptingLabel"),
@@ -38,7 +59,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
     },
     {
       label: t("dashboard.metricTotalQuestions"),
-      value: String(visibleQuestions.length),
+      value: String(safeQuestions.length),
     },
     {
       label: t("dashboard.metricPendingQuestions"),
@@ -49,7 +70,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
       value: String(publishedCount),
     },
   ];
-  const questionList = visibleQuestions.length > 0
+  const questionList = safeQuestions.length > 0
     ? await import("./_components/box-question-list")
     : null;
   const QuestionList = questionList?.BoxQuestionList;
@@ -109,14 +130,14 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
           className="motion-enter-soft motion-delay-1"
           title={t("dashboard.detailQuestionsTitle")}
         >
-          {visibleQuestions.length === 0 ? (
+          {safeQuestions.length === 0 ? (
             <EmptyState
               className="motion-enter motion-delay-3"
               title={t("dashboard.noQuestionsTitle")}
               description={t("dashboard.noQuestionsDescription")}
             />
           ) : QuestionList ? (
-            <QuestionList boxId={box.id} questions={visibleQuestions} />
+            <QuestionList boxId={box.id} questions={safeQuestions} />
           ) : null}
         </SectionCard>
       </Stack>

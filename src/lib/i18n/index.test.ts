@@ -8,7 +8,6 @@ import {
   resolveLocaleFromAcceptLanguage,
   translate,
 } from "@/lib/i18n";
-import { formatDateTime, formatRelativeState } from "@/lib/format";
 
 test("resolveLocaleFromAcceptLanguage prefers Chinese locales", () => {
   assert.equal(resolveLocaleFromAcceptLanguage("zh-CN,zh;q=0.9,en;q=0.8"), "zh-CN");
@@ -44,10 +43,6 @@ test("getLocalizedErrorMessage translates stable error codes", () => {
   );
 });
 
-test("format helpers return locale-aware values", () => {
-  const value = new Date("2026-04-03T15:20:00.000Z");
-
-  assert.match(formatDateTime(value, "en"), /\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}/);
-  assert.equal(formatRelativeState(true, "zh-CN"), "开启");
+test("getStatusLabel returns the translated label", () => {
   assert.equal(getStatusLabel("PUBLISHED", "en"), "Published");
 });

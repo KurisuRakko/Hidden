@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { FileUploadField } from "@/components/common/file-upload-field";
 import { StatusChip } from "@/components/common/status-chip";
 import { useI18n } from "@/components/providers/i18n-provider";
-import { formatDateTime } from "@/lib/format";
 import { getStatusLabel } from "@/lib/i18n";
 
 type OwnerQuestionCardProps = {
@@ -33,8 +32,8 @@ type OwnerQuestionCardProps = {
     content: string;
     imageUrl: string | null;
     status: string;
-    submittedAt: Date | string;
-    publishedAt: Date | string | null;
+    submittedAtLabel: string;
+    publishedAtLabel: string | null;
     answer: {
       content: string;
       imageUrl: string | null;
@@ -188,13 +187,9 @@ export function OwnerQuestionCard({
                 />
               </Stack>
               <Typography variant="body2" color="text.secondary">
-                {t("dashboard.ownerQuestion.submittedAt", {
-                  value: formatDateTime(question.submittedAt, locale),
-                })}
-                {question.publishedAt
-                  ? ` · ${t("dashboard.ownerQuestion.publishedAt", {
-                      value: formatDateTime(question.publishedAt, locale),
-                    })}`
+                {question.submittedAtLabel}
+                {question.publishedAtLabel
+                  ? ` · ${question.publishedAtLabel}`
                   : ""}
               </Typography>
             </Stack>

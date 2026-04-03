@@ -6,7 +6,7 @@ import { loadDashboardMePageData } from "../_lib/load-dashboard-me-page";
 import { DASHBOARD_ME_BACK_TRANSITION } from "../_lib/transitions";
 
 export default async function DashboardMeAccountPage() {
-  const { viewer, locale, t } = await loadDashboardMePageData();
+  const { viewer, accountSummary, t } = await loadDashboardMePageData();
 
   return (
     <UserDashboardShell
@@ -23,7 +23,7 @@ export default async function DashboardMeAccountPage() {
           className="motion-enter-soft"
           title={t("dashboard.accountInfoTitle")}
         >
-          <DashboardAccountInfo viewer={viewer} locale={locale} />
+          <DashboardAccountInfo {...accountSummary} />
         </SectionCard>
       </Stack>
     </UserDashboardShell>

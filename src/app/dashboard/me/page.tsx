@@ -12,7 +12,7 @@ import { loadDashboardMePageData } from "./_lib/load-dashboard-me-page";
 import { DASHBOARD_ME_FORWARD_TRANSITION } from "./_lib/transitions";
 
 export default async function DashboardMePage() {
-  const { viewer, locale, t } = await loadDashboardMePageData();
+  const { viewer, accountSummary, t } = await loadDashboardMePageData();
 
   return (
     <UserDashboardShell
@@ -29,7 +29,7 @@ export default async function DashboardMePage() {
           title={t("dashboard.personalSettings.accountTitle")}
           description={t("dashboard.personalSettings.accountDescription")}
           icon={<ManageAccountsRounded />}
-          summary={<DashboardAccountInfo viewer={viewer} locale={locale} compact />}
+          summary={<DashboardAccountInfo {...accountSummary} compact />}
           transitionTypes={[DASHBOARD_ME_FORWARD_TRANSITION]}
           className="motion-enter-soft motion-delay-1"
         />

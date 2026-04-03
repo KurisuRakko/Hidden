@@ -8,8 +8,8 @@ type BoxQuestionListProps = {
     content: string;
     imageUrl: string | null;
     status: string;
-    submittedAt: Date | string;
-    publishedAt: Date | string | null;
+    submittedAtLabel: string;
+    publishedAtLabel: string | null;
     answer: {
       content: string;
       imageUrl: string | null;
