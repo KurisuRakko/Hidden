@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_SC, Roboto } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
 import { getMessages } from "@/lib/i18n";
@@ -20,6 +20,28 @@ const notoSansSC = Noto_Sans_SC({
 export const metadata: Metadata = {
   title: "Hidden",
   description: "Anonymous question boxes with moderation and invite-only registration.",
+  applicationName: "Hidden",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/pwa/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/pwa/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/pwa/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Hidden",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1976d2",
+  colorScheme: "light",
 };
 
 export default async function RootLayout({

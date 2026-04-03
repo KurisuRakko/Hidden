@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hidden Dashboard | Offline</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --md2-primary: #1976d2;
+        --md2-surface: #ffffff;
+        --md2-background: #fafafa;
+        --md2-on-surface: rgba(0, 0, 0, 0.87);
+        --md2-on-surface-secondary: rgba(0, 0, 0, 0.6);
+        --md2-shadow: 0 1px 3px rgba(0, 0, 0, 0.24);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--md2-background);
+        color: var(--md2-on-surface);
+        font-family: Roboto, "Noto Sans SC", Arial, sans-serif;
+      }
+
+      .shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .card {
+        width: min(560px, 100%);
+        background: var(--md2-surface);
+        border-radius: 8px;
+        box-shadow: var(--md2-shadow);
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 500;
+      }
+
+      p {
+        margin: 12px 0 0;
+        color: var(--md2-on-surface-secondary);
+        line-height: 1.55;
+      }
+
+      .actions {
+        margin-top: 22px;
+        display: flex;
+        gap: 12px;
+      }
+
+      button,
+      a {
+        appearance: none;
+        border: 0;
+        border-radius: 4px;
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 10px 16px;
+        text-decoration: none;
+      }
+
+      button {
+        background: var(--md2-primary);
+        color: #fff;
+        box-shadow: var(--md2-shadow);
+      }
+
+      a {
+        color: var(--md2-primary);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="card" role="main" aria-live="polite">
+        <h1>Dashboard is temporarily offline</h1>
+        <p>
+          You can open this dashboard shell while offline, but private data and actions require
+          network access. Reconnect to continue.
+        </p>
+        <div class="actions">
+          <button type="button" onclick="window.location.reload()">Try Again</button>
+          <a href="/">Open Public Site</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

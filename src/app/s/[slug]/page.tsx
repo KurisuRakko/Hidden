@@ -1,6 +1,5 @@
 export const dynamic = "force-dynamic";
 
-import Link from "next/link";
 import { EditRounded } from "@mui/icons-material";
 import {
   Box,
@@ -113,9 +112,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                   </Stack>
 
                   <Button
-                    component={Link}
                     href={askHref}
-                    transitionTypes={["public-ask-forward"]}
                     startIcon={<EditRounded />}
                     variant="contained"
                     size="large"

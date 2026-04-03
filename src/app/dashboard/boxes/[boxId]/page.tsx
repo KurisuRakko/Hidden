@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import { EmptyState } from "@/components/common/empty-state";
 import { SectionCard } from "@/components/common/section-card";
-import { OwnerQuestionCard } from "@/components/questions/owner-question-card";
 import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
 import { getBoxDetailForOwner } from "@/features/boxes/service";
 import { requireUserPage } from "@/lib/auth/guards";
@@ -50,6 +49,10 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
       value: String(publishedCount),
     },
   ];
+  const questionList = visibleQuestions.length > 0
+    ? await import("./_components/box-question-list")
+    : null;
+  const QuestionList = questionList?.BoxQuestionList;
 
   return (
     <UserDashboardShell
@@ -106,23 +109,15 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
           className="motion-enter-soft motion-delay-1"
           title={t("dashboard.detailQuestionsTitle")}
         >
-          <Stack spacing={2}>
-            {visibleQuestions.length === 0 ? (
-              <EmptyState
-                className="motion-enter motion-delay-3"
-                title={t("dashboard.noQuestionsTitle")}
-                description={t("dashboard.noQuestionsDescription")}
-              />
-            ) : (
-              visibleQuestions.map((question) => (
-                <OwnerQuestionCard
-                  key={question.id}
-                  boxId={box.id}
-                  question={question}
-                />
-              ))
-            )}
-          </Stack>
+          {visibleQuestions.length === 0 ? (
+            <EmptyState
+              className="motion-enter motion-delay-3"
+              title={t("dashboard.noQuestionsTitle")}
+              description={t("dashboard.noQuestionsDescription")}
+            />
+          ) : QuestionList ? (
+            <QuestionList boxId={box.id} questions={visibleQuestions} />
+          ) : null}
         </SectionCard>
       </Stack>
     </UserDashboardShell>

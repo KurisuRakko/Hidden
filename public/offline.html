@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hidden | Offline</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --md2-primary: #1976d2;
+        --md2-surface: #ffffff;
+        --md2-background: #fafafa;
+        --md2-on-surface: rgba(0, 0, 0, 0.87);
+        --md2-on-surface-secondary: rgba(0, 0, 0, 0.6);
+        --md2-shadow: 0 1px 3px rgba(0, 0, 0, 0.24);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: var(--md2-background);
+        color: var(--md2-on-surface);
+        font-family: Roboto, "Noto Sans SC", Arial, sans-serif;
+        padding: 24px;
+      }
+
+      .card {
+        width: min(480px, 100%);
+        background: var(--md2-surface);
+        border-radius: 8px;
+        box-shadow: var(--md2-shadow);
+        padding: 24px;
+      }
+
+      .badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        background: var(--md2-primary);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 500;
+        margin-bottom: 12px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 500;
+      }
+
+      p {
+        margin: 10px 0 0;
+        color: var(--md2-on-surface-secondary);
+        line-height: 1.5;
+      }
+
+      .actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      a,
+      button {
+        appearance: none;
+        border: 0;
+        border-radius: 4px;
+        font: inherit;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 10px 16px;
+      }
+
+      a {
+        background: var(--md2-primary);
+        color: #fff;
+        box-shadow: var(--md2-shadow);
+      }
+
+      button {
+        background: transparent;
+        color: var(--md2-primary);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="main" aria-live="polite">
+      <div class="badge">H</div>
+      <h1>You are offline</h1>
+      <p>
+        Hidden cannot reach the network right now. Reconnect and tap refresh to continue with
+        the latest content.
+      </p>
+      <div class="actions">
+        <a href="/">Back to Home</a>
+        <button type="button" onclick="window.location.reload()">Refresh</button>
+      </div>
+    </main>
+  </body>
+</html>
