@@ -124,7 +124,7 @@ export function createAppTheme(
               borderRadius: 4,
               paddingInline: 16,
               transition:
-                "background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard)",
+                "background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)",
               "&:focus-visible": {
                 boxShadow: `0 0 0 3px ${alpha(primaryMain, 0.22)}`,
               },
@@ -136,6 +136,7 @@ export function createAppTheme(
               },
               "&:active": {
                 boxShadow: isDark ? "0 1px 2px rgba(0, 0, 0, 0.32)" : "0 1px 2px rgba(0, 0, 0, 0.24)",
+                transform: "scale(0.97)"
               },
             },
             outlined: {
@@ -148,9 +149,12 @@ export function createAppTheme(
             root: {
               borderRadius: 999,
               transition:
-                "background-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard)",
+                "background-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)",
               "&:focus-visible": {
                 boxShadow: `0 0 0 3px ${alpha(primaryMain, 0.22)}`,
+              },
+              "&:active": {
+                transform: "scale(0.95)"
               },
             },
           },
@@ -159,8 +163,24 @@ export function createAppTheme(
           styleOverrides: {
             root: {
               boxShadow: isDark ? "0 4px 10px rgba(0, 0, 0, 0.4)" : "0 3px 8px rgba(0, 0, 0, 0.24)",
+              transition:
+                "background-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)",
               "&:hover": {
                 boxShadow: isDark ? "0 6px 14px rgba(0, 0, 0, 0.46)" : "0 5px 12px rgba(0, 0, 0, 0.28)",
+              },
+              "&:active": {
+                transform: "scale(0.95)"
+              },
+            },
+          },
+        },
+        MuiCardActionArea: {
+          styleOverrides: {
+            root: {
+              transition:
+                "background-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out)",
+              "&:active": {
+                transform: "scale(0.98)"
               },
             },
           },
@@ -175,7 +195,7 @@ export function createAppTheme(
               backgroundImage: "none",
               border: "none",
               transition:
-                "box-shadow var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard)",
+                "box-shadow var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out)",
             },
           },
         },

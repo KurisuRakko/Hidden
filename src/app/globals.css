@@ -5,11 +5,13 @@
   --app-foreground: rgba(0, 0, 0, 0.87);
   --app-muted: rgba(0, 0, 0, 0.6);
   --app-divider: rgba(0, 0, 0, 0.12);
-  --motion-fast: 120ms;
-  --motion-base: 180ms;
-  --motion-slow: 220ms;
-  --motion-slower: 280ms;
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 300ms;
+  --motion-slower: 400ms;
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --surface-glass: #ffffff;
   --surface-glass-strong: #ffffff;
@@ -81,8 +83,8 @@ img {
 
 .motion-enter {
   opacity: 0;
-  transform: translateY(10px);
-  animation: motion-enter var(--motion-base) var(--ease-standard) forwards;
+  transform: translateY(12px);
+  animation: motion-enter var(--motion-slow) var(--ease-out) forwards;
   animation-delay: var(--motion-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -90,7 +92,7 @@ img {
 .motion-enter-soft {
   opacity: 0;
   transform: translateY(8px);
-  animation: motion-enter-soft var(--motion-base) var(--ease-standard) forwards;
+  animation: motion-enter-soft var(--motion-slow) var(--ease-out) forwards;
   animation-delay: var(--motion-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -131,16 +133,22 @@ img {
 
 .interactive-panel {
   transition:
-    box-shadow var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-fast) var(--ease-standard),
-    border-color var(--motion-fast) var(--ease-standard),
-    opacity var(--motion-fast) var(--ease-standard);
+    box-shadow var(--motion-base) var(--ease-out),
+    background-color var(--motion-base) var(--ease-out),
+    border-color var(--motion-base) var(--ease-out),
+    opacity var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out);
 }
 
 @media (hover: hover) {
   .interactive-panel:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
   }
+}
+
+.interactive-panel:active {
+  transform: scale(0.98);
 }
 
 .status-feedback {
@@ -227,7 +235,7 @@ img {
 @keyframes motion-enter {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
 
   to {
