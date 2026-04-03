@@ -107,15 +107,16 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
             {summaryItems.map((item) => (
               <Box
                 key={item.label}
-                sx={(theme) => ({
+                sx={{
                   minWidth: { xs: "100%", sm: 160 },
                   flex: "1 1 160px",
                   px: 1.5,
                   py: 1.25,
                   borderRadius: 1.5,
-                  bgcolor: theme.palette.action.hover,
-                  border: `1px solid ${theme.palette.divider}`,
-                })}
+                  bgcolor: "action.hover",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
               >
                 <Typography variant="overline" color="text.secondary">
                   {item.label}

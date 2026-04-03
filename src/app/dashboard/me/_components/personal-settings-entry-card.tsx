@@ -8,7 +8,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 
 type PersonalSettingsEntryCardProps = {
   href: string;
@@ -41,16 +40,16 @@ export function PersonalSettingsEntryCard({
           <Stack spacing={2.25}>
             <Stack direction="row" spacing={1.5} alignItems="flex-start">
               <Box
-                sx={(theme) => ({
+                sx={{
                   width: 48,
                   height: 48,
                   borderRadius: 2,
                   display: "grid",
                   placeItems: "center",
                   flexShrink: 0,
-                  color: theme.palette.primary.main,
-                  bgcolor: alpha(theme.palette.primary.main, 0.08),
-                })}
+                  color: "primary.main",
+                  bgcolor: "rgba(25, 118, 210, 0.08)",
+                }}
               >
                 {icon}
               </Box>
@@ -63,29 +62,30 @@ export function PersonalSettingsEntryCard({
               </Stack>
 
               <Box
-                sx={(theme) => ({
+                sx={{
                   width: 36,
                   height: 36,
                   borderRadius: 999,
                   display: "grid",
                   placeItems: "center",
                   flexShrink: 0,
-                  color: theme.palette.text.secondary,
-                  bgcolor: alpha(theme.palette.action.active, 0.06),
-                })}
+                  color: "text.secondary",
+                  bgcolor: "action.hover",
+                }}
               >
                 <ChevronRightRounded fontSize="small" />
               </Box>
             </Stack>
 
             <Box
-              sx={(theme) => ({
+              sx={{
                 px: 1.5,
                 py: 1.25,
                 borderRadius: 2,
-                border: `1px solid ${theme.palette.divider}`,
-                bgcolor: alpha(theme.palette.action.active, 0.035),
-              })}
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: "action.hover",
+              }}
             >
               {summary}
             </Box>
