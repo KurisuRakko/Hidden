@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { notFound } from "next/navigation";
 import {
   Alert,
   Box,
@@ -14,6 +15,7 @@ import { PublicShell } from "@/components/layout/public-shell";
 import { PublicQuestionForm } from "@/components/questions/public-question-form";
 import { getPublicBoxBySlug } from "@/features/boxes/service";
 import { formatDateTime } from "@/lib/format";
+import { AppError } from "@/lib/http";
 import { createTranslator } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
 
@@ -25,7 +27,18 @@ type PublicBoxPageProps = {
 
 export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
   const { slug } = await params;
-  const box = await getPublicBoxBySlug(slug);
+  let box;
+
+  try {
+    box = await getPublicBoxBySlug(slug);
+  } catch (error) {
+    if (error instanceof AppError && error.status === 404) {
+      notFound();
+    }
+
+    throw error;
+  }
+
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
 

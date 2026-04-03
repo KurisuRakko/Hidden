@@ -1,5 +1,4 @@
 import { Card, CardContent, Stack, Typography } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 
 type MetricCardProps = {
   label: string;
@@ -12,10 +11,10 @@ export function MetricCard({ label, value, supporting, className }: MetricCardPr
   return (
     <Card
       className={className}
-      sx={(theme) => ({
-        bgcolor: alpha(theme.palette.background.paper, 0.82),
-        border: `1px solid ${theme.palette.divider}`,
-      })}
+      sx={{
+        bgcolor: "rgba(255, 255, 255, 0.82)",
+        border: "1px solid rgba(32, 34, 39, 0.08)",
+      }}
     >
       <CardContent sx={{ p: { xs: 2.25, sm: 2.75, md: 3 } }}>
         <Stack spacing={0.75}>

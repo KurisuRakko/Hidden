@@ -210,18 +210,22 @@ The codebase should keep business logic in feature and lib modules so page files
 
 ## 9. Docker Plan
 
-The MVP should include a `docker-compose.yml` with these services:
+The current `docker-compose.yml` runs these services:
 
+- `proxy`: Nginx split-entry proxy for public and admin traffic
 - `web`: Next.js application
 - `db`: PostgreSQL
 - `storage`: MinIO
 
-Expected local developer flow:
+Expected flow:
 
-1. Copy environment variables from an example file.
-2. Run `docker compose up --build`.
-3. Apply database migrations.
-4. Open the web app in the browser.
+1. Copy environment variables from `.env.example`.
+2. Set `APP_URL`, `ADMIN_APP_URL`, and any required port overrides.
+3. Run `docker compose up --build`.
+4. Let the `web` container apply migrations, seed data, and initialize storage.
+5. Open the public app and admin app through their configured URLs.
+
+Deployment details should live in [docs/deployment.md](./deployment.md) so this architecture document stays high-level.
 
 ## 10. Non-Functional Requirements
 

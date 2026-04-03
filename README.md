@@ -10,7 +10,7 @@ Hidden is an invite-only anonymous question box web application built with Next.
 - Public anonymous submission pages at `/b/[slug]`
 - Pending review, answer, publish, reject, and delete workflow
 - Admin console for users, boxes, questions, and invite codes
-- Docker Compose setup with `web`, `db`, and `storage`
+- Docker Compose setup with `proxy`, `web`, `db`, and `storage`
 
 ## Stack
 
@@ -22,7 +22,7 @@ Hidden is an invite-only anonymous question box web application built with Next.
 - MinIO object storage
 - Docker Compose
 
-## Local Startup
+## Quick Start
 
 1. Copy the environment file.
 
@@ -43,10 +43,12 @@ docker compose up --build
 - Admin portal from the same computer: [http://localhost:3001/admin-login](http://localhost:3001/admin-login)
 - Admin portal from another device on the same LAN: `http://<your-computer-lan-ip>:3001/admin-login`
 
+If port `3000` or `3001` is already in use on your machine, set `APP_PORT` or `ADMIN_PORT` in `.env` before starting Compose.
+
 To make the admin portal usable from other devices on the same LAN:
 
 - keep `ADMIN_BIND_HOST=0.0.0.0` in `.env`
-- set `ADMIN_APP_URL` to your computer's LAN address, for example `http://192.168.1.20:3001`
+- set `ADMIN_APP_URL` to your computer's LAN address and configured admin port, for example `http://192.168.1.20:3001`
 - restart the stack with `docker compose up --build`
 
 On container startup, Hidden will automatically:
@@ -55,6 +57,8 @@ On container startup, Hidden will automatically:
 - seed the default admin and invite code
 - create the MinIO bucket and public read policy
 - start the Next.js web server
+
+For current deployment instructions, see [docs/deployment.md](./docs/deployment.md).
 
 ## Default Admin
 
@@ -88,5 +92,6 @@ The default sample values in `.env.example` are:
 ## Development Notes
 
 - Product requirements live in [README.md](./README.md), [docs/product-spec.md](./docs/product-spec.md), and [docs/technical-architecture.md](./docs/technical-architecture.md).
+- Deployment and environment guidance lives in [docs/deployment.md](./docs/deployment.md).
 - Uploaded images are stored in MinIO and exposed through the configured public bucket URL.
 - The first version keeps moderation logic intentionally simple and server-side.

@@ -21,13 +21,29 @@ type UserDashboardThemeContextValue = {
 const UserDashboardThemeContext =
   createContext<UserDashboardThemeContextValue | null>(null);
 
-function getStoredMode() {
+function safeGetStoredMode() {
   if (typeof window === "undefined") {
     return null;
   }
 
-  const value = window.localStorage.getItem(STORAGE_KEY);
-  return value === "light" || value === "dark" ? value : null;
+  try {
+    const value = window.localStorage.getItem(STORAGE_KEY);
+    return value === "light" || value === "dark" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function safeSetStoredMode(mode: PaletteMode) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(STORAGE_KEY, mode);
+  } catch {
+    // Ignore storage write failures in restricted browser contexts.
+  }
 }
 
 export function UserDashboardThemeProvider({
@@ -36,14 +52,10 @@ export function UserDashboardThemeProvider({
   children: React.ReactNode;
 }) {
   const { locale } = useI18n();
-  const [mode, setMode] = useState<PaletteMode>(() => getStoredMode() ?? "light");
+  const [mode, setMode] = useState<PaletteMode>(() => safeGetStoredMode() ?? "light");
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    window.localStorage.setItem(STORAGE_KEY, mode);
+    safeSetStoredMode(mode);
   }, [mode]);
 
   const theme = useMemo(() => createAppTheme(mode, locale), [locale, mode]);
