@@ -30,7 +30,6 @@ export default async function DashboardMePage() {
             <SectionCard
               className="motion-enter-soft"
               title={t("dashboard.accountInfoTitle")}
-              description={t("dashboard.accountInfoDescription")}
             >
               <Stack spacing={1.25}>
                 <Typography>
@@ -52,7 +51,6 @@ export default async function DashboardMePage() {
             <SectionCard
               className="motion-enter-soft motion-delay-1"
               title={t("dashboard.themeTitle")}
-              description={t("dashboard.themeDescription")}
             >
               <DashboardThemeSettingsCard />
             </SectionCard>
@@ -60,7 +58,6 @@ export default async function DashboardMePage() {
             <SectionCard
               className="motion-enter-soft motion-delay-2"
               title={t("dashboard.languageTitle")}
-              description={t("dashboard.languageDescription")}
             >
               <DashboardLanguageSettingsCard />
             </SectionCard>
@@ -72,7 +69,6 @@ export default async function DashboardMePage() {
             <SectionCard
               className="motion-enter-soft motion-delay-1"
               title={t("dashboard.passwordTitle")}
-              description={t("dashboard.passwordDescription")}
             >
               <ChangePasswordForm />
             </SectionCard>
@@ -80,7 +76,6 @@ export default async function DashboardMePage() {
             <SectionCard
               className="motion-enter-soft motion-delay-3"
               title={t("dashboard.logoutTitle")}
-              description={t("dashboard.logoutDescription")}
             >
               <LogoutButton
                 variant="outlined"

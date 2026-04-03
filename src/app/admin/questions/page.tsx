@@ -19,7 +19,7 @@ import { StatusChip } from "@/components/common/status-chip";
 import { listAdminQuestions } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
-import { buildPathWithQuery } from "@/lib/url";
+import { buildPathWithQuery, getPublicBoxPath } from "@/lib/url";
 
 type AdminQuestionsPageProps = {
   searchParams: Promise<{
@@ -139,8 +139,8 @@ export default async function AdminQuestionsPage({
                     {question.box.owner.phone}
                   </TableCell>
                   <TableCell sx={{ borderBottom: "none" }}>
-                    <Button href={`/b/${question.box.slug}`} target="_blank">
-                      /b/{question.box.slug}
+                    <Button href={getPublicBoxPath(question.box.slug)} target="_blank">
+                      {getPublicBoxPath(question.box.slug)}
                     </Button>
                   </TableCell>
                   <TableCell sx={{ borderBottom: "none" }}>

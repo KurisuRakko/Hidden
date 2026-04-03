@@ -20,6 +20,10 @@ import {
   normalizeSlug,
   questionTextSchema,
 } from "@/lib/validation/common";
+import {
+  assertQuestionCanBeRestored,
+  getRestoredQuestionStatus,
+} from "@/features/boxes/question-status";
 
 const questionInclude = {
   answer: true,
@@ -376,7 +380,9 @@ export async function updateQuestionStatusForOwner(
   boxId: string,
   questionId: string,
   ownerId: string,
-  status: "REJECTED" | "DELETED",
+  input:
+    | { status: "REJECTED" | "DELETED" }
+    | { action: "RESTORE" },
 ) {
   await getOwnedBoxOrThrow(boxId, ownerId);
 
@@ -385,10 +391,31 @@ export async function updateQuestionStatusForOwner(
       id: questionId,
       boxId,
     },
+    include: {
+      answer: true,
+    },
   });
 
   if (!question) {
     throw new AppError(404, "Question not found.", "QUESTION_NOT_FOUND");
+  }
+
+  if ("action" in input) {
+    assertQuestionCanBeRestored(question.status);
+
+    const restoredStatus = getRestoredQuestionStatus(question);
+
+    return prisma.question.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        status: restoredStatus,
+        deletedAt: null,
+        publishedAt:
+          restoredStatus === QuestionStatus.PUBLISHED ? question.publishedAt : null,
+      },
+    });
   }
 
   return prisma.question.update({
@@ -396,8 +423,8 @@ export async function updateQuestionStatusForOwner(
       id: questionId,
     },
     data: {
-      status,
-      deletedAt: status === QuestionStatus.DELETED ? new Date() : null,
+      status: input.status,
+      deletedAt: input.status === QuestionStatus.DELETED ? new Date() : null,
     },
   });
 }

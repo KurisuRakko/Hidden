@@ -7,7 +7,7 @@ Hidden is an invite-only anonymous question box web application built with Next.
 - Phone number + password + invite code registration
 - Server-side session cookie authentication
 - Multi-box management for each user
-- Public anonymous submission pages at `/b/[slug]`
+- Public anonymous submission pages at `/s/[slug]`
 - Pending review, answer, publish, reject, and delete workflow
 - Admin console for users, boxes, questions, and invite codes
 - Docker Compose setup with `proxy`, `web`, `db`, and `storage`
@@ -81,7 +81,7 @@ The default sample values in `.env.example` are:
 - `/register`
 - `/dashboard`
 - `/dashboard/boxes`
-- `/b/[slug]`
+- `/s/[slug]`
 - `/admin`
 - `/admin/users`
 - `/admin/boxes`

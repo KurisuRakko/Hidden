@@ -3,7 +3,7 @@ import {
   Grid,
   Stack,
 } from "@mui/material";
-import { ArrowBackRounded, OpenInNewRounded } from "@mui/icons-material";
+import { OpenInNewRounded } from "@mui/icons-material";
 import { BoxForm } from "@/components/boxes/box-form";
 import { BoxShareActions } from "@/components/boxes/box-share-actions";
 import { SectionCard } from "@/components/common/section-card";
@@ -19,6 +19,7 @@ import {
   getStatusLabel,
 } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { getPublicBoxPath } from "@/lib/url";
 
 type BoxSettingsPageProps = {
   params: Promise<{
@@ -37,26 +38,22 @@ export default async function BoxSettingsPage({
     getBoxDetailForOwner(boxId, viewer.id),
     getBoxSummaryForOwner(boxId, viewer.id),
   ]);
-  const shareUrl = await getPublicAppUrl(`/b/${box.slug}`);
+  const publicPath = getPublicBoxPath(box.slug);
+  const shareUrl = await getPublicAppUrl(publicPath);
 
   return (
-    <UserDashboardShell viewer={viewer} pageTitle={box.title}>
+    <UserDashboardShell
+      viewer={viewer}
+      pageTitle={box.title}
+      backHref={`/dashboard/boxes/${box.id}`}
+    >
       <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, xl: 7 }}>
           <SectionCard
             className="motion-enter-soft"
             title={t("dashboard.settingsTitle")}
-            description={t("dashboard.settingsDescription")}
           >
             <Stack spacing={2}>
-              <Button
-                href={`/dashboard/boxes/${box.id}`}
-                startIcon={<ArrowBackRounded />}
-                variant="text"
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                {t("dashboard.backToQuestions")}
-              </Button>
               <BoxForm
                 initialValues={{
                   id: box.id,
@@ -76,11 +73,10 @@ export default async function BoxSettingsPage({
             <SectionCard
               className="motion-enter-soft motion-delay-1"
               title={t("dashboard.publicPageTitle")}
-              description={t("dashboard.publicPageDescription")}
             >
               <Stack spacing={2}>
                 <Button
-                  href={`/b/${box.slug}`}
+                  href={publicPath}
                   target="_blank"
                   startIcon={<OpenInNewRounded />}
                   variant="outlined"
@@ -94,7 +90,6 @@ export default async function BoxSettingsPage({
             <SectionCard
               className="motion-enter-soft motion-delay-2"
               title={t("dashboard.summaryTitle")}
-              description={t("dashboard.summaryDescription")}
             >
               <Stack spacing={1}>
                 <div>

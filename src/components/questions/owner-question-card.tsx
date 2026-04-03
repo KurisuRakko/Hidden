@@ -55,7 +55,9 @@ export function OwnerQuestionCard({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const isBlocked = question.status === "REJECTED" || question.status === "DELETED";
+  const isRejected = question.status === "REJECTED";
+  const isDeleted = question.status === "DELETED";
+  const isLocked = isRejected || isDeleted;
 
   async function saveAnswer(formData: FormData) {
     setSaving(true);
@@ -114,7 +116,9 @@ export function OwnerQuestionCard({
     }
   }
 
-  async function blockQuestion() {
+  async function updateQuestionStatus(
+    payload: { status: "REJECTED" } | { action: "RESTORE" },
+  ) {
     setSaving(true);
     setError(null);
     setSuccess(null);
@@ -127,17 +131,26 @@ export function OwnerQuestionCard({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status: "REJECTED" }),
+          body: JSON.stringify(payload),
         },
       );
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? t("dashboard.ownerQuestion.blockError"));
+        setError(
+          result.error ??
+            ("action" in payload
+              ? t("dashboard.ownerQuestion.unblockError")
+              : t("dashboard.ownerQuestion.blockError")),
+        );
         return;
       }
 
-      setSuccess(t("dashboard.ownerQuestion.blockedSuccess"));
+      setSuccess(
+        "action" in payload
+          ? t("dashboard.ownerQuestion.unblockedSuccess")
+          : t("dashboard.ownerQuestion.blockedSuccess"),
+      );
       router.refresh();
     } catch {
       setError(t("common.feedback.networkError"));
@@ -191,9 +204,9 @@ export function OwnerQuestionCard({
             sx={(theme) => ({
               px: 1.75,
               py: 1.75,
-              borderRadius: "18px",
+              borderRadius: 1.5,
               border: `1px solid ${theme.palette.divider}`,
-              backgroundColor: alpha(theme.palette.primary.main, 0.05),
+              backgroundColor: alpha(theme.palette.primary.main, 0.04),
             })}
           >
             <Stack spacing={1.25}>
@@ -206,7 +219,7 @@ export function OwnerQuestionCard({
                   src={question.imageUrl}
                   alt={t("publicBox.questionAttachmentAlt")}
                   sx={{
-                    borderRadius: "16px",
+                    borderRadius: 1.5,
                     width: "100%",
                     maxHeight: 300,
                     objectFit: "cover",
@@ -226,7 +239,7 @@ export function OwnerQuestionCard({
               type="button"
               variant={expanded ? "outlined" : "contained"}
               startIcon={<ReplyRounded />}
-              disabled={isBlocked || saving}
+              disabled={isLocked || saving}
               onClick={() => setExpanded((value) => !value)}
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
@@ -236,15 +249,19 @@ export function OwnerQuestionCard({
             </Button>
             <Button
               type="button"
-              color="warning"
-              variant="text"
+              color={isRejected ? "inherit" : "warning"}
+              variant={isRejected ? "outlined" : "text"}
               startIcon={<BlockRounded />}
-              disabled={isBlocked || saving}
-              onClick={blockQuestion}
+              disabled={isDeleted || saving}
+              onClick={() =>
+                updateQuestionStatus(
+                  isRejected ? { action: "RESTORE" } : { status: "REJECTED" },
+                )
+              }
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              {isBlocked
-                ? t("dashboard.ownerQuestion.blocked")
+              {isRejected
+                ? t("dashboard.ownerQuestion.unblock")
                 : t("dashboard.ownerQuestion.block")}
             </Button>
           </Stack>
@@ -265,14 +282,14 @@ export function OwnerQuestionCard({
                 multiline
                 minRows={4}
                 fullWidth
-                disabled={isBlocked || saving}
+                disabled={isLocked || saving}
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
               />
               <FileUploadField
                 name="image"
                 accept="image/png,image/jpeg,image/webp"
-                disabled={isBlocked || saving}
+                disabled={isLocked || saving}
                 helperText={t("dashboard.ownerQuestion.replyImageHelper")}
                 buttonLabel={t("dashboard.ownerQuestion.uploadReplyImage")}
               />
@@ -282,7 +299,7 @@ export function OwnerQuestionCard({
                   src={question.answer.imageUrl}
                   alt={t("publicBox.answerAttachmentAlt")}
                   sx={{
-                    borderRadius: "16px",
+                    borderRadius: 1.5,
                     width: "100%",
                     maxHeight: 300,
                     objectFit: "cover",
@@ -293,7 +310,7 @@ export function OwnerQuestionCard({
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={isBlocked || saving}
+                  disabled={isLocked || saving}
                   startIcon={<SendRounded />}
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
@@ -302,7 +319,7 @@ export function OwnerQuestionCard({
                 <Button
                   type="button"
                   variant="outlined"
-                  disabled={isBlocked || saving}
+                  disabled={isLocked || saving}
                   onClick={publishQuestion}
                   sx={{ width: { xs: "100%", sm: "auto" } }}
                 >

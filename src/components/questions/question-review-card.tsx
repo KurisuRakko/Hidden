@@ -45,7 +45,9 @@ export function QuestionReviewCard({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const isLocked = ["REJECTED", "DELETED"].includes(question.status);
+  const isRejected = question.status === "REJECTED";
+  const isDeleted = question.status === "DELETED";
+  const isLocked = isRejected || isDeleted;
 
   async function saveAnswer(formData: FormData) {
     setSaving(true);
@@ -76,7 +78,11 @@ export function QuestionReviewCard({
     }
   }
 
-  async function updateStatus(status: "REJECTED" | "DELETED") {
+  async function updateStatus(
+    payload:
+      | { status: "REJECTED" | "DELETED" }
+      | { action: "RESTORE" },
+  ) {
     setSaving(true);
     setError(null);
     setSuccess(null);
@@ -89,17 +95,28 @@ export function QuestionReviewCard({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status }),
+          body: JSON.stringify(payload),
         },
       );
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "Unable to update question.");
+        setError(
+          result.error ??
+            ("action" in payload
+              ? "Unable to restore question."
+              : "Unable to update question."),
+        );
         return;
       }
 
-      setSuccess(status === "REJECTED" ? "Question rejected." : "Question deleted.");
+      setSuccess(
+        "action" in payload
+          ? "Question restored."
+          : payload.status === "REJECTED"
+            ? "Question rejected."
+            : "Question deleted.",
+      );
       router.refresh();
     } catch {
       setError("Network request failed. Please try again.");
@@ -137,7 +154,7 @@ export function QuestionReviewCard({
   }
 
   return (
-    <Card className="motion-enter-soft interactive-panel surface-glass">
+    <Card className="motion-enter-soft interactive-panel">
       <CardContent sx={{ p: { xs: 2.25, sm: 3 } }}>
         <Stack spacing={{ xs: 2, sm: 2.5 }}>
           <Stack
@@ -167,9 +184,10 @@ export function QuestionReviewCard({
             sx={{
               px: { xs: 1.5, sm: 1.75 },
               py: { xs: 1.5, sm: 1.75 },
-              borderRadius: "16px",
-              bgcolor: "rgba(255, 255, 255, 0.58)",
-              border: "1px solid rgba(32, 34, 39, 0.06)",
+              borderRadius: 1.5,
+              bgcolor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           >
             <Stack spacing={1.25}>
@@ -208,9 +226,10 @@ export function QuestionReviewCard({
             <Box
               sx={{
                 p: { xs: 1.5, sm: 1.75 },
-                borderRadius: "16px",
-                bgcolor: "rgba(255, 255, 255, 0.48)",
-                border: "1px solid rgba(32, 34, 39, 0.06)",
+                borderRadius: 1.5,
+                bgcolor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
               }}
             >
               <Stack spacing={1.5}>
@@ -271,20 +290,24 @@ export function QuestionReviewCard({
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
               <Button
                 type="button"
-                color="warning"
+                color={isRejected ? "inherit" : "warning"}
                 variant="outlined"
-                onClick={() => updateStatus("REJECTED")}
-                disabled={isLocked || saving}
+                onClick={() =>
+                  updateStatus(
+                    isRejected ? { action: "RESTORE" } : { status: "REJECTED" },
+                  )
+                }
+                disabled={isDeleted || saving}
                 sx={{ width: { xs: "100%", sm: "auto" } }}
               >
-                Reject
+                {isRejected ? "Restore" : "Reject"}
               </Button>
               <Button
                 type="button"
                 color="error"
                 variant="text"
-                onClick={() => updateStatus("DELETED")}
-                disabled={question.status === "DELETED" || saving}
+                onClick={() => updateStatus({ status: "DELETED" })}
+                disabled={isDeleted || saving}
                 sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 Delete

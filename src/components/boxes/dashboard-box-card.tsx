@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import {
+  Alert,
   Button,
   Card,
   CardContent,
@@ -11,6 +13,7 @@ import { alpha } from "@mui/material/styles";
 import { StatusChip } from "@/components/common/status-chip";
 import { useI18n } from "@/components/providers/i18n-provider";
 import { getStatusLabel } from "@/lib/i18n";
+import { getPublicBoxPath } from "@/lib/url";
 
 type DashboardBoxCardProps = {
   box: {
@@ -24,10 +27,31 @@ type DashboardBoxCardProps = {
       questions: number;
     };
   };
+  shareUrl: string;
 };
 
-export function DashboardBoxCard({ box }: DashboardBoxCardProps) {
+export function DashboardBoxCard({ box, shareUrl }: DashboardBoxCardProps) {
   const { locale, t } = useI18n();
+  const publicPath = getPublicBoxPath(box.slug);
+  const [feedback, setFeedback] = useState<{
+    severity: "success" | "error";
+    message: string;
+  } | null>(null);
+
+  async function handleCopyShareUrl() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setFeedback({
+        severity: "success",
+        message: t("dashboard.share.copied"),
+      });
+    } catch {
+      setFeedback({
+        severity: "error",
+        message: t("dashboard.share.copyFailed"),
+      });
+    }
+  }
 
   return (
     <Card
@@ -38,6 +62,10 @@ export function DashboardBoxCard({ box }: DashboardBoxCardProps) {
     >
       <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
         <Stack spacing={2}>
+          {feedback ? (
+            <Alert severity={feedback.severity}>{feedback.message}</Alert>
+          ) : null}
+
           <Stack spacing={1}>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -51,7 +79,7 @@ export function DashboardBoxCard({ box }: DashboardBoxCardProps) {
               />
             </Stack>
             <Typography color="text.secondary" className="text-break">
-              /b/{box.slug}
+              {publicPath}
             </Typography>
             <Typography color="text.secondary" className="text-break">
               {box.description || t("dashboard.boxCard.noDescription")}
@@ -74,12 +102,12 @@ export function DashboardBoxCard({ box }: DashboardBoxCardProps) {
               {t("dashboard.boxCard.open")}
             </Button>
             <Button
-              href={`/b/${box.slug}`}
-              target="_blank"
+              type="button"
+              onClick={handleCopyShareUrl}
               variant="text"
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
-              {t("dashboard.boxCard.sharePage")}
+              {t("common.actions.copyLink")}
             </Button>
           </Stack>
         </Stack>

@@ -31,6 +31,7 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
     <UserDashboardShell
       viewer={viewer}
       pageTitle={box.title}
+      backHref="/dashboard/questions"
       pageAction={
         <IconButton
           href={`/dashboard/boxes/${box.id}/settings`}
@@ -73,7 +74,6 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
         <SectionCard
           className="motion-enter-soft motion-delay-2"
           title={t("dashboard.detailQuestionsTitle")}
-          description={t("dashboard.detailQuestionsDescription")}
         >
           <Stack spacing={2}>
             {visibleQuestions.length === 0 ? (

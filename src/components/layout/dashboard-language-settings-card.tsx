@@ -64,7 +64,7 @@ export function DashboardLanguageSettingsCard() {
             language: t(`common.localeOption.${locale}`),
           })}
         </Typography>
-        <Typography color="text.secondary">
+        <Typography color="text.secondary" sx={{ fontSize: "0.95rem" }}>
           {t("dashboard.language.helper")}
         </Typography>
       </Stack>

@@ -7,7 +7,11 @@ import { ok } from "@/lib/http";
 
 const requestSchema = z.object({
   status: z.enum([QuestionStatus.REJECTED, QuestionStatus.DELETED]),
-});
+}).or(
+  z.object({
+    action: z.literal("RESTORE"),
+  }),
+);
 
 type RouteContext = {
   params: Promise<{
@@ -22,7 +26,7 @@ export const PATCH = withApiHandler(
     const body = requestSchema.parse(await request.json());
     const { id, questionId } = await context.params;
     return ok(
-      await updateQuestionStatusForOwner(id, questionId, viewer.id, body.status),
+      await updateQuestionStatusForOwner(id, questionId, viewer.id, body),
     );
   },
   { localizeErrors: true },

@@ -123,7 +123,7 @@ export function BoxForm({
           <Box
             sx={(theme) => ({
               p: 1.25,
-              borderRadius: "18px",
+              borderRadius: 1.5,
               border: `1px solid ${theme.palette.divider}`,
               bgcolor: theme.palette.action.hover,
             })}
@@ -135,7 +135,7 @@ export function BoxForm({
               sx={{
                 width: "100%",
                 maxHeight: 220,
-                borderRadius: "14px",
+                borderRadius: 1.5,
                 objectFit: "cover",
               }}
             />
@@ -188,7 +188,7 @@ export function BoxForm({
         sx={(theme) => ({
           px: 1.5,
           py: 1,
-          borderRadius: "14px",
+          borderRadius: 1.5,
           bgcolor: theme.palette.action.hover,
           border: `1px solid ${theme.palette.divider}`,
         })}

@@ -72,37 +72,32 @@ const enMessages = {
     tagline: "Anonymous inboxes with moderation",
   },
   home: {
-    badge: "Invite-only anonymous Q&A",
-    title: "Hidden gives every creator a calm, moderated anonymous inbox.",
+    badge: "Invite-only",
+    title: "Hidden is a moderated anonymous inbox.",
     description:
-      "Visitors ask freely. Owners review first, answer at their own pace, and publish only what deserves a place on the public page.",
+      "Collect anonymous questions, then review, answer, and publish on your terms.",
     features: {
       publicBoxesTitle: "Public question boxes",
-      publicBoxesDescription:
-        "Each box gets a clean public page at /b/[slug] with published answers and a one-image anonymous submission form.",
+      publicBoxesDescription: "Each box has its own public page.",
       moderationTitle: "Moderation-first workflow",
-      moderationDescription:
-        "Every new question starts pending. Users can reject, delete, answer, and publish without exposing drafts.",
+      moderationDescription: "Review questions before they go public.",
       inviteOnlyTitle: "Invite-only growth",
-      inviteOnlyDescription:
-        "Registration uses phone number, password, and invite code so the first version stays controlled and operable.",
+      inviteOnlyDescription: "Invite codes keep sign-ups controlled.",
     },
   },
   auth: {
     disabledNotice:
       "Your account is not active right now. Please contact an administrator.",
     adminTitle: "Admin sign in",
-    adminDescription:
-      "Use the internal admin portal to review users, questions, and moderation logs.",
+    adminDescription: "Access the internal admin portal.",
     loginTitle: "Sign in",
-    loginDescription: "Use your phone number and password to continue.",
-    registerTitle: "Create your Hidden account",
-    registerDescription: "Registration is invite-only in the first release.",
+    loginDescription: "Enter your phone number and password.",
+    registerTitle: "Create account",
+    registerDescription: "Register with an invite code.",
     countryCode: "Country code",
     phoneNumber: "Phone number",
     phonePlaceholder: "138 0013 8000",
-    phoneHelper:
-      "Enter the local number without the international prefix.",
+    phoneHelper: "Enter your local number.",
     password: "Password",
     inviteCode: "Invite code",
     submit: "Submitting...",
@@ -117,22 +112,39 @@ const enMessages = {
     },
   },
   publicBox: {
-    defaultDescription: "Ask something thoughtful and keep it anonymous.",
-    pausedNotice:
-      "This box is visible, but the owner has paused new submissions.",
+    defaultDescription: "Ask anonymously.",
+    pausedNotice: "This box is not accepting new questions right now.",
+    heroEyebrow: "Published Q&A",
+    askTitle: "Ask something new",
+    askDescription:
+      "Browse the published answers first, then open a dedicated page when you are ready to send an anonymous question.",
+    askAction: "Ask anonymously",
     publishedAnswersTitle: "Published answers",
-    publishedAnswersDescription:
-      "Only questions the owner has chosen to publish appear here.",
+    publishedAnswersDescription: "Only public answers appear here.",
     noAnswers: "No public answers yet.",
+    noAnswersDescription:
+      "Nothing has been published yet. When you are ready, use the button above to send the first anonymous question.",
     publishedAt: "Published {value}",
     questionTitle: "Question",
     answerTitle: "Answer",
     questionAttachmentAlt: "Question attachment",
     answerAttachmentAlt: "Answer attachment",
   },
+  publicAsk: {
+    eyebrow: "Anonymous question",
+    title: "Write your question",
+    description:
+      "Send an anonymous question to {title}. It will be reviewed before anything is published.",
+    pausedDescription:
+      "This box is paused for new questions right now, but you can still go back and browse the published Q&A.",
+    backToBox: "Back to published Q&A",
+    backToPublished: "Back to published Q&A",
+  },
   publicQuestionForm: {
-    success:
-      "Question received. It will stay private until the owner reviews it.",
+    success: "Question received.",
+    successTitle: "Question received",
+    successDescription:
+      "Your question has been sent anonymously and is now waiting for review.",
     questionLabel: "Your anonymous question",
     imageHelper:
       "Optional image, up to 5 MB. JPG, PNG, and WEBP are supported.",
@@ -140,53 +152,32 @@ const enMessages = {
     submit: "Send anonymously",
     submitting: "Submitting...",
     submitError: "Unable to submit question.",
+    backToPublished: "Back to published Q&A",
+    askAnother: "Ask another question",
   },
   dashboard: {
     lightMode: "Light",
     darkMode: "Dark",
     switchToDark: "Switch to dark mode",
     switchToLight: "Switch to light mode",
-    accountInfoTitle: "Account information",
-    accountInfoDescription:
-      "This section shows the basic details of the currently signed-in account.",
+    accountInfoTitle: "Account",
     themeTitle: "Theme",
-    themeDescription:
-      "You can switch the user dashboard between light and dark at any time.",
     languageTitle: "Language",
-    languageDescription:
-      "Choose the language for the public site, sign-in flow, and user dashboard.",
     currentMode: "Current mode: {mode}",
-    themeScope:
-      "This only affects the user dashboard. The public site follows your language preference but keeps its own theme.",
+    themeScope: "Only affects the dashboard.",
     accountPhone: "Phone: {phone}",
     accountRole: "Role: {role}",
     accountCreatedAt: "Created: {value}",
     passwordTitle: "Change password",
-    passwordDescription:
-      "After you update your password, old sessions on other devices will be signed out.",
     logoutTitle: "Sign out",
-    logoutDescription:
-      "Use this when you want to safely sign out from the current device.",
     myBoxesTitle: "My boxes",
-    myBoxesDescription:
-      "Open any box from here to review incoming questions and continue managing it.",
     noBoxesTitle: "No boxes yet",
     noBoxesDescription:
       "Create your first box and it will appear here once it is ready.",
     newBoxPageTitle: "New box",
-    newBoxTitle: "Launch a new question box",
-    newBoxDescription:
-      "Fill in the name, link, and visibility settings, then share it right away.",
-    existingBoxesTitle: "Your existing boxes",
-    existingBoxesDescription:
-      "If you only need to continue managing an existing box, jump in here.",
-    existingBoxesEmptyTitle: "Nothing here yet",
-    existingBoxesEmptyDescription:
-      "After you publish your first box, it will start showing up here.",
-    createdPageTitle: "Box created",
-    createdDescription:
-      "Your box is ready. Share the link now or jump straight into management.",
-    createdSuccess: "Created successfully",
+    newBoxTitle: "New box",
+    createdPageTitle: "Created",
+    createdSuccess: "Box created",
     detailSettingsAria: "Question box settings",
     metricTotalQuestions: "Total questions",
     metricPendingQuestions: "Pending questions",
@@ -194,21 +185,13 @@ const enMessages = {
     metricAccepting: "Still accepting new questions",
     metricPaused: "Currently paused",
     detailQuestionsTitle: "Questions",
-    detailQuestionsDescription:
-      "Incoming questions appear here. You can answer them and decide whether to publish or hide them.",
     noQuestionsTitle: "No questions yet",
     noQuestionsDescription:
       "Questions will appear here after someone submits to this box.",
     settingsTitle: "Box settings",
-    settingsDescription:
-      "Update the title, description, link, visibility, and submission status here.",
     backToQuestions: "Back to questions",
     publicPageTitle: "Public page",
-    publicPageDescription:
-      "This is the page others see when they submit questions.",
-    summaryTitle: "Current summary",
-    summaryDescription:
-      "A quick view of this question box's current state.",
+    summaryTitle: "Summary",
     summaryStatus: "Status: {value}",
     summaryAccepting: "Accepting questions: {value}",
     summaryWallpaper: "Wallpaper: {value}",
@@ -222,7 +205,7 @@ const enMessages = {
       title: "Box title",
       description: "Description",
       slug: "Public slug",
-      slugHelper: "Public URLs use /b/[slug].",
+      slugHelper: "Public URLs use /s/[slug].",
       wallpaperHelper:
         "Optionally upload a wallpaper for the public question page header. Uploading a new image replaces the old one.",
       wallpaperAlt: "Current box wallpaper",
@@ -250,7 +233,6 @@ const enMessages = {
       paused: "Paused",
       questionCount: "{count} questions",
       open: "Open",
-      sharePage: "Share page",
     },
     ownerQuestion: {
       anonymousQuestion: "Anonymous question",
@@ -261,8 +243,11 @@ const enMessages = {
       collapseReply: "Collapse reply",
       blocked: "Blocked",
       block: "Block",
+      unblock: "Unblock",
       blockError: "Unable to block the question.",
+      unblockError: "Unable to unblock the question.",
       blockedSuccess: "Question blocked.",
+      unblockedSuccess: "Question unblocked.",
       replyContent: "Reply",
       replyImageHelper:
         "Optionally upload an answer image. Uploading a new one replaces the previous image.",
@@ -275,9 +260,6 @@ const enMessages = {
       publishSuccess: "Question published.",
     },
     changePassword: {
-      intro: "Update your password to keep this account secure.",
-      description:
-        "After the change, Hidden keeps this device signed in and signs out your other active sessions.",
       currentPassword: "Current password",
       newPassword: "New password",
       newPasswordHelper: "Use 8 to 72 characters.",
@@ -297,8 +279,7 @@ const enMessages = {
     },
     language: {
       current: "Current language: {language}",
-      helper:
-        "Your choice is saved in this browser and also applies to the public site next time you visit.",
+      helper: "Also used on the public site.",
       updating: "Updating...",
       updateSuccess: "Language preference updated.",
       updateError: "Unable to update the language preference.",
@@ -323,6 +304,7 @@ const enMessages = {
     BOX_NOT_FOUND: "Question box not found.",
     QUESTION_NOT_FOUND: "Question not found.",
     QUESTION_REJECTED: "Rejected questions cannot be changed this way.",
+    QUESTION_NOT_BLOCKED: "Only blocked questions can be restored.",
     ANSWER_REQUIRED: "Add an answer before publishing.",
     BOX_CLOSED: "This box is not accepting new questions.",
     RATE_LIMITED:

@@ -8,13 +8,21 @@ import { EmptyState } from "@/components/common/empty-state";
 import { SectionCard } from "@/components/common/section-card";
 import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
 import { listBoxesForOwner } from "@/features/boxes/service";
+import { getPublicAppUrl } from "@/lib/admin-portal";
 import { requireUserPage } from "@/lib/auth/guards";
 import { createTranslator } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { getPublicBoxPath } from "@/lib/url";
 
 export default async function DashboardQuestionsPage() {
   const viewer = await requireUserPage();
   const boxes = await listBoxesForOwner(viewer.id);
+  const boxesWithShareUrls = await Promise.all(
+    boxes.map(async (box) => ({
+      box,
+      shareUrl: await getPublicAppUrl(getPublicBoxPath(box.slug)),
+    })),
+  );
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
 
@@ -24,7 +32,6 @@ export default async function DashboardQuestionsPage() {
         <SectionCard
           className="motion-enter-soft"
           title={t("dashboard.myBoxesTitle")}
-          description={t("dashboard.myBoxesDescription")}
         >
           <Stack spacing={2}>
             <Button
@@ -42,7 +49,9 @@ export default async function DashboardQuestionsPage() {
                 description={t("dashboard.noBoxesDescription")}
               />
             ) : (
-              boxes.map((box) => <DashboardBoxCard key={box.id} box={box} />)
+              boxesWithShareUrls.map(({ box, shareUrl }) => (
+                <DashboardBoxCard key={box.id} box={box} shareUrl={shareUrl} />
+              ))
             )}
           </Stack>
         </SectionCard>

@@ -27,12 +27,15 @@ export default async function Home() {
       <Box sx={{ py: { xs: 2.25, sm: 5.5, md: 9 } }}>
         <Stack spacing={{ xs: 3.25, sm: 5, md: 6 }}>
           <Box
-            className="motion-pop surface-glass"
+            className="motion-pop"
             sx={{
-              borderRadius: { xs: "20px", sm: "24px" },
+              bgcolor: "background.paper",
+              boxShadow: 1,
+              borderRadius: 2,
               px: { xs: 2.1, sm: 3.5, md: 6 },
               py: { xs: 2.5, sm: 5, md: 7 },
-              border: "1px solid rgba(30, 31, 36, 0.06)",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           >
             <Stack spacing={{ xs: 2, sm: 3 }}>
@@ -114,7 +117,7 @@ export default async function Home() {
               >
                 <Card
                   sx={{ height: "100%" }}
-                  className="interactive-panel surface-glass"
+                  className="interactive-panel"
                 >
                   <CardContent sx={{ p: { xs: 2.5, sm: 3, md: 3.5 } }}>
                     <Stack spacing={{ xs: 1.25, sm: 1.75 }}>

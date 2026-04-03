@@ -50,7 +50,7 @@ export function WorkspaceShell({
       }}
     >
       <Stack spacing={3}>
-        <Card className="motion-enter-soft surface-glass">
+        <Card className="motion-enter-soft">
           <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
             <Stack
               direction={{ xs: "column", md: "row" }}

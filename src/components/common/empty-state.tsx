@@ -14,9 +14,10 @@ export function EmptyState({ title, description, className }: EmptyStateProps) {
         px: { xs: 2.25, sm: 3 },
         py: { xs: 3.5, sm: 5.5 },
         textAlign: "center",
-        border: "1px dashed rgba(32, 34, 39, 0.2)",
-        borderRadius: "16px",
-        bgcolor: "rgba(255, 255, 255, 0.72)",
+        border: "1px dashed",
+        borderColor: "divider",
+        borderRadius: 1.5,
+        bgcolor: "background.paper",
       }}
     >
       <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1.15rem", sm: "1.25rem" } }}>

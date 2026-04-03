@@ -157,8 +157,8 @@ export function AuthForm({
 
   return (
     <Card
-      className="motion-pop motion-delay-1 surface-glass"
-      sx={{ maxWidth: 520, mx: "auto", overflow: "hidden", borderRadius: { xs: "20px", sm: "24px" } }}
+      className="motion-pop motion-delay-1"
+      sx={{ maxWidth: 520, mx: "auto", overflow: "hidden", borderRadius: 2 }}
     >
       <CardContent sx={{ p: { xs: 2.25, sm: 3.5, md: 4 } }}>
         <Stack spacing={{ xs: 2, sm: 2.75 }}>
@@ -169,17 +169,17 @@ export function AuthForm({
               sx={{ fontSize: { xs: "1.55rem", sm: "2rem", md: "2.125rem" } }}
             >
               {isAdminLogin
-                ? "Admin sign in"
+                ? t("auth.adminTitle")
                 : mode === "login"
                   ? t("auth.loginTitle")
                   : t("auth.registerTitle")}
             </Typography>
             <Typography color="text.secondary">
               {isAdminLogin
-                ? "Use the internal admin portal to review users, questions, and moderation logs."
+                ? t("auth.adminDescription")
                 : mode === "login"
-                ? t("auth.loginDescription")
-                : t("auth.registerDescription")}
+                  ? t("auth.loginDescription")
+                  : t("auth.registerDescription")}
             </Typography>
           </Box>
 
@@ -279,13 +279,13 @@ export function AuthForm({
               >
                 {submitting
                   ? isAdminLogin
-                    ? "Submitting..."
+                    ? t("auth.submit")
                     : t("auth.submit")
                   : isAdminLogin
-                    ? "Sign in to admin"
+                    ? t("auth.signInToAdmin")
                     : mode === "login"
-                    ? t("common.actions.signIn")
-                    : t("auth.registerAction")}
+                      ? t("common.actions.signIn")
+                      : t("auth.registerAction")}
               </Button>
             </Stack>
           </Box>

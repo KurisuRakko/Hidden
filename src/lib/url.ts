@@ -13,3 +13,11 @@ export function buildPathWithQuery(
   const query = searchParams.toString();
   return query ? `${pathname}?${query}` : pathname;
 }
+
+export function getPublicBoxPath(slug: string) {
+  return `/s/${encodeURIComponent(slug)}`;
+}
+
+export function getPublicBoxAskPath(slug: string) {
+  return `${getPublicBoxPath(slug)}/ask`;
+}

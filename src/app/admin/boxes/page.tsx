@@ -16,7 +16,7 @@ import { StatusChip } from "@/components/common/status-chip";
 import { listAdminBoxes } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
-import { buildPathWithQuery } from "@/lib/url";
+import { buildPathWithQuery, getPublicBoxPath } from "@/lib/url";
 
 type AdminBoxesPageProps = {
   searchParams: Promise<{
@@ -87,8 +87,8 @@ export default async function AdminBoxesPage({
               <TableRow key={box.id}>
                 <TableCell>{box.title}</TableCell>
                 <TableCell>
-                  <Button href={`/b/${box.slug}`} target="_blank">
-                    /b/{box.slug}
+                  <Button href={getPublicBoxPath(box.slug)} target="_blank">
+                    {getPublicBoxPath(box.slug)}
                   </Button>
                 </TableCell>
                 <TableCell>{box.owner.phone}</TableCell>

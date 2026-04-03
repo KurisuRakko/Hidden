@@ -2,21 +2,27 @@
 
 import Link from "next/link";
 import {
+  BottomNavigation,
+  BottomNavigationAction,
   Box,
   Button,
   Card,
   CardContent,
+  Fab,
   IconButton,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { usePathname } from "next/navigation";
 import {
+  AddRounded,
   DarkModeRounded,
   LightModeRounded,
   SendRounded,
 } from "@mui/icons-material";
+import { HeaderLeadingBackAction } from "@/components/layout/header-leading-back-action";
 import {
   getActiveUserDashboardItem,
   userDashboardNavigation,
@@ -36,6 +42,7 @@ type UserDashboardShellProps = {
   children: React.ReactNode;
   pageTitle?: string;
   pageAction?: React.ReactNode;
+  backHref?: string;
 };
 
 export function UserDashboardShell({
@@ -43,6 +50,7 @@ export function UserDashboardShell({
   children,
   pageTitle = "Hidden",
   pageAction = null,
+  backHref,
 }: UserDashboardShellProps) {
   return (
     <UserDashboardThemeProvider>
@@ -50,6 +58,7 @@ export function UserDashboardShell({
         viewer={viewer}
         pageTitle={pageTitle}
         pageAction={pageAction}
+        backHref={backHref}
       >
         {children}
       </UserDashboardShellInner>
@@ -62,9 +71,17 @@ function UserDashboardShellInner({
   children,
   pageTitle = "Hidden",
   pageAction = null,
+  backHref,
 }: UserDashboardShellProps) {
   const pathname = usePathname();
   const activeNavigation = getActiveUserDashboardItem(pathname);
+  const mobileNavigation = userDashboardNavigation.filter(
+    (item) => !item.mobileOnlyPrimaryAction,
+  );
+  const [leftMobileItem, rightMobileItem] = mobileNavigation;
+  const mobileNavigationValue = activeNavigation.mobileOnlyPrimaryAction
+    ? null
+    : activeNavigation.key;
   const { mode, toggleMode } = useUserDashboardTheme();
   const { locale, t } = useI18n();
 
@@ -73,48 +90,21 @@ function UserDashboardShellInner({
       className="safe-shell"
       sx={{
         minHeight: "100dvh",
-        px: { xs: 1.25, sm: 2, lg: 4 },
-        py: { xs: 1.5, sm: 2, lg: 4.5 },
+        px: { xs: 1.5, sm: 2.5, lg: 4 },
+        py: { xs: 1.5, sm: 2, lg: 4 },
         pb: {
-          xs: "calc(var(--mobile-nav-height) + 52px + env(safe-area-inset-bottom))",
+          xs: "calc(var(--mobile-nav-height) + 76px + env(safe-area-inset-bottom))",
           lg: 0,
         },
         colorScheme: mode,
-        "--app-background": mode === "dark" ? "#0f1318" : "#f3f1ec",
-        "--app-surface": mode === "dark" ? "#171d24" : "#ffffff",
-        "--app-foreground": mode === "dark" ? "#eef2f7" : "#1e1f24",
-        "--app-muted": mode === "dark" ? "#a9b4c2" : "#60636d",
-        "--app-divider":
-          mode === "dark"
-            ? "rgba(238, 242, 247, 0.12)"
-            : "rgba(30, 31, 36, 0.08)",
         color: "text.primary",
         backgroundColor: "background.default",
-        backgroundImage:
-          mode === "dark"
-            ? "radial-gradient(circle at top left, rgba(138, 180, 255, 0.18), transparent 28%), radial-gradient(circle at top right, rgba(107, 201, 188, 0.12), transparent 22%), linear-gradient(180deg, #0f1318 0%, #111821 100%)"
-            : "radial-gradient(circle at top left, rgba(31, 93, 168, 0.14), transparent 28%), radial-gradient(circle at top right, rgba(0, 105, 92, 0.1), transparent 22%), linear-gradient(180deg, #f8f6f2 0%, #f3f1ec 100%)",
         transition:
-          "background-color var(--motion-base) var(--ease-standard), background-image var(--motion-slow) var(--ease-standard), color var(--motion-base) var(--ease-standard)",
+          "background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard)",
       }}
     >
       <Stack spacing={{ xs: 2.5, lg: 3 }}>
-        <Card
-          className="motion-enter-soft"
-          sx={(theme) => ({
-            background:
-              theme.palette.mode === "dark"
-                ? `linear-gradient(180deg, ${alpha("#171d24", 0.98)} 0%, ${alpha(
-                    "#1d2630",
-                    0.92,
-                  )} 100%)`
-                : `linear-gradient(180deg, ${alpha("#ffffff", 0.95)} 0%, ${alpha(
-                    "#f7f4ee",
-                    0.9,
-                  )} 100%)`,
-            backdropFilter: "blur(14px)",
-          })}
-        >
+        <Card className="motion-enter-soft">
           <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
             <Stack
               direction="row"
@@ -123,34 +113,35 @@ function UserDashboardShellInner({
               spacing={2}
             >
               <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
-                <Box
-                  sx={(theme) => ({
-                    width: { xs: 44, sm: 48 },
-                    height: { xs: 44, sm: 48 },
-                    borderRadius: "16px",
-                    display: "grid",
-                    placeItems: "center",
-                    color: theme.palette.primary.contrastText,
-                    background:
-                      theme.palette.mode === "dark"
-                        ? "linear-gradient(135deg, #8ab4ff 0%, #5f8fdd 100%)"
-                        : "linear-gradient(135deg, #1f5da8 0%, #184885 100%)",
-                    boxShadow:
-                      theme.palette.mode === "dark"
-                        ? "0 10px 28px rgba(0, 0, 0, 0.24)"
-                        : "0 12px 26px rgba(31, 93, 168, 0.18)",
-                  })}
-                >
-                  <SendRounded />
-                </Box>
-                <Stack spacing={0.2} sx={{ minWidth: 0 }}>
+                {backHref ? (
+                  <HeaderLeadingBackAction
+                    back={{ mode: "href", href: backHref }}
+                    variant="dashboard"
+                  />
+                ) : (
+                  <Box
+                    sx={(theme) => ({
+                      width: { xs: 40, sm: 44 },
+                      height: { xs: 40, sm: 44 },
+                      borderRadius: 1.5,
+                      display: "grid",
+                      placeItems: "center",
+                      color: theme.palette.primary.contrastText,
+                      bgcolor: "primary.main",
+                      boxShadow: theme.shadows[3],
+                    })}
+                  >
+                    <SendRounded fontSize="small" />
+                  </Box>
+                )}
+                <Stack spacing={0.25} sx={{ minWidth: 0 }}>
                   <Typography variant="overline" color="text.secondary">
                     Hidden
                   </Typography>
                   <Typography
                     variant="h4"
                     className="text-break"
-                    sx={{ fontSize: { xs: "1.35rem", sm: "1.8rem" } }}
+                    sx={{ fontSize: { xs: "1.35rem", sm: "1.75rem" } }}
                   >
                     {pageTitle}
                   </Typography>
@@ -167,10 +158,10 @@ function UserDashboardShellInner({
                       : t("dashboard.switchToLight")
                   }
                   sx={(theme) => ({
-                    width: 44,
-                    height: 44,
+                    width: 40,
+                    height: 40,
                     border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: alpha(theme.palette.background.paper, 0.72),
+                    bgcolor: theme.palette.background.paper,
                   })}
                 >
                   {mode === "light" ? <DarkModeRounded /> : <LightModeRounded />}
@@ -210,8 +201,9 @@ function UserDashboardShellInner({
                       mt: 1.5,
                       px: 1.5,
                       py: 1.25,
-                      borderRadius: "16px",
-                      backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                      borderRadius: 1,
+                      bgcolor: alpha(theme.palette.action.active, 0.04),
+                      border: `1px solid ${theme.palette.divider}`,
                     })}
                   >
                     <Typography variant="subtitle2">{viewer.phone}</Typography>
@@ -232,101 +224,75 @@ function UserDashboardShellInner({
         sx={{
           display: { xs: "block", lg: "none" },
           position: "fixed",
-          right: "max(14px, env(safe-area-inset-right))",
-          bottom: "max(14px, env(safe-area-inset-bottom))",
-          left: "max(14px, env(safe-area-inset-left))",
+          right: "max(12px, env(safe-area-inset-right))",
+          bottom: "max(12px, env(safe-area-inset-bottom))",
+          left: "max(12px, env(safe-area-inset-left))",
           zIndex: 1200,
         }}
       >
-        <Box
-          sx={(theme) => ({
+        <Paper
+          elevation={8}
+          sx={{
             position: "relative",
-            borderRadius: "28px",
-            border: `1px solid ${theme.palette.divider}`,
-            background:
-              theme.palette.mode === "dark"
-                ? alpha(theme.palette.background.paper, 0.92)
-                : alpha("#ffffff", 0.92),
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            boxShadow:
-              theme.palette.mode === "dark"
-                ? "0 18px 40px rgba(0, 0, 0, 0.28)"
-                : "0 18px 40px rgba(15, 22, 36, 0.14)",
-            px: 1.25,
-            py: 1,
-          })}
+            overflow: "visible",
+            borderRadius: 2,
+            bgcolor: "background.paper",
+            pt: 1,
+            pb: "calc(env(safe-area-inset-bottom) + 8px)",
+          }}
         >
-          <Box
+          <Fab
+            component={Link}
+            href="/dashboard/boxes/new"
+            aria-label={t("common.nav.createBox")}
+            color={activeNavigation.key === "create" ? "secondary" : "primary"}
+            className="dashboard-fab-animate"
             sx={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr",
-              alignItems: "end",
-              columnGap: 1,
+              position: "absolute",
+              top: 0,
+              left: "50%",
+              transform: "translate(-50%, -38%)",
             }}
           >
-            {userDashboardNavigation
-              .filter((item) => !item.mobileOnlyPrimaryAction)
-              .map((item) => {
-                const active = activeNavigation.key === item.key;
+            <AddRounded />
+          </Fab>
 
-                return (
-                  <Button
-                    key={item.key}
-                    component={Link}
-                    href={item.href}
-                    color={active ? "primary" : "inherit"}
-                    sx={{
-                      minHeight: "var(--mobile-nav-height)",
-                      borderRadius: "22px",
-                      flexDirection: "column",
-                      gap: 0.4,
-                      fontSize: "0.78rem",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {item.icon}
-                    {t(item.labelKey)}
-                  </Button>
-                );
-              })}
-
-            <Box sx={{ display: "flex", justifyContent: "center", mt: -4.5 }}>
-              <IconButton
+          <BottomNavigation
+            showLabels
+            value={mobileNavigationValue}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 72px 1fr",
+              alignItems: "end",
+            }}
+          >
+            {leftMobileItem ? (
+              <BottomNavigationAction
+                value={leftMobileItem.key}
                 component={Link}
-                href="/dashboard/boxes/new"
-                aria-label={t("common.nav.createBox")}
-                className="dashboard-fab-animate"
-                sx={(theme) => ({
-                  width: 72,
-                  height: 72,
-                  border: `6px solid ${theme.palette.background.default}`,
-                  color: theme.palette.primary.contrastText,
-                  background:
-                    activeNavigation.key === "create"
-                      ? "linear-gradient(135deg, #1f5da8 0%, #00695c 100%)"
-                      : theme.palette.mode === "dark"
-                        ? "linear-gradient(135deg, #8ab4ff 0%, #6bc9bc 100%)"
-                        : "linear-gradient(135deg, #1f5da8 0%, #3d9488 100%)",
-                  boxShadow:
-                    theme.palette.mode === "dark"
-                      ? "0 16px 32px rgba(0, 0, 0, 0.34)"
-                      : "0 16px 30px rgba(31, 93, 168, 0.24)",
-                  "&:hover": {
-                    background:
-                      theme.palette.mode === "dark"
-                        ? "linear-gradient(135deg, #9ac0ff 0%, #7ad2c6 100%)"
-                        : "linear-gradient(135deg, #2769b8 0%, #45a498 100%)",
-                  },
-                })}
-              >
-                <Typography component="span" sx={{ fontSize: "2rem", lineHeight: 1 }}>
-                  +
-                </Typography>
-              </IconButton>
-            </Box>
-          </Box>
-        </Box>
+                href={leftMobileItem.href}
+                icon={leftMobileItem.icon}
+                label={t(leftMobileItem.labelKey)}
+                sx={{ minWidth: 0 }}
+              />
+            ) : (
+              <Box />
+            )}
+            <Box aria-hidden="true" />
+            {rightMobileItem ? (
+              <BottomNavigationAction
+                value={rightMobileItem.key}
+                component={Link}
+                href={rightMobileItem.href}
+                icon={rightMobileItem.icon}
+                label={t(rightMobileItem.labelKey)}
+                sx={{ minWidth: 0 }}
+              />
+            ) : (
+              <Box />
+            )}
+          </BottomNavigation>
+        </Paper>
       </Box>
     </Box>
   );

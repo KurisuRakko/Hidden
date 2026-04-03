@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Button, Stack, TextField } from "@mui/material";
 import { useState } from "react";
 import { useI18n } from "@/components/providers/i18n-provider";
 
@@ -80,15 +80,6 @@ export function ChangePasswordForm() {
 
   return (
     <Stack spacing={2.25}>
-      <Stack spacing={0.75}>
-        <Typography variant="body1">
-          {t("dashboard.changePassword.intro")}
-        </Typography>
-        <Typography color="text.secondary" sx={{ fontSize: "0.95rem" }}>
-          {t("dashboard.changePassword.description")}
-        </Typography>
-      </Stack>
-
       {error ? <Alert severity="error">{error}</Alert> : null}
       {success ? <Alert severity="success">{success}</Alert> : null}
 

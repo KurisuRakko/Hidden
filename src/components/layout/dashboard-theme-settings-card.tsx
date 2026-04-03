@@ -27,7 +27,7 @@ export function DashboardThemeSettingsCard() {
                 : t("dashboard.darkMode"),
           })}
         </Typography>
-        <Typography color="text.secondary">
+        <Typography color="text.secondary" sx={{ fontSize: "0.95rem" }}>
           {t("dashboard.themeScope")}
         </Typography>
       </Stack>

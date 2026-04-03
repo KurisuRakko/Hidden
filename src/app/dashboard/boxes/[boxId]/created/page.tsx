@@ -10,6 +10,7 @@ import { getPublicAppUrl } from "@/lib/admin-portal";
 import { requireUserPage } from "@/lib/auth/guards";
 import { createTranslator } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { getPublicBoxPath } from "@/lib/url";
 
 type CreatedPageProps = {
   params: Promise<{
@@ -21,16 +22,19 @@ export default async function BoxCreatedPage({ params }: CreatedPageProps) {
   const viewer = await requireUserPage();
   const { boxId } = await params;
   const box = await getBoxSummaryForOwner(boxId, viewer.id);
-  const shareUrl = await getPublicAppUrl(`/b/${box.slug}`);
+  const shareUrl = await getPublicAppUrl(getPublicBoxPath(box.slug));
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
 
   return (
-    <UserDashboardShell viewer={viewer} pageTitle={t("dashboard.createdPageTitle")}>
+    <UserDashboardShell
+      viewer={viewer}
+      pageTitle={t("dashboard.createdPageTitle")}
+      backHref={`/dashboard/boxes/${box.id}`}
+    >
       <SectionCard
         className="motion-enter-soft"
         title={box.title}
-        description={t("dashboard.createdDescription")}
       >
         <Stack spacing={2.5}>
           <Stack direction="row" spacing={1.25} alignItems="center">
