@@ -13,6 +13,9 @@ import { getPublicBoxPath } from "@/lib/url";
 import { PublicBoxWallpaperCard } from "../_components/public-box-wallpaper-card";
 import { loadPublicBoxPageData } from "../_lib/load-public-box-page";
 
+const PUBLIC_SURFACE_BACKGROUND = alpha("#ffffff", 0.94);
+const PUBLIC_BORDER_COLOR = "rgba(0, 0, 0, 0.12)";
+
 type PublicAskPageProps = {
   params: Promise<{
     slug: string;
@@ -26,6 +29,7 @@ export default async function PublicAskPage({ params }: PublicAskPageProps) {
 
   return (
     <PublicShell
+      contentViewTransitionName="public-page-content"
       back={{
         mode: "href",
         href: boxHref,
@@ -33,22 +37,20 @@ export default async function PublicAskPage({ params }: PublicAskPageProps) {
       }}
     >
       <Stack spacing={{ xs: 2.5, md: 3 }} sx={{ py: { xs: 2.75, md: 5 } }}>
-        <PublicBoxWallpaperCard wallpaperUrl={box.wallpaperUrl} className="motion-pop">
+        <PublicBoxWallpaperCard wallpaperUrl={box.wallpaperUrl}>
           <Box sx={{ maxWidth: 720 }}>
             <Box
-              sx={(theme) => ({
+              sx={{
                 p: { xs: 2, sm: 2.5, md: 3 },
                 borderRadius: 2,
                 border: `1px solid ${
                   box.wallpaperUrl
                     ? "rgba(255, 255, 255, 0.22)"
-                    : theme.palette.divider
+                    : PUBLIC_BORDER_COLOR
                 }`,
-                backgroundColor: box.wallpaperUrl
-                  ? alpha("#ffffff", 0.94)
-                  : alpha(theme.palette.background.paper, 0.94),
-                boxShadow: theme.shadows[4],
-              })}
+                backgroundColor: PUBLIC_SURFACE_BACKGROUND,
+                boxShadow: 4,
+              }}
             >
               <Stack spacing={{ xs: 2.25, md: 2.5 }}>
                 <Stack spacing={1}>

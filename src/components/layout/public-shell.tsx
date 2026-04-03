@@ -24,6 +24,7 @@ type PublicShellProps = {
   hideGuestActions?: boolean;
   homeHref?: string;
   back?: HeaderBackAction;
+  contentViewTransitionName?: string;
 };
 
 export async function PublicShell({
@@ -31,6 +32,7 @@ export async function PublicShell({
   hideGuestActions = false,
   homeHref = "/",
   back,
+  contentViewTransitionName,
 }: PublicShellProps) {
   const viewer = await getViewer();
   const locale = await getRequestLocale();
@@ -84,7 +86,6 @@ export async function PublicShell({
       <AppBar
         position="sticky"
         elevation={0}
-        className="motion-fade"
         sx={{
           bgcolor: "background.paper",
           color: "text.primary",
@@ -140,7 +141,15 @@ export async function PublicShell({
           pb: { xs: 5, md: 6 },
         }}
       >
-        <Box className="motion-enter-soft motion-delay-1">{children}</Box>
+        <Box
+          style={
+            contentViewTransitionName
+              ? { viewTransitionName: contentViewTransitionName }
+              : undefined
+          }
+        >
+          {children}
+        </Box>
       </Container>
     </Box>
   );

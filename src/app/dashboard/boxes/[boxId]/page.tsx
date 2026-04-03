@@ -1,7 +1,11 @@
 import { SettingsRounded } from "@mui/icons-material";
-import { Grid, IconButton, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { EmptyState } from "@/components/common/empty-state";
-import { MetricCard } from "@/components/common/metric-card";
 import { SectionCard } from "@/components/common/section-card";
 import { OwnerQuestionCard } from "@/components/questions/owner-question-card";
 import { UserDashboardShell } from "@/components/layout/user-dashboard-shell";
@@ -26,53 +30,80 @@ export default async function BoxDetailPage({ params }: BoxDetailPageProps) {
 
   const pendingCount = visibleQuestions.filter((item) => item.status === "PENDING").length;
   const publishedCount = visibleQuestions.filter((item) => item.status === "PUBLISHED").length;
+  const summaryItems = [
+    {
+      label: t("dashboard.summaryAcceptingLabel"),
+      value: box.acceptingQuestions
+        ? t("dashboard.metricAccepting")
+        : t("dashboard.metricPaused"),
+    },
+    {
+      label: t("dashboard.metricTotalQuestions"),
+      value: String(visibleQuestions.length),
+    },
+    {
+      label: t("dashboard.metricPendingQuestions"),
+      value: String(pendingCount),
+    },
+    {
+      label: t("dashboard.metricPublishedQuestions"),
+      value: String(publishedCount),
+    },
+  ];
 
   return (
     <UserDashboardShell
       viewer={viewer}
       pageTitle={box.title}
       backHref="/dashboard/questions"
-      pageAction={
-        <IconButton
-          href={`/dashboard/boxes/${box.id}/settings`}
-          aria-label={t("dashboard.detailSettingsAria")}
-        >
-          <SettingsRounded />
-        </IconButton>
-      }
     >
       <Stack spacing={3}>
-        <Grid container spacing={{ xs: 2, md: 3 }}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <MetricCard
-              label={t("dashboard.metricTotalQuestions")}
-              value={visibleQuestions.length}
-              className="motion-enter-soft"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <MetricCard
-              label={t("dashboard.metricPendingQuestions")}
-              value={pendingCount}
-              className="motion-enter-soft motion-delay-1"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <MetricCard
-              label={t("dashboard.metricPublishedQuestions")}
-              value={publishedCount}
-              supporting={
-                box.acceptingQuestions
-                  ? t("dashboard.metricAccepting")
-                  : t("dashboard.metricPaused")
-              }
-              className="motion-enter-soft motion-delay-2"
-            />
-          </Grid>
-        </Grid>
+        <SectionCard
+          className="motion-enter-soft"
+          title={t("dashboard.settingsTitle")}
+          description={t("dashboard.detailManageDescription")}
+          action={
+            <Button
+              href={`/dashboard/boxes/${box.id}/settings`}
+              startIcon={<SettingsRounded />}
+              variant="contained"
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
+              {t("dashboard.detailSettingsAction")}
+            </Button>
+          }
+          variant="secondary"
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={{ xs: 1.5, sm: 2 }}
+            useFlexGap
+            flexWrap="wrap"
+          >
+            {summaryItems.map((item) => (
+              <Box
+                key={item.label}
+                sx={(theme) => ({
+                  minWidth: { xs: "100%", sm: 160 },
+                  flex: "1 1 160px",
+                  px: 1.5,
+                  py: 1.25,
+                  borderRadius: 1.5,
+                  bgcolor: theme.palette.action.hover,
+                  border: `1px solid ${theme.palette.divider}`,
+                })}
+              >
+                <Typography variant="overline" color="text.secondary">
+                  {item.label}
+                </Typography>
+                <Typography sx={{ mt: 0.25 }}>{item.value}</Typography>
+              </Box>
+            ))}
+          </Stack>
+        </SectionCard>
 
         <SectionCard
-          className="motion-enter-soft motion-delay-2"
+          className="motion-enter-soft motion-delay-1"
           title={t("dashboard.detailQuestionsTitle")}
         >
           <Stack spacing={2}>

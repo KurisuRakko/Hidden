@@ -40,7 +40,8 @@ export const userDashboardNavigation: UserDashboardNavItem[] = [
     href: "/dashboard/me",
     labelKey: "common.nav.me",
     icon: <PersonRounded />,
-    matches: (pathname) => pathname === "/dashboard/me",
+    matches: (pathname) =>
+      pathname === "/dashboard/me" || pathname.startsWith("/dashboard/me/"),
   },
 ];
 

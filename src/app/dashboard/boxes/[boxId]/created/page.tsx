@@ -43,7 +43,6 @@ export default async function BoxCreatedPage({ params }: CreatedPageProps) {
           </Stack>
           <BoxShareActions
             shareUrl={shareUrl}
-            manageHref={`/dashboard/boxes/${box.id}`}
           />
         </Stack>
       </SectionCard>

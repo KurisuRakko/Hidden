@@ -32,8 +32,7 @@ export default async function DashboardQuestionsPage() {
         <SectionCard
           className="motion-enter-soft"
           title={t("dashboard.myBoxesTitle")}
-        >
-          <Stack spacing={2}>
+          action={
             <Button
               href="/dashboard/boxes/new"
               startIcon={<AddRounded />}
@@ -42,7 +41,9 @@ export default async function DashboardQuestionsPage() {
             >
               {t("common.nav.createBox")}
             </Button>
-
+          }
+        >
+          <Stack spacing={2}>
             {boxes.length === 0 ? (
               <EmptyState
                 title={t("dashboard.noBoxesTitle")}

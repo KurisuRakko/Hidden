@@ -1,7 +1,9 @@
 import {
   Button,
+  Divider,
   Grid,
   Stack,
+  Typography,
 } from "@mui/material";
 import { OpenInNewRounded } from "@mui/icons-material";
 import { BoxForm } from "@/components/boxes/box-form";
@@ -53,72 +55,67 @@ export default async function BoxSettingsPage({
             className="motion-enter-soft"
             title={t("dashboard.settingsTitle")}
           >
-            <Stack spacing={2}>
-              <BoxForm
-                initialValues={{
-                  id: box.id,
-                  title: box.title,
-                  description: box.description,
-                  slug: box.slug,
-                  wallpaperUrl: box.wallpaperUrl,
-                  acceptingQuestions: box.acceptingQuestions,
-                  status: box.status === "DISABLED" ? "HIDDEN" : box.status,
-                }}
-              />
-            </Stack>
+            <BoxForm
+              initialValues={{
+                id: box.id,
+                title: box.title,
+                description: box.description,
+                slug: box.slug,
+                wallpaperUrl: box.wallpaperUrl,
+                acceptingQuestions: box.acceptingQuestions,
+                status: box.status === "DISABLED" ? "HIDDEN" : box.status,
+              }}
+            />
           </SectionCard>
         </Grid>
         <Grid size={{ xs: 12, xl: 5 }}>
-          <Stack spacing={3}>
-            <SectionCard
-              className="motion-enter-soft motion-delay-1"
-              title={t("dashboard.publicPageTitle")}
-            >
-              <Stack spacing={2}>
-                <Button
-                  href={publicPath}
-                  target="_blank"
-                  startIcon={<OpenInNewRounded />}
-                  variant="outlined"
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
-                >
-                  {t("common.actions.openPublicPage")}
-                </Button>
-                <BoxShareActions shareUrl={shareUrl} />
-              </Stack>
-            </SectionCard>
-            <SectionCard
-              className="motion-enter-soft motion-delay-2"
-              title={t("dashboard.summaryTitle")}
-            >
-              <Stack spacing={1}>
-                <div>
+          <SectionCard
+            className="motion-enter-soft motion-delay-1"
+            title={t("dashboard.publicPageTitle")}
+            description={t("dashboard.publicPageDescription")}
+            variant="secondary"
+          >
+            <Stack spacing={2.5}>
+              <Button
+                href={publicPath}
+                target="_blank"
+                startIcon={<OpenInNewRounded />}
+                variant="outlined"
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
+                {t("common.actions.openPublicPage")}
+              </Button>
+              <BoxShareActions shareUrl={shareUrl} />
+              <Divider />
+              <Stack spacing={1.25}>
+                <Typography variant="subtitle2">{t("dashboard.summaryTitle")}</Typography>
+                <Typography color="text.secondary">
                   {t("dashboard.summaryStatus", {
                     value: getStatusLabel(boxSummary.status, locale),
                   })}
-                </div>
-                <div>
+                </Typography>
+                <Typography color="text.secondary">
                   {t("dashboard.summaryAccepting", {
                     value: boxSummary.acceptingQuestions
                       ? t("dashboard.acceptingOn")
                       : t("dashboard.acceptingOff"),
                   })}
-                </div>
-                <div>
+                </Typography>
+                <Typography color="text.secondary">
                   {t("dashboard.summaryWallpaper", {
                     value: boxSummary.wallpaperUrl
                       ? t("dashboard.wallpaperSet")
                       : t("dashboard.wallpaperUnset"),
                   })}
-                </div>
-                <div>
+                </Typography>
+                <Typography color="text.secondary">
                   {t("dashboard.summaryQuestions", {
                     count: boxSummary._count.questions,
                   })}
-                </div>
+                </Typography>
               </Stack>
-            </SectionCard>
-          </Stack>
+            </Stack>
+          </SectionCard>
         </Grid>
       </Grid>
     </UserDashboardShell>

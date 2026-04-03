@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CardContent,
+  Link,
   Stack,
   Typography,
 } from "@mui/material";
@@ -86,12 +87,24 @@ export function DashboardBoxCard({ box, shareUrl }: DashboardBoxCardProps) {
             </Typography>
           </Stack>
 
-          <Typography variant="body2" color="text.secondary">
-            {box.acceptingQuestions
-              ? t("dashboard.boxCard.accepting")
-              : t("dashboard.boxCard.paused")}{" "}
-            · {t("dashboard.boxCard.questionCount", { count: box._count.questions })}
-          </Typography>
+          <Stack spacing={0.5}>
+            <Typography variant="body2" color="text.secondary">
+              {box.acceptingQuestions
+                ? t("dashboard.boxCard.accepting")
+                : t("dashboard.boxCard.paused")}{" "}
+              · {t("dashboard.boxCard.questionCount", { count: box._count.questions })}
+            </Typography>
+            <Link
+              href={publicPath}
+              target="_blank"
+              underline="hover"
+              color="text.secondary"
+              className="text-break"
+              sx={{ fontSize: "0.875rem", opacity: 0.84 }}
+            >
+              {publicPath}
+            </Link>
+          </Stack>
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
             <Button
@@ -104,7 +117,7 @@ export function DashboardBoxCard({ box, shareUrl }: DashboardBoxCardProps) {
             <Button
               type="button"
               onClick={handleCopyShareUrl}
-              variant="text"
+              variant="outlined"
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
               {t("common.actions.copyLink")}

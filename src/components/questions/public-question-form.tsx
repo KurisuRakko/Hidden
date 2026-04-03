@@ -119,7 +119,6 @@ export function PublicQuestionForm({
       action={handleSubmit}
       aria-busy={submitting}
       spacing={{ xs: 2, md: 2.25 }}
-      className="motion-enter-soft motion-delay-2"
     >
       <Box
         aria-live="polite"

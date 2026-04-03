@@ -23,6 +23,7 @@ import {
   SendRounded,
 } from "@mui/icons-material";
 import { HeaderLeadingBackAction } from "@/components/layout/header-leading-back-action";
+import { type HeaderBackAction } from "@/components/layout/header-leading-back-action";
 import {
   getActiveUserDashboardItem,
   userDashboardNavigation,
@@ -42,6 +43,7 @@ type UserDashboardShellProps = {
   children: React.ReactNode;
   pageTitle?: string;
   pageAction?: React.ReactNode;
+  back?: HeaderBackAction;
   backHref?: string;
 };
 
@@ -50,6 +52,7 @@ export function UserDashboardShell({
   children,
   pageTitle = "Hidden",
   pageAction = null,
+  back,
   backHref,
 }: UserDashboardShellProps) {
   return (
@@ -58,6 +61,7 @@ export function UserDashboardShell({
         viewer={viewer}
         pageTitle={pageTitle}
         pageAction={pageAction}
+        back={back}
         backHref={backHref}
       >
         {children}
@@ -71,6 +75,7 @@ function UserDashboardShellInner({
   children,
   pageTitle = "Hidden",
   pageAction = null,
+  back,
   backHref,
 }: UserDashboardShellProps) {
   const pathname = usePathname();
@@ -84,6 +89,7 @@ function UserDashboardShellInner({
     : activeNavigation.key;
   const { mode, toggleMode } = useUserDashboardTheme();
   const { locale, t } = useI18n();
+  const backAction = back ?? (backHref ? { mode: "href", href: backHref } : null);
 
   return (
     <Box
@@ -91,9 +97,9 @@ function UserDashboardShellInner({
       sx={{
         minHeight: "100dvh",
         px: { xs: 1.5, sm: 2.5, lg: 4 },
-        py: { xs: 1.5, sm: 2, lg: 4 },
+        py: { xs: 1.25, sm: 1.5, lg: 3 },
         pb: {
-          xs: "calc(var(--mobile-nav-height) + 76px + env(safe-area-inset-bottom))",
+          xs: "calc(var(--mobile-nav-height) + 68px + env(safe-area-inset-bottom))",
           lg: 0,
         },
         colorScheme: mode,
@@ -103,27 +109,27 @@ function UserDashboardShellInner({
           "background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard)",
       }}
     >
-      <Stack spacing={{ xs: 2.5, lg: 3 }}>
+      <Stack spacing={{ xs: 2, lg: 2.5 }}>
         <Card className="motion-enter-soft">
-          <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+          <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 2.25 } }}>
             <Stack
               direction="row"
               alignItems="center"
               justifyContent="space-between"
-              spacing={2}
+              spacing={1.5}
             >
-              <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
-                {backHref ? (
+              <Stack direction="row" spacing={1.25} alignItems="center" sx={{ minWidth: 0 }}>
+                {backAction ? (
                   <HeaderLeadingBackAction
-                    back={{ mode: "href", href: backHref }}
+                    back={backAction}
                     variant="dashboard"
                   />
                 ) : (
                   <Box
                     sx={(theme) => ({
-                      width: { xs: 40, sm: 44 },
-                      height: { xs: 40, sm: 44 },
-                      borderRadius: 1.5,
+                      width: { xs: 36, sm: 40 },
+                      height: { xs: 36, sm: 40 },
+                      borderRadius: 1.25,
                       display: "grid",
                       placeItems: "center",
                       color: theme.palette.primary.contrastText,
@@ -141,14 +147,14 @@ function UserDashboardShellInner({
                   <Typography
                     variant="h4"
                     className="text-break"
-                    sx={{ fontSize: { xs: "1.35rem", sm: "1.75rem" } }}
+                    sx={{ fontSize: { xs: "1.2rem", sm: "1.55rem" } }}
                   >
                     {pageTitle}
                   </Typography>
                 </Stack>
               </Stack>
 
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={0.75} alignItems="center">
                 {pageAction}
                 <IconButton
                   onClick={toggleMode}
@@ -158,8 +164,8 @@ function UserDashboardShellInner({
                       : t("dashboard.switchToLight")
                   }
                   sx={(theme) => ({
-                    width: 40,
-                    height: 40,
+                    width: { xs: 36, sm: 38 },
+                    height: { xs: 36, sm: 38 },
                     border: `1px solid ${theme.palette.divider}`,
                     bgcolor: theme.palette.background.paper,
                   })}
@@ -224,9 +230,9 @@ function UserDashboardShellInner({
         sx={{
           display: { xs: "block", lg: "none" },
           position: "fixed",
-          right: "max(12px, env(safe-area-inset-right))",
-          bottom: "max(12px, env(safe-area-inset-bottom))",
-          left: "max(12px, env(safe-area-inset-left))",
+          right: "max(10px, env(safe-area-inset-right))",
+          bottom: "max(10px, env(safe-area-inset-bottom))",
+          left: "max(10px, env(safe-area-inset-left))",
           zIndex: 1200,
         }}
       >
@@ -237,8 +243,8 @@ function UserDashboardShellInner({
             overflow: "visible",
             borderRadius: 2,
             bgcolor: "background.paper",
-            pt: 1,
-            pb: "calc(env(safe-area-inset-bottom) + 8px)",
+            pt: 0.75,
+            pb: "calc(env(safe-area-inset-bottom) + 6px)",
           }}
         >
           <Fab
@@ -247,11 +253,12 @@ function UserDashboardShellInner({
             aria-label={t("common.nav.createBox")}
             color={activeNavigation.key === "create" ? "secondary" : "primary"}
             className="dashboard-fab-animate"
+            size="medium"
             sx={{
               position: "absolute",
               top: 0,
               left: "50%",
-              transform: "translate(-50%, -38%)",
+              transform: "translate(-50%, -35%)",
             }}
           >
             <AddRounded />
@@ -262,7 +269,7 @@ function UserDashboardShellInner({
             value={mobileNavigationValue}
             sx={{
               display: "grid",
-              gridTemplateColumns: "1fr 72px 1fr",
+              gridTemplateColumns: "1fr 64px 1fr",
               alignItems: "end",
             }}
           >
@@ -273,7 +280,7 @@ function UserDashboardShellInner({
                 href={leftMobileItem.href}
                 icon={leftMobileItem.icon}
                 label={t(leftMobileItem.labelKey)}
-                sx={{ minWidth: 0 }}
+                sx={{ minWidth: 0, py: 0.5 }}
               />
             ) : (
               <Box />
@@ -286,7 +293,7 @@ function UserDashboardShellInner({
                 href={rightMobileItem.href}
                 icon={rightMobileItem.icon}
                 label={t(rightMobileItem.labelKey)}
-                sx={{ minWidth: 0 }}
+                sx={{ minWidth: 0, py: 0.5 }}
               />
             ) : (
               <Box />

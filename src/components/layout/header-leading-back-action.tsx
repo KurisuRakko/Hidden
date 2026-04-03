@@ -31,9 +31,9 @@ export function HeaderLeadingBackAction({
   const { t } = useI18n();
   const buttonSx = (theme: Theme) => ({
     flexShrink: 0,
-    width: variant === "dashboard" ? { xs: 40, sm: 44 } : { xs: 36, md: 38 },
-    height: variant === "dashboard" ? { xs: 40, sm: 44 } : { xs: 36, md: 38 },
-    borderRadius: 1.5,
+    width: variant === "dashboard" ? { xs: 36, sm: 40 } : { xs: 36, md: 38 },
+    height: variant === "dashboard" ? { xs: 36, sm: 40 } : { xs: 36, md: 38 },
+    borderRadius: variant === "dashboard" ? 1.25 : 1.5,
     bgcolor: "primary.main",
     color: theme.palette.primary.contrastText,
     boxShadow: variant === "dashboard" ? theme.shadows[3] : theme.shadows[2],

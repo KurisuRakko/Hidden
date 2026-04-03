@@ -19,6 +19,12 @@ import { getPublicBoxAskPath } from "@/lib/url";
 import { loadPublicBoxPageData } from "./_lib/load-public-box-page";
 import { PublicBoxWallpaperCard } from "./_components/public-box-wallpaper-card";
 
+const PUBLIC_SURFACE_BACKGROUND = alpha("#ffffff", 0.94);
+const PUBLIC_PANEL_BACKGROUND = alpha("#ffffff", 0.9);
+const PUBLIC_BORDER_COLOR = "rgba(0, 0, 0, 0.12)";
+const PUBLIC_ANSWER_BACKGROUND = alpha("#1976d2", 0.05);
+const PUBLIC_ANSWER_BORDER_COLOR = alpha("#1976d2", 0.16);
+
 type PublicBoxPageProps = {
   params: Promise<{
     slug: string;
@@ -31,9 +37,12 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
   const askHref = getPublicBoxAskPath(box.slug);
 
   return (
-    <PublicShell back={{ mode: "history", fallbackHref: "/" }}>
+    <PublicShell
+      back={{ mode: "history", fallbackHref: "/" }}
+      contentViewTransitionName="public-page-content"
+    >
       <Stack spacing={{ xs: 2.5, md: 3 }} sx={{ py: { xs: 2.75, md: 5 } }}>
-        <PublicBoxWallpaperCard wallpaperUrl={box.wallpaperUrl} className="motion-pop">
+        <PublicBoxWallpaperCard wallpaperUrl={box.wallpaperUrl}>
           <Grid container spacing={{ xs: 2, md: 3 }} alignItems="stretch">
             <Grid size={{ xs: 12, md: 7 }}>
               <Stack
@@ -76,7 +85,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
 
             <Grid size={{ xs: 12, md: 5 }}>
               <Box
-                sx={(theme) => ({
+                sx={{
                   height: "100%",
                   p: { xs: 2, sm: 2.5 },
                   borderRadius: 2,
@@ -84,13 +93,11 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
                   border: `1px solid ${
                     box.wallpaperUrl
                       ? "rgba(255, 255, 255, 0.22)"
-                      : theme.palette.divider
+                      : PUBLIC_BORDER_COLOR
                   }`,
-                  backgroundColor: box.wallpaperUrl
-                    ? alpha("#ffffff", 0.94)
-                    : alpha(theme.palette.background.paper, 0.94),
-                  boxShadow: theme.shadows[4],
-                })}
+                  backgroundColor: PUBLIC_SURFACE_BACKGROUND,
+                  boxShadow: 4,
+                }}
               >
                 <Stack spacing={2.5} justifyContent="space-between">
                   <Stack spacing={1}>
@@ -123,7 +130,7 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
           </Grid>
         </PublicBoxWallpaperCard>
 
-        <Card className="motion-enter-soft motion-delay-1">
+        <Card>
           <CardContent sx={{ p: { xs: 2.25, sm: 3, md: 4 } }}>
             <Stack spacing={{ xs: 2.5, md: 3 }}>
               <Stack spacing={1}>
@@ -137,22 +144,18 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
 
               {box.questions.length === 0 ? (
                 <EmptyState
-                  className="motion-enter-soft motion-delay-2"
                   title={t("publicBox.noAnswers")}
                   description={t("publicBox.noAnswersDescription")}
                 />
               ) : (
-                box.questions.map((question, index) => (
+                box.questions.map((question) => (
                   <Card
                     key={question.id}
-                    className={`interactive-panel motion-enter-soft motion-delay-${Math.min(
-                      4,
-                      index + 1,
-                    )}`}
-                    sx={(theme) => ({
-                      border: `1px solid ${theme.palette.divider}`,
-                      backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                    })}
+                    className="interactive-panel"
+                    sx={{
+                      border: `1px solid ${PUBLIC_BORDER_COLOR}`,
+                      backgroundColor: PUBLIC_PANEL_BACKGROUND,
+                    }}
                   >
                     <CardContent sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
                       <Stack spacing={2.25}>
@@ -191,12 +194,12 @@ export default async function PublicBoxPage({ params }: PublicBoxPageProps) {
 
                         {question.answer ? (
                           <Box
-                            sx={(theme) => ({
+                            sx={{
                               p: { xs: 1.5, sm: 1.75, md: 2 },
                               borderRadius: 1.75,
-                              backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                              border: `1px solid ${alpha(theme.palette.primary.main, 0.16)}`,
-                            })}
+                              backgroundColor: PUBLIC_ANSWER_BACKGROUND,
+                              border: `1px solid ${PUBLIC_ANSWER_BORDER_COLOR}`,
+                            }}
                           >
                             <Stack spacing={1.25}>
                               <Typography variant="h6">

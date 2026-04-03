@@ -11,18 +11,15 @@ import {
 import {
   ContentCopyRounded,
   LaunchRounded,
-  SettingsRounded,
 } from "@mui/icons-material";
 import { useI18n } from "@/components/providers/i18n-provider";
 
 type BoxShareActionsProps = {
   shareUrl: string;
-  manageHref?: string;
 };
 
 export function BoxShareActions({
   shareUrl,
-  manageHref,
 }: BoxShareActionsProps) {
   const { t } = useI18n();
   const [message, setMessage] = useState<string | null>(null);
@@ -52,7 +49,7 @@ export function BoxShareActions({
       <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
         <Button
           type="button"
-          variant="contained"
+          variant="outlined"
           startIcon={<ContentCopyRounded />}
           onClick={handleCopy}
           sx={{ width: { xs: "100%", sm: "auto" } }}
@@ -69,17 +66,6 @@ export function BoxShareActions({
         >
           {t("dashboard.share.open")}
         </Button>
-        {manageHref ? (
-          <Button
-            component={Link}
-            href={manageHref}
-            variant="text"
-            startIcon={<SettingsRounded />}
-            sx={{ width: { xs: "100%", sm: "auto" } }}
-          >
-            {t("dashboard.share.manage")}
-          </Button>
-        ) : null}
       </Stack>
     </Stack>
   );

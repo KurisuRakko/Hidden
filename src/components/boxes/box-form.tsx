@@ -5,11 +5,13 @@ import {
   Box,
   Button,
   Collapse,
+  Divider,
   FormControlLabel,
   MenuItem,
   Stack,
   Switch,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -95,115 +97,142 @@ export function BoxForm({
       <Collapse in={Boolean(error)} unmountOnExit>
         {error ? <Alert severity="error" className="status-feedback">{error}</Alert> : null}
       </Collapse>
-      <TextField
-        name="title"
-        label={t("dashboard.boxForm.title")}
-        required
-        fullWidth
-        defaultValue={initialValues?.title ?? ""}
-      />
-      <TextField
-        name="description"
-        label={t("dashboard.boxForm.description")}
-        fullWidth
-        multiline
-        minRows={3}
-        defaultValue={initialValues?.description ?? ""}
-      />
-      <TextField
-        name="slug"
-        label={t("dashboard.boxForm.slug")}
-        required
-        fullWidth
-        helperText={t("dashboard.boxForm.slugHelper")}
-        defaultValue={initialValues?.slug ?? ""}
-      />
-      <Stack spacing={1.5}>
-        {initialValues?.wallpaperUrl && !removeWallpaper && !hasPendingWallpaper ? (
-          <Box
-            sx={(theme) => ({
-              p: 1.25,
-              borderRadius: 1.5,
-              border: `1px solid ${theme.palette.divider}`,
-              bgcolor: theme.palette.action.hover,
-            })}
-          >
-            <Box
-              component="img"
-              src={initialValues.wallpaperUrl}
-              alt={t("dashboard.boxForm.wallpaperAlt")}
-              sx={{
-                width: "100%",
-                maxHeight: 220,
-                borderRadius: 1.5,
-                objectFit: "cover",
-              }}
-            />
-          </Box>
-        ) : null}
-
-        <FileUploadField
-          name="wallpaper"
-          accept="image/png,image/jpeg,image/webp"
-          helperText={t("dashboard.boxForm.wallpaperHelper")}
-          buttonLabel={t("dashboard.boxForm.uploadWallpaper")}
-          emptyLabel={
-            initialValues?.wallpaperUrl && !removeWallpaper
-              ? t("dashboard.boxForm.keepWallpaper")
-              : t("dashboard.boxForm.noWallpaper")
-          }
-          onFileChange={() => {
-            setRemoveWallpaper(false);
-            setHasPendingWallpaper(true);
-          }}
+      <Stack spacing={2}>
+        <Stack spacing={0.5}>
+          <Typography variant="subtitle2">{t("dashboard.boxForm.basicsTitle")}</Typography>
+          <Typography color="text.secondary">
+            {t("dashboard.boxForm.basicsDescription")}
+          </Typography>
+        </Stack>
+        <TextField
+          name="title"
+          label={t("dashboard.boxForm.title")}
+          required
+          fullWidth
+          defaultValue={initialValues?.title ?? ""}
         />
-
-        {initialValues?.wallpaperUrl ? (
-          <Button
-            type="button"
-            variant={removeWallpaper ? "contained" : "text"}
-            color={removeWallpaper ? "warning" : "inherit"}
-            onClick={() => {
-              setRemoveWallpaper((value) => !value);
-              setHasPendingWallpaper(false);
-            }}
-            sx={{ width: { xs: "100%", sm: "auto" } }}
-          >
-            {removeWallpaper
-              ? t("dashboard.boxForm.restoreWallpaper")
-              : t("dashboard.boxForm.removeWallpaper")}
-          </Button>
-        ) : null}
+        <TextField
+          name="description"
+          label={t("dashboard.boxForm.description")}
+          fullWidth
+          multiline
+          minRows={3}
+          defaultValue={initialValues?.description ?? ""}
+        />
+        <TextField
+          name="slug"
+          label={t("dashboard.boxForm.slug")}
+          required
+          fullWidth
+          helperText={t("dashboard.boxForm.slugHelper")}
+          defaultValue={initialValues?.slug ?? ""}
+        />
       </Stack>
-      <TextField
-        select
-        label={t("dashboard.boxForm.visibility")}
-        value={status}
-        onChange={(event) => setStatus(event.target.value as "ACTIVE" | "HIDDEN")}
-      >
-        <MenuItem value="ACTIVE">{getStatusLabel("ACTIVE", locale)}</MenuItem>
-        <MenuItem value="HIDDEN">{getStatusLabel("HIDDEN", locale)}</MenuItem>
-      </TextField>
-      <Box
-        sx={(theme) => ({
-          px: 1.5,
-          py: 1,
-          borderRadius: 1.5,
-          bgcolor: theme.palette.action.hover,
-          border: `1px solid ${theme.palette.divider}`,
-        })}
-      >
-        <FormControlLabel
-          control={
-            <Switch
-              checked={acceptingQuestions}
-              onChange={(event) => setAcceptingQuestions(event.target.checked)}
-            />
-          }
-          label={t("dashboard.boxForm.acceptQuestions")}
-          sx={{ m: 0, width: "100%", justifyContent: "space-between" }}
-        />
-      </Box>
+      <Divider />
+      <Stack spacing={2}>
+        <Stack spacing={0.5}>
+          <Typography variant="subtitle2">{t("dashboard.boxForm.wallpaperTitle")}</Typography>
+          <Typography color="text.secondary">
+            {t("dashboard.boxForm.wallpaperDescription")}
+          </Typography>
+        </Stack>
+        <Stack spacing={1.5}>
+          {initialValues?.wallpaperUrl && !removeWallpaper && !hasPendingWallpaper ? (
+            <Box
+              sx={(theme) => ({
+                p: 1.25,
+                borderRadius: 1.5,
+                border: `1px solid ${theme.palette.divider}`,
+                bgcolor: theme.palette.action.hover,
+              })}
+            >
+              <Box
+                component="img"
+                src={initialValues.wallpaperUrl}
+                alt={t("dashboard.boxForm.wallpaperAlt")}
+                sx={{
+                  width: "100%",
+                  maxHeight: 220,
+                  borderRadius: 1.5,
+                  objectFit: "cover",
+                }}
+              />
+            </Box>
+          ) : null}
+
+          <FileUploadField
+            name="wallpaper"
+            accept="image/png,image/jpeg,image/webp"
+            helperText={t("dashboard.boxForm.wallpaperHelper")}
+            buttonLabel={t("dashboard.boxForm.uploadWallpaper")}
+            emptyLabel={
+              initialValues?.wallpaperUrl && !removeWallpaper
+                ? t("dashboard.boxForm.keepWallpaper")
+                : t("dashboard.boxForm.noWallpaper")
+            }
+            onFileChange={() => {
+              setRemoveWallpaper(false);
+              setHasPendingWallpaper(true);
+            }}
+          />
+
+          {initialValues?.wallpaperUrl ? (
+            <Button
+              type="button"
+              variant={removeWallpaper ? "contained" : "text"}
+              color={removeWallpaper ? "warning" : "inherit"}
+              onClick={() => {
+                setRemoveWallpaper((value) => !value);
+                setHasPendingWallpaper(false);
+              }}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
+              {removeWallpaper
+                ? t("dashboard.boxForm.restoreWallpaper")
+                : t("dashboard.boxForm.removeWallpaper")}
+            </Button>
+          ) : null}
+        </Stack>
+      </Stack>
+      <Divider />
+      <Stack spacing={2}>
+        <Stack spacing={0.5}>
+          <Typography variant="subtitle2">{t("dashboard.boxForm.availabilityTitle")}</Typography>
+          <Typography color="text.secondary">
+            {t("dashboard.boxForm.availabilityDescription")}
+          </Typography>
+        </Stack>
+        <TextField
+          select
+          label={t("dashboard.boxForm.visibility")}
+          value={status}
+          onChange={(event) => setStatus(event.target.value as "ACTIVE" | "HIDDEN")}
+        >
+          <MenuItem value="ACTIVE">{getStatusLabel("ACTIVE", locale)}</MenuItem>
+          <MenuItem value="HIDDEN">{getStatusLabel("HIDDEN", locale)}</MenuItem>
+        </TextField>
+        <Box
+          sx={(theme) => ({
+            px: 1.5,
+            py: 1,
+            borderRadius: 1.5,
+            bgcolor: theme.palette.action.hover,
+            border: `1px solid ${theme.palette.divider}`,
+          })}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={acceptingQuestions}
+                onChange={(event) => setAcceptingQuestions(event.target.checked)}
+              />
+            }
+            label={t("dashboard.boxForm.acceptQuestions")}
+            sx={{ m: 0, width: "100%", justifyContent: "space-between" }}
+          />
+        </Box>
+      </Stack>
+      <Divider />
       <Button
         type="submit"
         variant="contained"
