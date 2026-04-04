@@ -1,12 +1,16 @@
+import bcrypt from "bcryptjs";
+import { randomBytes } from "node:crypto";
 import {
   AdminTargetType,
   InviteCodeStatus,
   Prisma,
   QuestionBoxStatus,
   QuestionStatus,
+  UserRole,
   UserStatus,
 } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { createSession } from "@/lib/auth/session";
 import { AppError } from "@/lib/http";
 import { inviteFormSchema, normalizeInviteCode } from "@/lib/validation/common";
 
@@ -486,4 +490,73 @@ export async function deleteAnswerAsAdmin(adminId: string, answerId: string) {
   });
 
   return result;
+}
+
+export async function resetUserPassword(adminId: string, userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true },
+  });
+
+  if (!user) {
+    throw new AppError(404, "User not found.", "USER_NOT_FOUND");
+  }
+
+  if (user.role === UserRole.ADMIN) {
+    throw new AppError(403, "Cannot reset password for admin accounts.", "CANNOT_RESET_ADMIN");
+  }
+
+  const temporaryPassword = randomBytes(12).toString("base64url");
+  const passwordHash = await bcrypt.hash(temporaryPassword, 12);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    // Invalidate all existing sessions for this user
+    await tx.session.deleteMany({
+      where: { userId },
+    });
+  });
+
+  await logAdminAction({
+    adminId,
+    targetType: AdminTargetType.USER,
+    targetId: userId,
+    action: "user.password.reset",
+  });
+
+  return { temporaryPassword };
+}
+
+export async function impersonateUser(adminId: string, userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true, status: true },
+  });
+
+  if (!user) {
+    throw new AppError(404, "User not found.", "USER_NOT_FOUND");
+  }
+
+  if (user.role === UserRole.ADMIN) {
+    throw new AppError(403, "Cannot impersonate admin accounts.", "CANNOT_IMPERSONATE_ADMIN");
+  }
+
+  if (user.status !== UserStatus.ACTIVE) {
+    throw new AppError(400, "Cannot impersonate a disabled or banned user.", "USER_NOT_ACTIVE");
+  }
+
+  const session = await createSession(userId);
+
+  await logAdminAction({
+    adminId,
+    targetType: AdminTargetType.USER,
+    targetId: userId,
+    action: "user.impersonate",
+  });
+
+  return session;
 }

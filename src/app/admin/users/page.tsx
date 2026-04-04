@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { SectionCard } from "@/components/common/section-card";
 import { StatusChip } from "@/components/common/status-chip";
+import { UserActions } from "@/components/admin/user-actions";
 import { UserStatusSelect } from "@/components/admin/user-status-select";
 import { listAdminUsers } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
@@ -78,6 +79,7 @@ export default async function AdminUsersPage({
               <TableCell>Status</TableCell>
               <TableCell>Boxes</TableCell>
               <TableCell>Created</TableCell>
+              <TableCell align="right">Status</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -93,6 +95,13 @@ export default async function AdminUsersPage({
                 <TableCell>{formatDateTime(user.createdAt)}</TableCell>
                 <TableCell align="right">
                   <UserStatusSelect userId={user.id} status={user.status} />
+                </TableCell>
+                <TableCell align="right">
+                  <UserActions
+                    userId={user.id}
+                    userRole={user.role}
+                    userStatus={user.status}
+                  />
                 </TableCell>
               </TableRow>
             ))}
