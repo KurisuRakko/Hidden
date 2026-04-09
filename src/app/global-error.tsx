@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { StandaloneErrorScreen } from "@/components/errors/standalone-error-screen";
+import { siteConfig } from "@/lib/site";
 
 type GlobalErrorPageProps = {
   error: Error & { digest?: string };
@@ -17,8 +18,8 @@ export default function GlobalErrorPage({ error }: GlobalErrorPageProps) {
       <body style={{ margin: 0 }}>
         <StandaloneErrorScreen
           error={error}
-          homeHref="https://hidden.rakko.cn"
-          officialHref="https://rakko.cn"
+          homeHref={siteConfig.publicHomeUrl}
+          officialHref={siteConfig.officialSiteUrl}
         />
       </body>
     </html>

@@ -46,3 +46,8 @@ test("getLocalizedErrorMessage translates stable error codes", () => {
 test("getStatusLabel returns the translated label", () => {
   assert.equal(getStatusLabel("PUBLISHED", "en"), "Published");
 });
+
+test("translate returns the new about action label", () => {
+  assert.equal(translate("zh-CN", "common.actions.about"), "关于");
+  assert.equal(translate("en", "project.ctaAction"), "Back to about");
+});

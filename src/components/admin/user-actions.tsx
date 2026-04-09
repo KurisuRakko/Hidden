@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HardDeleteButton } from "@/components/admin/hard-delete-button";
 
 type UserActionsProps = {
   userId: string;
@@ -81,6 +82,13 @@ export function UserActions({ userId, userRole, userStatus }: UserActionsProps) 
         >
           Impersonate
         </Button>
+        {!isAdmin && (
+          <HardDeleteButton
+            endpoint={`/api/admin/users/${userId}`}
+            label="Hard Delete"
+            description="This will permanently delete the user account and all associated data including boxes, questions, and answers."
+          />
+        )}
       </Stack>
 
       <Dialog

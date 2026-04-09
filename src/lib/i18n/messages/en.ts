@@ -32,6 +32,11 @@ const enMessages = {
       previous: "Previous",
       next: "Next",
       uploadImage: "Upload image",
+      about: "About",
+      visitWebsite: "Visit website",
+      viewRepository: "View repository",
+      viewProject: "Project page",
+      sendEmail: "Send email",
     },
     nav: {
       questions: "My boxes",
@@ -84,6 +89,151 @@ const enMessages = {
       inviteOnlyTitle: "Invite-only growth",
       inviteOnlyDescription: "Invite codes keep sign-ups controlled.",
     },
+  },
+  about: {
+    metadataTitle: "About KurisuRakko",
+    metadataDescription:
+      "Learn about KurisuRakko, the official site, support contact, and the Hidden project repository.",
+    badge: "About the creator",
+    title: "KurisuRakko builds Hidden with a moderation-first, MD2-inspired approach.",
+    description:
+      "This page collects the official links for KurisuRakko and gives you a clean path into the Hidden project overview.",
+    cards: {
+      officialSiteEyebrow: "Official site",
+      officialSiteTitle: "rakko.cn",
+      officialSiteDescription:
+        "Visit the KurisuRakko site for the canonical public identity and broader project context.",
+      repositoryEyebrow: "Source code",
+      repositoryTitle: "Hidden on GitHub",
+      repositoryDescription:
+        "Browse the repository, issues, and implementation details for Hidden.",
+      supportEyebrow: "Contact",
+      supportTitle: "Email support",
+      supportDescription:
+        "Reach out directly when you need help with Hidden or related project questions.",
+      projectEyebrow: "Project guide",
+      projectTitle: "About Hidden",
+      projectDescription:
+        "Read the product goals, capabilities, stack, and deployment shape in one focused page.",
+    },
+    overviewTitle: "Who is KurisuRakko",
+    overviewDescription:
+      "KurisuRakko is the author and maintainer behind Hidden. The official links are collected here so visitors can see who built the project and where the canonical references live.",
+    overviewPoints: {
+      identity:
+        "Maintains the public identity at rakko.cn and keeps Hidden connected to a clear official source.",
+      product:
+        "Builds Hidden as a moderated anonymous inbox with straightforward public flows and practical creator controls.",
+      engineering:
+        "Keeps the implementation compact with Next.js, TypeScript, MUI, Prisma, PostgreSQL, MinIO, and Docker Compose.",
+    },
+    principlesTitle: "What this project values",
+    principlesDescription:
+      "The public experience follows a few stable principles that already show up across the codebase and docs.",
+    principles: {
+      moderationTitle: "Moderation first",
+      moderationDescription:
+        "Anonymous questions are reviewed before publication so creators stay in control.",
+      inviteTitle: "Controlled growth",
+      inviteDescription:
+        "Invite-only registration keeps the early product manageable without extra complexity.",
+      md2Title: "Material Design 2",
+      md2Description:
+        "The UI favors MD2-style cards, elevation, and readable hierarchy over flashy effects.",
+    },
+    projectCtaAction: "Open project page",
+    closingTitle: "Continue into the Hidden project details",
+    closingDescription:
+      "Use the project page when you want the full product, stack, and deployment overview, or jump out to the official site for broader context.",
+  },
+  project: {
+    metadataTitle: "About the Hidden project",
+    metadataDescription:
+      "Overview of Hidden, including product goals, role model, tech stack, and deployment shape.",
+    badge: "About the project",
+    title: "Hidden is an invite-only anonymous inbox built for moderated publishing.",
+    description:
+      "The project combines lightweight public pages with structured review tools so visitors, creators, and administrators each get a clear path.",
+    summaryTitle: "Project overview",
+    summaryDescription:
+      "Hidden focuses on a simple MVP that can ship quickly while leaving room for stronger anti-abuse controls and future verification.",
+    summaryPoints: {
+      visitors:
+        "Visitors can open a public box, browse published answers, and submit one anonymous question with an optional image.",
+      users:
+        "Registered users can manage multiple boxes, review pending questions, answer them, and decide what becomes public.",
+      admins:
+        "Administrators can monitor users, boxes, questions, invite codes, and platform activity from one internal portal.",
+    },
+    capabilitiesTitle: "Core capabilities",
+    capabilitiesDescription:
+      "These are the main product flows already described in the repository docs.",
+    capabilities: {
+      registrationTitle: "Invite-based accounts",
+      registrationDescription:
+        "Phone number, password, and invite code registration with server-side session authentication.",
+      boxesTitle: "Multi-box ownership",
+      boxesDescription:
+        "Each signed-in user can create and configure multiple question boxes with their own public slugs.",
+      moderationTitle: "Review and publish workflow",
+      moderationDescription:
+        "Questions enter a pending state first, then can be answered, published, rejected, or deleted.",
+      governanceTitle: "Admin governance",
+      governanceDescription:
+        "The admin portal covers user status, box status, question moderation, invite codes, and audit logs.",
+    },
+    stackTitle: "Technical stack",
+    stackDescription:
+      "The implementation stays intentionally compact by keeping product pages, dashboards, APIs, and authentication in one Next.js codebase.",
+    stack: {
+      frontendTitle: "Next.js + TypeScript",
+      frontendDescription:
+        "App Router handles the public site, dashboards, server rendering, and API routes in one repository.",
+      uiTitle: "MUI with MD2 direction",
+      uiDescription:
+        "The UI uses MUI with an MD2-inspired theme, card grouping, and clear visual hierarchy.",
+      dataTitle: "Prisma + PostgreSQL + MinIO",
+      dataDescription:
+        "Relational data lives in PostgreSQL through Prisma, while uploaded media is stored in MinIO.",
+      opsTitle: "Docker-first operations",
+      opsDescription:
+        "Docker Compose runs the proxy, web app, database, and object storage together for local and server deployments.",
+    },
+    deploymentTitle: "Deployment shape",
+    deploymentDescription:
+      "The repository documents three practical ways to run Hidden today.",
+    deployment: {
+      localTitle: "Local machine",
+      localDescription:
+        "Run the full stack with Docker Compose for development on one computer.",
+      lanTitle: "LAN or private network",
+      lanDescription:
+        "Expose the public site and optional admin access to devices on the same network.",
+      internetTitle: "Internet-facing host",
+      internetDescription:
+        "Place the public site behind a domain and TLS proxy while keeping the admin listener protected.",
+    },
+    linksTitle: "Project links",
+    linksDescription:
+      "Use these canonical sources when you want the current codebase or official project context.",
+    links: {
+      repositoryEyebrow: "Repository",
+      repositoryTitle: "GitHub source",
+      repositoryDescription:
+        "Browse the current implementation, issues, and change history for Hidden.",
+      officialEyebrow: "Official site",
+      officialTitle: "KurisuRakko site",
+      officialDescription:
+        "See the broader creator context and official external presence for the project.",
+      contactEyebrow: "Support",
+      contactTitle: "Email",
+      contactDescription:
+        "Use email when you need direct human contact for Hidden-related questions.",
+    },
+    ctaAction: "Back to about",
+    closingTitle: "Keep exploring the official project context",
+    closingDescription:
+      "Open the repository when you want the code, or go back to the about page for the creator-facing overview and official links.",
   },
   auth: {
     disabledNotice:

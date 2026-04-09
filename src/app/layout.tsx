@@ -3,6 +3,7 @@ import { Noto_Sans_SC, Roboto } from "next/font/google";
 import { AppProviders } from "@/components/providers/app-providers";
 import { getMessages } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -18,9 +19,10 @@ const notoSansSC = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
-  title: "Hidden",
+  metadataBase: new URL(siteConfig.publicBaseUrl),
+  title: siteConfig.appName,
   description: "Anonymous question boxes with moderation and invite-only registration.",
-  applicationName: "Hidden",
+  applicationName: siteConfig.appName,
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
@@ -32,7 +34,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Hidden",
+    title: siteConfig.appName,
   },
   formatDetection: {
     telephone: false,

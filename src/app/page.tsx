@@ -23,7 +23,7 @@ export default async function Home() {
   const t = createTranslator(locale);
 
   return (
-    <PublicShell>
+    <PublicShell showAboutEntry>
       <Box sx={{ py: { xs: 2.25, sm: 5.5, md: 9 } }}>
         <Stack spacing={{ xs: 3.25, sm: 5, md: 6 }}>
           <Box

@@ -560,3 +560,94 @@ export async function impersonateUser(adminId: string, userId: string) {
 
   return session;
 }
+
+export async function hardDeleteUser(adminId: string, userId: string) {
+  if (adminId === userId) {
+    throw new AppError(403, "Cannot delete your own account.", "CANNOT_DELETE_SELF");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true },
+  });
+
+  if (!user) {
+    throw new AppError(404, "User not found.", "USER_NOT_FOUND");
+  }
+
+  if (user.role === UserRole.ADMIN) {
+    throw new AppError(403, "Cannot delete admin accounts.", "CANNOT_DELETE_ADMIN");
+  }
+
+  // Cascade: sessions, boxes, questions, answers are all removed via DB cascade
+  await prisma.user.delete({ where: { id: userId } });
+
+  await logAdminAction({
+    adminId,
+    targetType: AdminTargetType.USER,
+    targetId: userId,
+    action: "user.hard_delete",
+  });
+}
+
+export async function hardDeleteBox(adminId: string, boxId: string) {
+  const box = await prisma.questionBox.findUnique({
+    where: { id: boxId },
+    select: { id: true },
+  });
+
+  if (!box) {
+    throw new AppError(404, "Question box not found.", "BOX_NOT_FOUND");
+  }
+
+  // Cascade: questions and answers are removed via DB cascade
+  await prisma.questionBox.delete({ where: { id: boxId } });
+
+  await logAdminAction({
+    adminId,
+    targetType: AdminTargetType.QUESTION_BOX,
+    targetId: boxId,
+    action: "box.hard_delete",
+  });
+}
+
+export async function hardDeleteQuestion(adminId: string, questionId: string) {
+  const question = await prisma.question.findUnique({
+    where: { id: questionId },
+    select: { id: true },
+  });
+
+  if (!question) {
+    throw new AppError(404, "Question not found.", "QUESTION_NOT_FOUND");
+  }
+
+  // Cascade: answer is removed via DB cascade
+  await prisma.question.delete({ where: { id: questionId } });
+
+  await logAdminAction({
+    adminId,
+    targetType: AdminTargetType.QUESTION,
+    targetId: questionId,
+    action: "question.hard_delete",
+  });
+}
+
+export async function hardDeleteAnswer(adminId: string, answerId: string) {
+  const answer = await prisma.answer.findUnique({
+    where: { id: answerId },
+    select: { id: true },
+  });
+
+  if (!answer) {
+    throw new AppError(404, "Answer not found.", "ANSWER_NOT_FOUND");
+  }
+
+  await prisma.answer.delete({ where: { id: answerId } });
+
+  await logAdminAction({
+    adminId,
+    targetType: AdminTargetType.ANSWER,
+    targetId: answerId,
+    action: "answer.hard_delete",
+  });
+}

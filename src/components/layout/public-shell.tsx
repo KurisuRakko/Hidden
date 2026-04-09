@@ -1,11 +1,13 @@
 import Link from "next/link";
 import {
+  InfoOutlined,
   SendRounded,
 } from "@mui/icons-material";
 import {
   AppBar,
   Box,
   Container,
+  IconButton,
   Stack,
   Toolbar,
   Typography,
@@ -18,6 +20,7 @@ import {
 import { PublicHeaderActions } from "@/components/layout/public-header-actions";
 import { createTranslator } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { publicPagePaths } from "@/lib/site";
 
 type PublicShellProps = {
   children: React.ReactNode;
@@ -25,6 +28,7 @@ type PublicShellProps = {
   homeHref?: string;
   back?: HeaderBackAction;
   contentViewTransitionName?: string;
+  showAboutEntry?: boolean;
 };
 
 export async function PublicShell({
@@ -33,6 +37,7 @@ export async function PublicShell({
   homeHref = "/",
   back,
   contentViewTransitionName,
+  showAboutEntry = false,
 }: PublicShellProps) {
   const viewer = await getViewer();
   const locale = await getRequestLocale();
@@ -44,8 +49,6 @@ export async function PublicShell({
       alignItems="center"
       sx={{
         minWidth: 0,
-        width: "100%",
-        maxWidth: { xs: "calc(100% - 52px)", md: "none" },
       }}
     >
       {back ? (
@@ -109,21 +112,49 @@ export async function PublicShell({
               spacing={{ xs: 1.5, md: 2 }}
             >
               <Box sx={{ flex: "1 1 auto", minWidth: 0 }}>
-                {back ? (
-                  headerIdentity
-                ) : (
-                  <Link
-                    href={homeHref}
-                    style={{
-                      color: "inherit",
-                      display: "block",
-                      minWidth: 0,
-                      textDecoration: "none",
-                    }}
-                  >
-                    {headerIdentity}
-                  </Link>
-                )}
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={{ xs: 1, md: 1.25 }}
+                  sx={{ minWidth: 0 }}
+                >
+                  {showAboutEntry && !back ? (
+                    <IconButton
+                      component={Link}
+                      href={publicPagePaths.about}
+                      aria-label={t("common.actions.about")}
+                      size="small"
+                      sx={(theme) => ({
+                        flexShrink: 0,
+                        width: { xs: 36, md: 38 },
+                        height: { xs: 36, md: 38 },
+                        borderRadius: 999,
+                        border: `1px solid ${theme.palette.divider}`,
+                        bgcolor: "background.paper",
+                        boxShadow: theme.shadows[1],
+                      })}
+                    >
+                      <InfoOutlined fontSize="small" />
+                    </IconButton>
+                  ) : null}
+                  <Box sx={{ flex: "1 1 auto", minWidth: 0 }}>
+                    {back ? (
+                      headerIdentity
+                    ) : (
+                      <Link
+                        href={homeHref}
+                        style={{
+                          color: "inherit",
+                          display: "block",
+                          minWidth: 0,
+                          textDecoration: "none",
+                        }}
+                      >
+                        {headerIdentity}
+                      </Link>
+                    )}
+                  </Box>
+                </Stack>
               </Box>
               <PublicHeaderActions
                 viewer={viewer ? { role: viewer.role } : null}

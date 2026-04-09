@@ -32,6 +32,11 @@ const zhCNMessages = {
       previous: "上一页",
       next: "下一页",
       uploadImage: "上传图片",
+      about: "关于",
+      visitWebsite: "访问官网",
+      viewRepository: "查看仓库",
+      viewProject: "项目页面",
+      sendEmail: "发送邮件",
     },
     nav: {
       questions: "我的提问箱",
@@ -83,6 +88,151 @@ const zhCNMessages = {
       inviteOnlyTitle: "邀请码控制增长",
       inviteOnlyDescription: "通过邀请码控制注册节奏。",
     },
+  },
+  about: {
+    metadataTitle: "关于 KurisuRakko",
+    metadataDescription:
+      "了解 KurisuRakko、官网、支持联系方式，以及 Hidden 项目仓库入口。",
+    badge: "关于作者",
+    title: "KurisuRakko 以审核优先、MD2 风格为方向持续构建 Hidden。",
+    description:
+      "这里集中整理 KurisuRakko 的官方入口，也提供一条清晰路径继续查看 Hidden 项目本身。",
+    cards: {
+      officialSiteEyebrow: "官方网站",
+      officialSiteTitle: "rakko.cn",
+      officialSiteDescription:
+        "前往 KurisuRakko 官网，查看官方身份信息与更完整的项目上下文。",
+      repositoryEyebrow: "源码仓库",
+      repositoryTitle: "GitHub 上的 Hidden",
+      repositoryDescription:
+        "查看 Hidden 的仓库、议题以及当前实现细节。",
+      supportEyebrow: "联系方式",
+      supportTitle: "邮箱支持",
+      supportDescription:
+        "如果你需要 Hidden 或相关项目的帮助，可以直接通过邮箱联系。",
+      projectEyebrow: "项目说明",
+      projectTitle: "关于 Hidden",
+      projectDescription:
+        "继续查看 Hidden 的产品目标、核心能力、技术栈和部署形态。",
+    },
+    overviewTitle: "KurisuRakko 是谁",
+    overviewDescription:
+      "KurisuRakko 是 Hidden 的作者与维护者。这里把官方链接集中到一起，方便访客确认是谁在构建这个项目，以及哪些入口是权威来源。",
+    overviewPoints: {
+      identity:
+        "通过 rakko.cn 维护公开身份，让 Hidden 始终和清晰的官方来源绑定。",
+      product:
+        "将 Hidden 打造成一个流程直接、创作者可控、以审核为先的匿名提问箱。",
+      engineering:
+        "在实现上保持紧凑，围绕 Next.js、TypeScript、MUI、Prisma、PostgreSQL、MinIO 和 Docker Compose 组织。",
+    },
+    principlesTitle: "这个项目重视什么",
+    principlesDescription:
+      "当前公开站点围绕几条稳定原则展开，这些原则也已经体现在代码和文档里。",
+    principles: {
+      moderationTitle: "审核优先",
+      moderationDescription:
+        "匿名提问先进入审核，再决定是否公开，让创作者始终掌握节奏。",
+      inviteTitle: "受控增长",
+      inviteDescription:
+        "通过邀请码控制早期增长速度，先把产品稳定性做好。",
+      md2Title: "Material Design 2",
+      md2Description:
+        "界面更偏向 MD2 的卡片层级、阴影和清晰结构，而不是夸张的视觉效果。",
+    },
+    projectCtaAction: "打开项目页面",
+    closingTitle: "继续查看 Hidden 项目细节",
+    closingDescription:
+      "如果你想继续了解产品能力、技术栈和部署方式，可以进入项目页；如果想回到更宽的官方语境，也可以直接前往官网。",
+  },
+  project: {
+    metadataTitle: "关于 Hidden 项目",
+    metadataDescription:
+      "了解 Hidden 的产品目标、角色模型、技术栈与部署形态。",
+    badge: "关于项目",
+    title: "Hidden 是一个面向审核发布流程的邀请码制匿名提问箱。",
+    description:
+      "这个项目把轻量公开页和结构化审核工具放在同一套体系里，让访客、创作者和管理员都拥有清晰路径。",
+    summaryTitle: "项目概览",
+    summaryDescription:
+      "Hidden 聚焦一个能尽快交付的 MVP，同时保留后续加强防滥用和手机号验证的空间。",
+    summaryPoints: {
+      visitors:
+        "访客可以打开公开提问箱、浏览已发布内容，并提交一条可选附图的匿名提问。",
+      users:
+        "注册用户可以管理多个提问箱、审核待处理提问、撰写回复，并决定哪些内容公开。",
+      admins:
+        "管理员可以在同一个内部入口中管理用户、提问箱、提问、邀请码与平台活动。",
+    },
+    capabilitiesTitle: "核心能力",
+    capabilitiesDescription:
+      "这些是仓库文档里已经明确写下的主要产品流程。",
+    capabilities: {
+      registrationTitle: "邀请码账号体系",
+      registrationDescription:
+        "支持手机号、密码和邀请码注册，并使用服务端会话做身份验证。",
+      boxesTitle: "多提问箱管理",
+      boxesDescription:
+        "每个已登录用户都可以创建并配置多个带独立公开链接的提问箱。",
+      moderationTitle: "审核与发布流程",
+      moderationDescription:
+        "问题先进入待处理状态，再由用户选择回复、发布、屏蔽或删除。",
+      governanceTitle: "管理后台治理",
+      governanceDescription:
+        "后台覆盖用户状态、提问箱状态、问题审核、邀请码和操作日志。",
+    },
+    stackTitle: "技术栈",
+    stackDescription:
+      "实现上保持紧凑，把公开页、用户中心、API 和认证都放进同一套 Next.js 代码库。",
+    stack: {
+      frontendTitle: "Next.js + TypeScript",
+      frontendDescription:
+        "通过 App Router 在一个仓库里承载公开站点、用户中心、服务端渲染和 API 路由。",
+      uiTitle: "MUI 与 MD2 方向",
+      uiDescription:
+        "界面基于 MUI，并围绕 MD2 风格的卡片分组、层次和可读性组织。",
+      dataTitle: "Prisma + PostgreSQL + MinIO",
+      dataDescription:
+        "结构化数据使用 Prisma 管理 PostgreSQL，上传媒体文件则存放在 MinIO。",
+      opsTitle: "Docker 优先的运行方式",
+      opsDescription:
+        "通过 Docker Compose 协同代理、Web 应用、数据库和对象存储，适合本地与服务器部署。",
+    },
+    deploymentTitle: "部署形态",
+    deploymentDescription:
+      "仓库文档目前整理了三种最实用的运行方式。",
+    deployment: {
+      localTitle: "本机开发",
+      localDescription:
+        "通过 Docker Compose 在一台电脑上完整运行整套服务。",
+      lanTitle: "局域网或私有网络",
+      lanDescription:
+        "把公开站点和可选的管理入口暴露给同一网络中的其他设备。",
+      internetTitle: "公网服务器",
+      internetDescription:
+        "将公开站点放在域名和 TLS 代理之后，同时继续保护管理员入口。",
+    },
+    linksTitle: "项目链接",
+    linksDescription:
+      "当你想查看当前代码或官方外部信息时，可以优先使用这些权威入口。",
+    links: {
+      repositoryEyebrow: "仓库",
+      repositoryTitle: "GitHub 源码",
+      repositoryDescription:
+        "查看 Hidden 当前实现、议题和变更历史。",
+      officialEyebrow: "官网",
+      officialTitle: "KurisuRakko 官网",
+      officialDescription:
+        "查看创作者的更完整背景，以及项目对外的官方存在。",
+      contactEyebrow: "支持",
+      contactTitle: "邮箱",
+      contactDescription:
+        "如果你需要 Hidden 相关的人工联系入口，可以直接通过邮箱沟通。",
+    },
+    ctaAction: "返回关于页",
+    closingTitle: "继续浏览官方项目上下文",
+    closingDescription:
+      "想直接看代码就去仓库，想回到作者与官方入口的整理页，就返回关于页。",
   },
   auth: {
     disabledNotice: "你的账号当前未启用，请联系管理员处理。",

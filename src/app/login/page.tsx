@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
 
   return (
-    <PublicShell>
+    <PublicShell showAboutEntry>
       <Box sx={{ py: { xs: 2.5, sm: 4.5, md: 7 } }}>
         <AuthForm
           mode="login"

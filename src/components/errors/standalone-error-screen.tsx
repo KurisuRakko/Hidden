@@ -12,6 +12,7 @@ import {
   Typography,
   createTheme,
 } from "@mui/material";
+import { siteConfig, supportEmailHref } from "@/lib/site";
 
 type ErrorLike = Error & {
   digest?: string;
@@ -153,13 +154,13 @@ export function StandaloneErrorScreen({
 
               <Stack spacing={0.5}>
                 <Typography>
-                  您可以联系 KurisuRakko 获得协助 / Contact KurisuRakko for
-                  help
+                  您可以联系 {siteConfig.creatorName} 获得协助 / Contact{" "}
+                  {siteConfig.creatorName} for help
                 </Typography>
                 <Typography color="text.secondary">
                   邮箱 / Email:{" "}
-                  <Link href="mailto:y@rakko.cn" underline="hover">
-                    y@rakko.cn
+                  <Link href={supportEmailHref} underline="hover">
+                    {siteConfig.supportEmail}
                   </Link>
                 </Typography>
               </Stack>
@@ -179,7 +180,8 @@ export function StandaloneErrorScreen({
                   variant="outlined"
                   fullWidth
                 >
-                  前往 KurisuRakko 官网 / Visit KurisuRakko
+                  前往 {siteConfig.creatorName} 官网 / Visit{" "}
+                  {siteConfig.creatorName}
                 </Button>
               </Stack>
             </Stack>
