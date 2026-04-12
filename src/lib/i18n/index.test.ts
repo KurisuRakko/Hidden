@@ -51,3 +51,13 @@ test("translate returns the new about action label", () => {
   assert.equal(translate("zh-CN", "common.actions.about"), "关于");
   assert.equal(translate("en", "project.ctaAction"), "Back to about");
 });
+
+test("getLocalizedErrorMessage translates password required validation", () => {
+  assert.equal(
+    getLocalizedErrorMessage({
+      locale: "zh-CN",
+      message: "Password is required.",
+    }),
+    "密码不能为空。",
+  );
+});

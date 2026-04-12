@@ -42,6 +42,16 @@ export async function PublicShell({
   const viewer = await getViewer();
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
+  const aboutButtonSx = {
+    flexShrink: 0,
+    width: { xs: 36, md: 38 },
+    height: { xs: 36, md: 38 },
+    borderRadius: 999,
+    border: "1px solid",
+    borderColor: "divider",
+    bgcolor: "background.paper",
+    boxShadow: 1,
+  } as const;
   const headerIdentity = (
     <Stack
       direction="row"
@@ -123,16 +133,7 @@ export async function PublicShell({
                       href={publicPagePaths.about}
                       aria-label={t("common.actions.about")}
                       size="small"
-                      sx={{
-                        flexShrink: 0,
-                        width: { xs: 36, md: 38 },
-                        height: { xs: 36, md: 38 },
-                        borderRadius: 999,
-                        border: 1,
-                        borderColor: "divider",
-                        bgcolor: "background.paper",
-                        boxShadow: 1,
-                      }}
+                      sx={aboutButtonSx}
                     >
                       <InfoOutlined fontSize="small" />
                     </IconButton>

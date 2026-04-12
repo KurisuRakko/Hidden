@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CardContent,
+  Divider,
   MenuItem,
   Stack,
   TextField,
@@ -22,11 +23,16 @@ import {
 import { useI18n } from "@/components/providers/i18n-provider";
 import { getLocalizedErrorMessage } from "@/lib/i18n";
 
+type AuthFieldName = "localPhone" | "password" | "inviteCode";
+type AuthFieldErrors = Partial<Record<AuthFieldName, string>>;
+
 type AuthFormProps = {
   mode: "login" | "register";
   portal?: "PUBLIC" | "ADMIN";
   notice?: string;
   defaultDialCode: DialCode;
+  oidcEnabled?: boolean;
+  oidcProviderLabel?: string;
 };
 
 export function AuthForm({
@@ -34,20 +40,97 @@ export function AuthForm({
   portal = "PUBLIC",
   notice,
   defaultDialCode,
+  oidcEnabled = false,
+  oidcProviderLabel = "Casdoor",
 }: AuthFormProps) {
   const { locale, t } = useI18n();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<AuthFieldErrors>({});
   const [errorActionUrl, setErrorActionUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const isAdminLogin = mode === "login" && portal === "ADMIN";
+  const showOidcEntry = oidcEnabled && !isAdminLogin;
   const feedbackSeverity = error ? "error" : notice ? "info" : null;
   const feedbackMessage = error ?? notice ?? null;
   const dialCodeOptions = isAdminLogin ? DIAL_CODE_OPTIONS : getDialCodeOptions(locale);
 
+  function getFieldKeyFromPath(path: unknown) {
+    if (path === "phone" || path === "localPhone") {
+      return "localPhone" as const;
+    }
+
+    if (path === "password") {
+      return "password" as const;
+    }
+
+    if (path === "inviteCode") {
+      return "inviteCode" as const;
+    }
+
+    return null;
+  }
+
+  function setSingleFieldError(field: AuthFieldName, message: string) {
+    setFieldErrors({ [field]: message });
+    setError(null);
+    setErrorActionUrl(null);
+  }
+
+  function buildFieldErrorsFromResponse(input: {
+    code?: string;
+    localizedError: string;
+    details?: unknown;
+  }) {
+    const nextFieldErrors: AuthFieldErrors = {};
+
+    if (mode === "register") {
+      if (input.code === "PHONE_TAKEN") {
+        nextFieldErrors.localPhone = input.localizedError;
+      }
+
+      if (
+        input.code === "INVITE_INVALID" ||
+        input.code === "INVITE_EXPIRED" ||
+        input.code === "INVITE_EXHAUSTED"
+      ) {
+        nextFieldErrors.inviteCode = input.localizedError;
+      }
+    }
+
+    if (input.code === "VALIDATION_ERROR" && Array.isArray(input.details)) {
+      for (const detail of input.details) {
+        if (!detail || typeof detail !== "object") {
+          continue;
+        }
+
+        const path = "path" in detail ? detail.path : undefined;
+        const message = "message" in detail ? detail.message : undefined;
+
+        if (typeof path !== "string" || typeof message !== "string") {
+          continue;
+        }
+
+        const field = getFieldKeyFromPath(path);
+
+        if (!field || nextFieldErrors[field]) {
+          continue;
+        }
+
+        nextFieldErrors[field] = getLocalizedErrorMessage({
+          locale,
+          message,
+        });
+      }
+    }
+
+    return nextFieldErrors;
+  }
+
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
     setError(null);
+    setFieldErrors({});
     setErrorActionUrl(null);
 
     const dialCode = String(formData.get("dialCode") ?? defaultDialCode);
@@ -59,7 +142,8 @@ export function AuthForm({
     const phone = `${dialCode}${localPhone}`;
 
     if (!localPhone) {
-      setError(
+      setSingleFieldError(
+        "localPhone",
         isAdminLogin
           ? "Enter a valid local phone number before continuing."
           : t("auth.validation.localPhoneRequired"),
@@ -69,7 +153,8 @@ export function AuthForm({
     }
 
     if (!password.trim()) {
-      setError(
+      setSingleFieldError(
+        "password",
         isAdminLogin
           ? "Enter your password before continuing."
           : t("auth.validation.passwordRequired"),
@@ -79,7 +164,7 @@ export function AuthForm({
     }
 
     if (mode === "register" && !inviteCode.trim()) {
-      setError(t("auth.validation.inviteCodeRequired"));
+      setSingleFieldError("inviteCode", t("auth.validation.inviteCodeRequired"));
       setSubmitting(false);
       return;
     }
@@ -109,7 +194,7 @@ export function AuthForm({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(
+        const localizedError =
           isAdminLogin
             ? result.error ?? "Request failed."
             : getLocalizedErrorMessage({
@@ -120,8 +205,20 @@ export function AuthForm({
                   typeof result.error === "string"
                     ? result.error
                     : t("common.feedback.requestFailed"),
-              }),
-        );
+              });
+        const nextFieldErrors = buildFieldErrorsFromResponse({
+          code: typeof result.code === "string" ? result.code : undefined,
+          localizedError,
+          details: result.details,
+        });
+
+        if (Object.keys(nextFieldErrors).length > 0) {
+          setFieldErrors(nextFieldErrors);
+          setError(null);
+        } else {
+          setError(localizedError);
+        }
+
         setErrorActionUrl(
           typeof result.details?.adminLoginUrl === "string"
             ? result.details.adminLoginUrl
@@ -177,9 +274,17 @@ export function AuthForm({
             <Typography color="text.secondary">
               {isAdminLogin
                 ? t("auth.adminDescription")
-                : mode === "login"
-                  ? t("auth.loginDescription")
-                  : t("auth.registerDescription")}
+                : showOidcEntry
+                  ? mode === "login"
+                    ? t("auth.loginDescriptionWithOidc", {
+                        provider: oidcProviderLabel,
+                      })
+                    : t("auth.registerDescriptionWithOidc", {
+                        provider: oidcProviderLabel,
+                      })
+                  : mode === "login"
+                    ? t("auth.loginDescription")
+                    : t("auth.registerDescription")}
             </Typography>
           </Box>
 
@@ -204,13 +309,44 @@ export function AuthForm({
             ) : null}
           </Box>
 
+          {showOidcEntry ? (
+            <Stack spacing={1.5}>
+              <Button
+                component="a"
+                href="/api/auth/oidc/start"
+                variant="contained"
+                size="large"
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
+                {t("auth.oidcPrimaryAction", {
+                  provider: oidcProviderLabel,
+                })}
+              </Button>
+              <Typography color="text.secondary">
+                {mode === "login"
+                  ? t("auth.oidcLoginDescription", {
+                      provider: oidcProviderLabel,
+                    })
+                  : t("auth.oidcRegisterDescription", {
+                      provider: oidcProviderLabel,
+                    })}
+              </Typography>
+              <Divider>
+                {mode === "login"
+                  ? t("auth.legacyLoginDivider")
+                  : t("auth.legacyRegisterDivider")}
+              </Divider>
+            </Stack>
+          ) : null}
+
           <Box
             component="form"
             action={handleSubmit}
             aria-busy={submitting}
             onChange={() => {
-              if (error) {
+              if (error || Object.keys(fieldErrors).length > 0) {
                 setError(null);
+                setFieldErrors({});
                 setErrorActionUrl(null);
               }
             }}
@@ -238,13 +374,15 @@ export function AuthForm({
                   fullWidth
                   required
                   disabled={submitting}
+                  error={Boolean(fieldErrors.localPhone)}
                   placeholder={
                     isAdminLogin ? "138 0013 8000" : t("auth.phonePlaceholder")
                   }
                   helperText={
-                    isAdminLogin
+                    fieldErrors.localPhone ??
+                    (isAdminLogin
                       ? "Enter the local number without the international prefix."
-                      : t("auth.phoneHelper")
+                      : t("auth.phoneHelper"))
                   }
                 />
               </Stack>
@@ -258,6 +396,8 @@ export function AuthForm({
                 fullWidth
                 required
                 disabled={submitting}
+                error={Boolean(fieldErrors.password)}
+                helperText={fieldErrors.password}
               />
               {mode === "register" ? (
                 <TextField
@@ -267,11 +407,13 @@ export function AuthForm({
                   fullWidth
                   required
                   disabled={submitting}
+                  error={Boolean(fieldErrors.inviteCode)}
+                  helperText={fieldErrors.inviteCode}
                 />
               ) : null}
               <Button
                 type="submit"
-                variant="contained"
+                variant={showOidcEntry ? "outlined" : "contained"}
                 disabled={submitting}
                 size="large"
                 aria-busy={submitting}

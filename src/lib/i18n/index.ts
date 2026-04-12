@@ -20,8 +20,7 @@ const messagesByLocale: Record<Locale, Messages> = {
 
 const validationMessageKeyMap: Record<string, string> = {
   "Enter a valid phone number.": "validation.phoneInvalid",
-  "Password must be at least 8 characters.": "validation.passwordTooShort",
-  "Password is too long.": "validation.passwordTooLong",
+  "Password is required.": "validation.passwordRequired",
   "Invite code is required.": "validation.inviteCodeRequired",
   "Invite code is too long.": "validation.inviteCodeTooLong",
   "Slug must use lowercase letters, numbers, and hyphens only.":

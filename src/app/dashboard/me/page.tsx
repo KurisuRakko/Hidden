@@ -12,7 +12,8 @@ import { loadDashboardMePageData } from "./_lib/load-dashboard-me-page";
 import { DASHBOARD_ME_FORWARD_TRANSITION } from "./_lib/transitions";
 
 export default async function DashboardMePage() {
-  const { viewer, accountSummary, t } = await loadDashboardMePageData();
+  const { viewer, accountSummary, oidcProviderLabel, t } =
+    await loadDashboardMePageData();
 
   return (
     <UserDashboardShell
@@ -52,7 +53,11 @@ export default async function DashboardMePage() {
           summary={(
             <Stack spacing={0.75}>
               <Typography variant="body2">
-                {t("dashboard.passwordTitle")}
+                {viewer.hasPassword
+                  ? t("dashboard.passwordTitle")
+                  : t("dashboard.passwordManagedByOidc", {
+                      provider: oidcProviderLabel,
+                    })}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {t("dashboard.logoutTitle")}

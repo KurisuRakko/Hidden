@@ -16,6 +16,25 @@ const envShape = {
   MINIO_SECRET_KEY: z.string().min(1),
   MINIO_BUCKET: z.string().min(1),
   MINIO_PUBLIC_URL: z.string().url(),
+  OIDC_ENABLED: z
+    .string()
+    .optional()
+    .transform((value) => value === "true"),
+  OIDC_PROVIDER_LABEL: z
+    .string()
+    .optional()
+    .transform((value) => value?.trim() || "Casdoor"),
+  OIDC_ISSUER_URL: z.string().optional(),
+  OIDC_CLIENT_ID: z.string().optional(),
+  OIDC_CLIENT_SECRET: z.string().optional(),
+  OIDC_SCOPES: z
+    .string()
+    .optional()
+    .transform((value) => value?.trim() || "openid profile email phone"),
+  OIDC_CALLBACK_PATH: z
+    .string()
+    .optional()
+    .transform((value) => value?.trim() || "/callback"),
   SEED_ADMIN_PHONE: z.string().min(1),
   SEED_ADMIN_PASSWORD: z.string().min(8),
   SEED_DEFAULT_INVITE: z.string().min(1),
@@ -61,4 +80,47 @@ export function getEnv() {
   cachedEnv = nextEnv;
 
   return cachedEnv;
+}
+
+export function getOidcPublicConfig() {
+  const env = getEnv();
+
+  return {
+    enabled: env.OIDC_ENABLED,
+    providerLabel: env.OIDC_PROVIDER_LABEL,
+  };
+}
+
+export function getOidcEnv() {
+  const env = getEnv();
+
+  if (!env.OIDC_ENABLED) {
+    return null;
+  }
+
+  if (!env.OIDC_ISSUER_URL?.trim()) {
+    throw new Error("Invalid environment configuration: OIDC_ISSUER_URL");
+  }
+
+  if (!env.OIDC_CLIENT_ID?.trim()) {
+    throw new Error("Invalid environment configuration: OIDC_CLIENT_ID");
+  }
+
+  if (!env.OIDC_CLIENT_SECRET?.trim()) {
+    throw new Error("Invalid environment configuration: OIDC_CLIENT_SECRET");
+  }
+
+  if (!env.OIDC_CALLBACK_PATH.startsWith("/")) {
+    throw new Error("Invalid environment configuration: OIDC_CALLBACK_PATH");
+  }
+
+  return {
+    enabled: true as const,
+    providerLabel: env.OIDC_PROVIDER_LABEL,
+    issuerUrl: env.OIDC_ISSUER_URL,
+    clientId: env.OIDC_CLIENT_ID,
+    clientSecret: env.OIDC_CLIENT_SECRET,
+    scopes: env.OIDC_SCOPES,
+    callbackPath: env.OIDC_CALLBACK_PATH,
+  };
 }

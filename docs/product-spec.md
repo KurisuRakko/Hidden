@@ -50,16 +50,26 @@ The first version should prioritize clear role boundaries, a smooth ask-and-answ
 
 ### 4.1 Registration
 
+**Legacy path (phone/password)**:
+
 1. A new user enters phone number, password, and invite code.
 2. The backend validates phone format and uniqueness.
 3. The backend validates the invite code and remaining usage count.
 4. The account is created and the password is securely hashed.
 5. The user is signed in and redirected to the dashboard.
 
+**OIDC path (Casdoor)**:
+
+1. A new user clicks "Continue with Casdoor" on the login or register page.
+2. The user authenticates at the Casdoor identity provider.
+3. On first sign-in, a new account is created automatically (no invite code required).
+4. The user is signed in and redirected to the dashboard.
+
 Notes:
 
 - Phone verification by SMS is not included in the first version.
 - A future upgrade can activate SMS verification without redesigning the account model.
+- OIDC-only accounts may not have a local phone number or password. The UI adapts accordingly.
 
 ### 4.2 Create a Question Box
 
@@ -90,7 +100,7 @@ Notes:
 - Web application
 - React-based frontend
 - Material Design 2 visual language
-- User registration and login
+- User registration and login (phone/password with invite code, and OIDC via Casdoor)
 - Multi-box ownership per user
 - Public box pages
 - Anonymous question submission
@@ -103,7 +113,6 @@ Notes:
 ### Not Included
 
 - SMS verification
-- Social login
 - Reactions, likes, or comments
 - Real-time notifications
 - AI moderation

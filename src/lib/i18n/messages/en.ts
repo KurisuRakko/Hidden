@@ -242,14 +242,29 @@ const enMessages = {
     adminDescription: "Access the internal admin portal.",
     loginTitle: "Sign in",
     loginDescription: "Enter your phone number and password.",
+    loginDescriptionWithOidc:
+      "Continue with {provider} first, or use the legacy phone sign-in below.",
     registerTitle: "Create account",
     registerDescription: "Register with an invite code.",
+    registerDescriptionWithOidc:
+      "Continue with {provider} to create your account, or use the legacy invite registration below.",
     countryCode: "Country code",
     phoneNumber: "Phone number",
     phonePlaceholder: "138 0013 8000",
     phoneHelper: "Enter your local number.",
     password: "Password",
     inviteCode: "Invite code",
+    oidcPrimaryAction: "Continue with {provider}",
+    oidcLoginDescription:
+      "This is the preferred public sign-in flow and will reuse your Hidden session once you return.",
+    oidcRegisterDescription:
+      "First-time sign-in through {provider} creates your Hidden account automatically.",
+    legacyLoginDivider: "Legacy phone sign-in",
+    legacyRegisterDivider: "Legacy invite registration",
+    oidcUnavailableNotice:
+      "{provider} sign-in is not configured right now. You can still use the legacy form below.",
+    oidcFailedNotice:
+      "{provider} sign-in could not be completed. Please try again or use the legacy form below.",
     submit: "Submitting...",
     signInToAdmin: "Sign in to admin",
     registerAction: "Register",
@@ -315,10 +330,13 @@ const enMessages = {
     languageTitle: "Language",
     currentMode: "Current mode: {mode}",
     themeScope: "Only affects the dashboard.",
-    accountPhone: "Phone: {phone}",
+    accountIdentifier: "Account: {value}",
     accountRole: "Role: {role}",
     accountCreatedAt: "Created: {value}",
     passwordTitle: "Change password",
+    passwordManagedByOidc: "Signed in with {provider}",
+    passwordManagedByOidcDescription:
+      "This account signs in through {provider}. A local password is not set, so password changes are unavailable here.",
     logoutTitle: "Sign out",
     myBoxesTitle: "My boxes",
     noBoxesTitle: "No boxes yet",
@@ -332,7 +350,7 @@ const enMessages = {
     meSettingsDescription: "Manage account, preferences, and security by category.",
     personalSettings: {
       accountTitle: "Account",
-      accountDescription: "Review phone number, role, and account creation details.",
+      accountDescription: "Review account identifier, role, and account creation details.",
       preferencesTitle: "Preferences",
       preferencesDescription: "Adjust theme and language in one place.",
       securityTitle: "Security",
@@ -438,7 +456,6 @@ const enMessages = {
     changePassword: {
       currentPassword: "Current password",
       newPassword: "New password",
-      newPasswordHelper: "Use 8 to 72 characters.",
       confirmPassword: "Confirm new password",
       updating: "Updating...",
       update: "Update password",
@@ -476,6 +493,8 @@ const enMessages = {
     CURRENT_PASSWORD_INCORRECT: "Current password is incorrect.",
     PASSWORD_UNCHANGED:
       "New password must be different from your current password.",
+    PASSWORD_SIGN_IN_UNAVAILABLE:
+      "This account does not have a local password sign-in.",
     SLUG_TAKEN: "Slug is already taken.",
     BOX_NOT_FOUND: "Question box not found.",
     QUESTION_NOT_FOUND: "Question not found.",
@@ -488,12 +507,19 @@ const enMessages = {
     INVALID_FILE_TYPE: "Only JPG, PNG, or WEBP images are allowed.",
     FILE_TOO_LARGE: "Image size must stay below 5 MB.",
     VALIDATION_ERROR: "Please check the submitted fields.",
+    OIDC_CALLBACK_INVALID: "The sign-in response is incomplete.",
+    OIDC_DISCOVERY_FAILED: "Unable to contact the sign-in provider.",
+    OIDC_NONCE_INVALID: "The sign-in session could not be verified.",
+    OIDC_PROFILE_INVALID: "The sign-in profile could not be verified.",
+    OIDC_STATE_EXPIRED: "The sign-in session expired. Please try again.",
+    OIDC_STATE_INVALID: "The sign-in session is invalid.",
+    OIDC_TOKEN_EXCHANGE_FAILED: "Unable to complete the sign-in exchange.",
+    OIDC_USERINFO_FAILED: "Unable to load your sign-in profile.",
     INTERNAL_SERVER_ERROR: "Internal server error",
   },
   validation: {
     phoneInvalid: "Enter a valid phone number.",
-    passwordTooShort: "Password must be at least 8 characters.",
-    passwordTooLong: "Password is too long.",
+    passwordRequired: "Password is required.",
     inviteCodeRequired: "Invite code is required.",
     inviteCodeTooLong: "Invite code is too long.",
     slugInvalid:

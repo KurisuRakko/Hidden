@@ -12,7 +12,7 @@ Preferred implementation:
 - ORM: Prisma
 - Database: PostgreSQL
 - File storage: MinIO
-- Authentication: Phone number + password + session cookie
+- Authentication: Phone/password (legacy) and OIDC authorization code flow (Casdoor), both backed by local session cookies
 
 This path keeps the codebase compact while allowing both frontend pages and backend APIs to live in the same repository.
 
@@ -53,13 +53,27 @@ This path keeps the codebase compact while allowing both frontend pages and back
 ### User
 
 - `id`
-- `phone`
-- `passwordHash`
+- `phone` (nullable — null for OIDC-only accounts)
+- `passwordHash` (nullable — null for OIDC-only accounts)
+- `email` (nullable — populated from OIDC claims)
+- `externalPhone` (nullable — populated from OIDC `phone_number`/`phone` claims; display only, not used for login)
 - `role`
 - `status`
 - `phoneVerifiedAt`
 - `createdAt`
 - `updatedAt`
+
+### UserIdentity
+
+- `id`
+- `userId`
+- `provider` (enum: `CASDOOR`)
+- `issuer` (OIDC issuer URL)
+- `subject` (OIDC `sub` claim — durable identity key)
+- `organization` (preserved from Casdoor claims for future admin authorization)
+- `createdAt`
+- `updatedAt`
+- Unique constraint on `(provider, issuer, subject)`
 
 ### InviteCode
 
@@ -151,6 +165,8 @@ Route and API protection should be centralized to avoid scattering permission ch
 
 ## 7. Main API Surface
 
+- `GET /api/auth/oidc/start` (begins OIDC authorization code flow)
+- `GET /callback` (OIDC callback — exchanges code for tokens, provisions account)
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
@@ -226,6 +242,8 @@ Expected flow:
 5. Open the public app and admin app through their configured URLs.
 
 Deployment details should live in [docs/deployment.md](./deployment.md) so this architecture document stays high-level.
+
+For the full authentication model (OIDC flow, legacy flow, session management, claim normalization), see [docs/authentication.md](./authentication.md). For Casdoor-specific IdP setup, see [docs/casdoor-idp-setup.md](./casdoor-idp-setup.md).
 
 ## 10. Non-Functional Requirements
 

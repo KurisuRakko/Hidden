@@ -113,7 +113,6 @@ export function ChangePasswordForm() {
           fullWidth
           required
           disabled={submitting}
-          helperText={t("dashboard.changePassword.newPasswordHelper")}
         />
         <TextField
           label={t("dashboard.changePassword.confirmPassword")}

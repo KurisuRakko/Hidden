@@ -5,6 +5,7 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { PublicShell } from "@/components/layout/public-shell";
 import { getViewer } from "@/lib/auth/guards";
 import { getAdminAppUrl } from "@/lib/admin-portal";
+import { getOidcPublicConfig } from "@/lib/env";
 import { createTranslator } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n/server";
 import { getDefaultDialCodeFromAcceptLanguage } from "@/lib/phone";
@@ -12,6 +13,7 @@ import { getDefaultDialCodeFromAcceptLanguage } from "@/lib/phone";
 type LoginPageProps = {
   searchParams: Promise<{
     disabled?: string;
+    oidc?: string;
   }>;
 };
 
@@ -19,6 +21,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const viewer = await getViewer();
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
+  const oidc = getOidcPublicConfig();
   const headerStore = await headers();
   const defaultDialCode = getDefaultDialCodeFromAcceptLanguage(
     headerStore.get("accept-language"),
@@ -31,6 +34,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   const params = await searchParams;
+  const notice = params.disabled
+    ? t("auth.disabledNotice")
+    : params.oidc === "unavailable"
+      ? t("auth.oidcUnavailableNotice", {
+          provider: oidc.providerLabel,
+        })
+      : params.oidc === "failed"
+        ? t("auth.oidcFailedNotice", {
+            provider: oidc.providerLabel,
+          })
+        : undefined;
 
   return (
     <PublicShell showAboutEntry>
@@ -39,11 +53,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           mode="login"
           portal="PUBLIC"
           defaultDialCode={defaultDialCode}
-          notice={
-            params.disabled
-              ? t("auth.disabledNotice")
-              : undefined
-          }
+          oidcEnabled={oidc.enabled}
+          oidcProviderLabel={oidc.providerLabel}
+          notice={notice}
         />
       </Box>
     </PublicShell>

@@ -5,10 +5,12 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { PublicShell } from "@/components/layout/public-shell";
 import { getViewer } from "@/lib/auth/guards";
 import { getAdminAppUrl } from "@/lib/admin-portal";
+import { getOidcPublicConfig } from "@/lib/env";
 import { getDefaultDialCodeFromAcceptLanguage } from "@/lib/phone";
 
 export default async function RegisterPage() {
   const viewer = await getViewer();
+  const oidc = getOidcPublicConfig();
   const headerStore = await headers();
   const defaultDialCode = getDefaultDialCodeFromAcceptLanguage(
     headerStore.get("accept-language"),
@@ -23,7 +25,12 @@ export default async function RegisterPage() {
   return (
     <PublicShell showAboutEntry>
       <Box sx={{ py: { xs: 2.5, sm: 4.5, md: 7 } }}>
-        <AuthForm mode="register" defaultDialCode={defaultDialCode} />
+        <AuthForm
+          mode="register"
+          defaultDialCode={defaultDialCode}
+          oidcEnabled={oidc.enabled}
+          oidcProviderLabel={oidc.providerLabel}
+        />
       </Box>
     </PublicShell>
   );

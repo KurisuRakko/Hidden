@@ -11,6 +11,7 @@ import {
 } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/auth/session";
+import { USER_DISPLAY_SELECT } from "@/lib/auth/user";
 import { AppError } from "@/lib/http";
 import { inviteFormSchema, normalizeInviteCode } from "@/lib/validation/common";
 
@@ -27,6 +28,23 @@ async function logAdminAction(input: {
   });
 }
 
+function buildUserSearchWhere(query: string): Prisma.UserWhereInput {
+  return {
+    OR: [
+      { phone: { contains: query } },
+      { externalPhone: { contains: query } },
+      { email: { contains: query, mode: "insensitive" } },
+      {
+        identities: {
+          some: {
+            subject: { contains: query, mode: "insensitive" },
+          },
+        },
+      },
+    ],
+  };
+}
+
 export async function getAdminOverview() {
   const [userCount, boxCount, questionCount, inviteCount, recentActions] =
     await Promise.all([
@@ -39,9 +57,7 @@ export async function getAdminOverview() {
         take: 8,
         include: {
           admin: {
-            select: {
-              phone: true,
-            },
+            select: USER_DISPLAY_SELECT,
           },
         },
       }),
@@ -57,13 +73,7 @@ export async function listAdminUsers(options: {
   pageSize: number;
 }) {
   const where: Prisma.UserWhereInput = {
-    ...(options.q
-      ? {
-          phone: {
-            contains: options.q,
-          },
-        }
-      : {}),
+    ...(options.q ? buildUserSearchWhere(options.q) : {}),
     ...(options.status && options.status !== "ALL"
       ? {
           status: options.status,
@@ -77,7 +87,12 @@ export async function listAdminUsers(options: {
       orderBy: { createdAt: "desc" },
       skip: (options.page - 1) * options.pageSize,
       take: options.pageSize,
-      include: {
+      select: {
+        id: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        ...USER_DISPLAY_SELECT,
         _count: {
           select: {
             boxes: true,
@@ -103,7 +118,7 @@ export async function listAdminBoxes(options: {
           OR: [
             { title: { contains: options.q, mode: "insensitive" } },
             { slug: { contains: options.q, mode: "insensitive" } },
-            { owner: { phone: { contains: options.q } } },
+            { owner: buildUserSearchWhere(options.q) },
           ],
         }
       : {}),
@@ -122,9 +137,7 @@ export async function listAdminBoxes(options: {
       take: options.pageSize,
       include: {
         owner: {
-          select: {
-            phone: true,
-          },
+          select: USER_DISPLAY_SELECT,
         },
         _count: {
           select: {
@@ -174,7 +187,7 @@ export async function listAdminQuestions(options: {
           OR: [
             { content: { contains: options.q, mode: "insensitive" } },
             { box: { slug: { contains: options.q, mode: "insensitive" } } },
-            { box: { owner: { phone: { contains: options.q } } } },
+            { box: { owner: buildUserSearchWhere(options.q) } },
           ],
         }
       : {}),
@@ -196,9 +209,7 @@ export async function listAdminQuestions(options: {
         box: {
           include: {
             owner: {
-              select: {
-                phone: true,
-              },
+              select: USER_DISPLAY_SELECT,
             },
           },
         },
@@ -222,7 +233,7 @@ export async function listAdminLogs(options: {
           OR: [
             { targetId: { contains: options.q, mode: "insensitive" } },
             { action: { contains: options.q, mode: "insensitive" } },
-            { admin: { phone: { contains: options.q } } },
+            { admin: buildUserSearchWhere(options.q) },
           ],
         }
       : {}),
@@ -241,9 +252,7 @@ export async function listAdminLogs(options: {
       take: options.pageSize,
       include: {
         admin: {
-          select: {
-            phone: true,
-          },
+          select: USER_DISPLAY_SELECT,
         },
       },
     }),
@@ -282,9 +291,7 @@ export async function listAdminInvites(options: {
       take: options.pageSize,
       include: {
         createdBy: {
-          select: {
-            phone: true,
-          },
+          select: USER_DISPLAY_SELECT,
         },
       },
     }),

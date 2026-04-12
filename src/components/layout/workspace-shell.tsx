@@ -21,7 +21,7 @@ type WorkspaceShellProps = {
   title: string;
   description: string;
   viewer: {
-    phone: string;
+    displayLabel: string;
     role: string;
   };
   navigation: WorkspaceNavItem[];
@@ -71,7 +71,7 @@ export function WorkspaceShell({
                 alignItems={{ xs: "stretch", sm: "center", md: "flex-end" }}
               >
                 <Stack spacing={0.25}>
-                  <Typography variant="subtitle1">{viewer.phone}</Typography>
+                  <Typography variant="subtitle1">{viewer.displayLabel}</Typography>
                   <Typography color="text.secondary">{viewer.role}</Typography>
                 </Stack>
                 <LogoutButton

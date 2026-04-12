@@ -6,6 +6,7 @@ import { StatusChip } from "@/components/common/status-chip";
 import { listAdminInvites } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import { getUserDisplayLabel } from "@/lib/user-display";
 import { buildPathWithQuery } from "@/lib/url";
 
 type AdminInvitesPageProps = {
@@ -97,7 +98,7 @@ export default async function AdminInvitesPage({
                       </Typography>
                       <Typography color="text.secondary">
                         Created {formatDateTime(invite.createdAt)}
-                        {invite.createdBy ? ` by ${invite.createdBy.phone}` : ""}
+                        {invite.createdBy ? ` by ${getUserDisplayLabel(invite.createdBy)}` : ""}
                       </Typography>
                     </Stack>
                   </Grid>

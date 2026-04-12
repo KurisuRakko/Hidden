@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { addDays } from "date-fns";
 import { cookies } from "next/headers";
 import { createHash, randomBytes } from "node:crypto";
@@ -6,12 +5,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getEnvValue } from "@/lib/env";
 import { AppError } from "@/lib/http";
+import {
+  SESSION_USER_SELECT,
+  serializeUserForClient,
+  type ClientUser,
+} from "@/lib/auth/user";
 import { SESSION_COOKIE_NAME, SESSION_TTL_DAYS } from "@/lib/constants";
-
-export type SessionUser = Pick<
-  User,
-  "id" | "phone" | "role" | "status" | "createdAt"
->;
+export type SessionUser = ClientUser;
 
 export type SessionPayload = {
   id: string;
@@ -98,13 +98,7 @@ export async function getCurrentSession() {
     },
     include: {
       user: {
-        select: {
-          id: true,
-          phone: true,
-          role: true,
-          status: true,
-          createdAt: true,
-        },
+        select: SESSION_USER_SELECT,
       },
     },
   });
@@ -125,7 +119,10 @@ export async function getCurrentSession() {
     return null;
   }
 
-  return payload;
+  return {
+    ...payload,
+    user: serializeUserForClient(payload.user),
+  };
 }
 
 export async function requireActiveSession() {

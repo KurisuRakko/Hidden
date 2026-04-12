@@ -4,6 +4,7 @@ import { SectionCard } from "@/components/common/section-card";
 import { getAdminOverview } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import { getUserDisplayLabel } from "@/lib/user-display";
 
 export default async function AdminOverviewPage() {
   await requireAdminPage();
@@ -54,7 +55,7 @@ export default async function AdminOverviewPage() {
                 <Stack spacing={0.75}>
                   <Typography variant="subtitle1">{action.action}</Typography>
                   <Typography color="text.secondary">
-                    {action.admin.phone} · {formatDateTime(action.createdAt)}
+                    {getUserDisplayLabel(action.admin)} · {formatDateTime(action.createdAt)}
                   </Typography>
                   {action.reason ? (
                     <Typography variant="body2" color="text.secondary">

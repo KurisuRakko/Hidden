@@ -10,7 +10,6 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HardDeleteButton } from "@/components/admin/hard-delete-button";
 
@@ -21,7 +20,6 @@ type UserActionsProps = {
 };
 
 export function UserActions({ userId, userRole, userStatus }: UserActionsProps) {
-  const router = useRouter();
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

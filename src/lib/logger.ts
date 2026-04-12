@@ -65,6 +65,26 @@ export function logApiRequest(data: {
   writeLog(level, "api.request", data);
 }
 
+export function logOidcEvent(data: {
+  requestId?: string;
+  portal: "PUBLIC" | "ADMIN";
+  stage: "start" | "callback.success" | "callback.failure";
+  issuerHost?: string;
+  errorCode?: string;
+  failureStage?: string;
+}) {
+  const level: LogLevel = data.stage === "callback.failure" ? "warn" : "info";
+
+  writeLog(level, "oidc.auth", {
+    requestId: data.requestId ?? null,
+    portal: data.portal,
+    stage: data.stage,
+    issuerHost: data.issuerHost ?? null,
+    errorCode: data.errorCode ?? null,
+    failureStage: data.failureStage ?? null,
+  });
+}
+
 export function logApiError(data: {
   requestId: string;
   method: string;

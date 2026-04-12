@@ -5,6 +5,7 @@ Hidden is an invite-only anonymous question box web application built with Next.
 ## What Is Included
 
 - Phone number + password + invite code registration
+- Optional Casdoor OIDC sign-in for the public site
 - Server-side session cookie authentication
 - Multi-box management for each user
 - Public anonymous submission pages at `/s/[slug]`
@@ -89,9 +90,16 @@ The default sample values in `.env.example` are:
 - `/admin/invites`
 - `/admin-login`
 
+## Documentation
+
+- Product requirements: [docs/product-spec.md](./docs/product-spec.md)
+- Technical architecture: [docs/technical-architecture.md](./docs/technical-architecture.md)
+- Deployment and environment: [docs/deployment.md](./docs/deployment.md)
+- Authentication model: [docs/authentication.md](./docs/authentication.md)
+- Casdoor IdP setup: [docs/casdoor-idp-setup.md](./docs/casdoor-idp-setup.md)
+
 ## Development Notes
 
-- Product requirements live in [README.md](./README.md), [docs/product-spec.md](./docs/product-spec.md), and [docs/technical-architecture.md](./docs/technical-architecture.md).
-- Deployment and environment guidance lives in [docs/deployment.md](./docs/deployment.md).
+- Public OIDC sign-in can be enabled by setting `OIDC_ENABLED=true` and filling in the Casdoor OIDC environment variables in `.env`. See [docs/casdoor-idp-setup.md](./docs/casdoor-idp-setup.md) for the full Casdoor configuration walkthrough and [docs/authentication.md](./docs/authentication.md) for the auth model details.
 - Uploaded images are stored in MinIO and exposed through the configured public bucket URL.
 - The first version keeps moderation logic intentionally simple and server-side.

@@ -322,7 +322,48 @@ That is expected when:
 
 Only active boxes are public.
 
-## 11. Hardening Recommendations
+## 11. Public OIDC Setup (Casdoor)
+
+Hidden supports OIDC sign-in for the public site via Casdoor. This is optional — the legacy phone/password flow continues to work regardless of OIDC configuration.
+
+### Enable OIDC
+
+Add these variables to `.env`:
+
+```env
+OIDC_ENABLED=true
+OIDC_PROVIDER_LABEL=Casdoor
+OIDC_ISSUER_URL=https://casdoor.example.com
+OIDC_CLIENT_ID=<client-id>
+OIDC_CLIENT_SECRET=<client-secret>
+OIDC_SCOPES=openid profile email phone
+OIDC_CALLBACK_PATH=/callback
+```
+
+The callback URL is constructed at runtime as `<request-origin>/callback`. This must match the redirect URI configured in the Casdoor application exactly (scheme, host, port, and path).
+
+### Casdoor Application Configuration
+
+For the full step-by-step Casdoor setup, see [docs/casdoor-idp-setup.md](./casdoor-idp-setup.md). The key requirements are:
+
+- Grant type: `authorization_code`
+- Redirect URI: `APP_URL/callback` (exact match required)
+- Scopes: `openid`, `profile`, `email`, `phone`
+
+### OIDC Verification Checklist
+
+After enabling OIDC, verify:
+
+1. Clicking "Continue with Casdoor" on `/login` redirects to the Casdoor authorization page.
+2. After authenticating at Casdoor, the user is redirected back and lands on `/dashboard`.
+3. The user's display label shows their email or phone from Casdoor (not a masked subject ID).
+4. Server logs show `oidc.auth` events with `stage: "start"` and `stage: "callback.success"`.
+
+For troubleshooting common OIDC errors, see the troubleshooting section of [docs/casdoor-idp-setup.md](./casdoor-idp-setup.md).
+
+For the full authentication model documentation, see [docs/authentication.md](./authentication.md).
+
+## 12. Hardening Recommendations
 
 If Hidden is going to serve real users, do these next:
 

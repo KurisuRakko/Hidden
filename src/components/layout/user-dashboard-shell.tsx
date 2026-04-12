@@ -37,7 +37,7 @@ import { getRoleLabel } from "@/lib/i18n";
 
 type UserDashboardShellProps = {
   viewer: {
-    phone: string;
+    displayLabel: string;
     role: string;
   };
   children: React.ReactNode;
@@ -212,7 +212,7 @@ function UserDashboardShellInner({
                       border: `1px solid ${theme.palette.divider}`,
                     })}
                   >
-                    <Typography variant="subtitle2">{viewer.phone}</Typography>
+                    <Typography variant="subtitle2">{viewer.displayLabel}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       {getRoleLabel(viewer.role, locale)}
                     </Typography>

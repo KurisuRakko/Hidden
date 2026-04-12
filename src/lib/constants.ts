@@ -1,5 +1,7 @@
 export const SESSION_COOKIE_NAME = "hidden_session";
 export const SESSION_TTL_DAYS = 30;
+export const OIDC_STATE_COOKIE_NAME = "hidden_oidc_state";
+export const OIDC_STATE_TTL_SECONDS = 10 * 60;
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",

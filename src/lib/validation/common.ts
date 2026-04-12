@@ -38,8 +38,7 @@ export const phoneSchema = z
 
 export const passwordSchema = z
   .string()
-  .min(8, "Password must be at least 8 characters.")
-  .max(72, "Password is too long.");
+  .refine((value) => value.trim().length > 0, "Password is required.");
 
 export const inviteCodeSchema = z
   .string()

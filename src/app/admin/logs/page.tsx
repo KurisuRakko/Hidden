@@ -15,6 +15,7 @@ import { SectionCard } from "@/components/common/section-card";
 import { listAdminLogs } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import { getUserDisplayLabel } from "@/lib/user-display";
 import { buildPathWithQuery } from "@/lib/url";
 
 type AdminLogsPageProps = {
@@ -95,7 +96,7 @@ export default async function AdminLogsPage({
             {result.items.map((log) => (
               <TableRow key={log.id}>
                 <TableCell>{formatDateTime(log.createdAt)}</TableCell>
-                <TableCell>{log.admin.phone}</TableCell>
+                <TableCell>{getUserDisplayLabel(log.admin)}</TableCell>
                 <TableCell>{log.action}</TableCell>
                 <TableCell>
                   <Stack spacing={0.5}>

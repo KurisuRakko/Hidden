@@ -1,14 +1,14 @@
 import { Stack, Typography } from "@mui/material";
 
 type DashboardAccountInfoProps = {
-  phoneLabel: string;
+  identifierLabel: string;
   roleLabel: string;
   createdAtLabel: string;
   compact?: boolean;
 };
 
 export function DashboardAccountInfo({
-  phoneLabel,
+  identifierLabel,
   roleLabel,
   createdAtLabel,
   compact = false,
@@ -18,7 +18,7 @@ export function DashboardAccountInfo({
 
   return (
     <Stack spacing={compact ? 0.75 : 1.25}>
-      <Typography variant={primaryVariant}>{phoneLabel}</Typography>
+      <Typography variant={primaryVariant}>{identifierLabel}</Typography>
       <Typography color="text.secondary" variant={secondaryVariant}>{roleLabel}</Typography>
       <Typography color="text.secondary" variant={secondaryVariant}>{createdAtLabel}</Typography>
     </Stack>

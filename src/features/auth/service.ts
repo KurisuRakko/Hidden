@@ -4,6 +4,7 @@ import { AuthPortal, getAdminAppUrl } from "@/lib/admin-portal";
 import { prisma, runSerializableTransaction } from "@/lib/db";
 import { AppError } from "@/lib/http";
 import { createSession } from "@/lib/auth/session";
+import { SESSION_USER_SELECT } from "@/lib/auth/user";
 import {
   inviteCodeSchema,
   passwordSchema,
@@ -60,6 +61,7 @@ export async function registerUser(input: {
           passwordHash,
           role: UserRole.USER,
         },
+        select: SESSION_USER_SELECT,
       });
 
       await tx.inviteCode.update({
@@ -102,9 +104,14 @@ export async function loginUser(input: {
 
   const user = await prisma.user.findUnique({
     where: { phone },
+    select: SESSION_USER_SELECT,
   });
 
   if (!user) {
+    throw new AppError(401, "Phone number or password is incorrect.", "LOGIN_FAILED");
+  }
+
+  if (!user.passwordHash) {
     throw new AppError(401, "Phone number or password is incorrect.", "LOGIN_FAILED");
   }
 
@@ -168,6 +175,14 @@ export async function changePassword(input: {
 
   if (!user) {
     throw new AppError(401, "Authentication required", "UNAUTHORIZED");
+  }
+
+  if (!user.passwordHash) {
+    throw new AppError(
+      400,
+      "Password sign-in is not available for this account.",
+      "PASSWORD_SIGN_IN_UNAVAILABLE",
+    );
   }
 
   const currentPasswordMatches = await bcrypt.compare(

@@ -16,6 +16,7 @@ import { StatusChip } from "@/components/common/status-chip";
 import { listAdminBoxes } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import { getUserDisplayLabel } from "@/lib/user-display";
 import { buildPathWithQuery, getPublicBoxPath } from "@/lib/url";
 
 type AdminBoxesPageProps = {
@@ -91,7 +92,7 @@ export default async function AdminBoxesPage({
                     {getPublicBoxPath(box.slug)}
                   </Button>
                 </TableCell>
-                <TableCell>{box.owner.phone}</TableCell>
+                <TableCell>{getUserDisplayLabel(box.owner)}</TableCell>
                 <TableCell>
                   <StatusChip status={box.status} />
                 </TableCell>

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Box, Button, Stack } from "@mui/material";
 
 export type AboutSubnavItem = {
@@ -15,14 +14,15 @@ type AboutSubnavProps = {
 export function AboutSubnav({ currentKey, items }: AboutSubnavProps) {
   return (
     <Box
-      sx={(theme) => ({
+      sx={{
         width: "fit-content",
         maxWidth: "100%",
         p: 0.5,
         borderRadius: 999,
-        border: `1px solid ${theme.palette.divider}`,
+        border: "1px solid",
+        borderColor: "divider",
         bgcolor: "rgba(255, 255, 255, 0.82)",
-      })}
+      }}
     >
       <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: "wrap" }}>
         {items.map((item) => {
@@ -31,7 +31,6 @@ export function AboutSubnav({ currentKey, items }: AboutSubnavProps) {
           return (
             <Button
               key={item.key}
-              component={Link}
               href={item.href}
               aria-current={active ? "page" : undefined}
               variant={active ? "contained" : "text"}

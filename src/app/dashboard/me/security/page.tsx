@@ -1,4 +1,5 @@
 import {
+  Alert,
   Divider,
   Stack,
   Typography,
@@ -11,7 +12,7 @@ import { loadDashboardMePageData } from "../_lib/load-dashboard-me-page";
 import { DASHBOARD_ME_BACK_TRANSITION } from "../_lib/transitions";
 
 export default async function DashboardMeSecurityPage() {
-  const { viewer, t } = await loadDashboardMePageData();
+  const { viewer, oidcProviderLabel, t } = await loadDashboardMePageData();
 
   return (
     <UserDashboardShell
@@ -31,7 +32,15 @@ export default async function DashboardMeSecurityPage() {
           <Stack spacing={3}>
             <Stack spacing={1.25}>
               <Typography variant="subtitle2">{t("dashboard.passwordTitle")}</Typography>
-              <ChangePasswordForm />
+              {viewer.hasPassword ? (
+                <ChangePasswordForm />
+              ) : (
+                <Alert severity="info">
+                  {t("dashboard.passwordManagedByOidcDescription", {
+                    provider: oidcProviderLabel,
+                  })}
+                </Alert>
+              )}
             </Stack>
             <Divider />
             <Stack spacing={1.25}>

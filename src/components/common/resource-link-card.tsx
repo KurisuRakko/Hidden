@@ -1,4 +1,3 @@
-import Link from "next/link";
 import clsx from "clsx";
 import {
   ArrowForwardRounded,
@@ -12,8 +11,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
-
 type ResourceLinkCardProps = {
   eyebrow?: string;
   title: string;
@@ -50,16 +47,17 @@ export function ResourceLinkCard({
         <Stack spacing={2.5} sx={{ height: "100%" }}>
           <Stack spacing={1.25} sx={{ flex: 1 }}>
             <Box
-              sx={(theme) => ({
+              sx={{
                 width: 44,
                 height: 44,
                 borderRadius: 1.5,
                 display: "grid",
                 placeItems: "center",
                 color: "primary.main",
-                bgcolor: alpha(theme.palette.primary.main, 0.08),
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
-              })}
+                bgcolor: "rgba(25, 118, 210, 0.08)",
+                border: "1px solid",
+                borderColor: "rgba(25, 118, 210, 0.18)",
+              }}
             >
               {icon}
             </Box>
@@ -81,7 +79,6 @@ export function ResourceLinkCard({
           </Stack>
 
           <Button
-            component={external ? "a" : Link}
             href={href}
             target={external ? "_blank" : undefined}
             rel={external ? "noreferrer" : undefined}

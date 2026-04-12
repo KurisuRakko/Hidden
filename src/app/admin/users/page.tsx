@@ -17,6 +17,7 @@ import { UserStatusSelect } from "@/components/admin/user-status-select";
 import { listAdminUsers } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import { getUserDisplayLabel } from "@/lib/user-display";
 import { buildPathWithQuery } from "@/lib/url";
 
 type AdminUsersPageProps = {
@@ -44,13 +45,13 @@ export default async function AdminUsersPage({
   return (
     <SectionCard
       title="Users"
-      description="Search users by phone number and update account status when moderation requires it."
+      description="Search users by phone number, email, or OIDC identity and update account status when moderation requires it."
     >
       <Stack spacing={3}>
         <Stack component="form" direction={{ xs: "column", md: "row" }} spacing={2}>
           <TextField
             name="q"
-            label="Search phone"
+            label="Search account"
             defaultValue={params.q ?? ""}
             fullWidth
           />
@@ -74,7 +75,7 @@ export default async function AdminUsersPage({
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Phone</TableCell>
+              <TableCell>Account</TableCell>
               <TableCell>Role</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Boxes</TableCell>
@@ -86,7 +87,7 @@ export default async function AdminUsersPage({
           <TableBody>
             {result.items.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.phone}</TableCell>
+                <TableCell>{getUserDisplayLabel(user)}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>
                   <StatusChip status={user.status} />

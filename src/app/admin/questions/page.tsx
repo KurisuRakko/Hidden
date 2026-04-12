@@ -19,6 +19,7 @@ import { StatusChip } from "@/components/common/status-chip";
 import { listAdminQuestions } from "@/features/admin/service";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { formatDateTime } from "@/lib/format";
+import { getUserDisplayLabel } from "@/lib/user-display";
 import { buildPathWithQuery, getPublicBoxPath } from "@/lib/url";
 
 type AdminQuestionsPageProps = {
@@ -58,7 +59,7 @@ export default async function AdminQuestionsPage({
   return (
     <SectionCard
       title="Questions"
-      description="Moderate content across the entire platform. Search by text, box slug, or creator phone."
+      description="Moderate content across the entire platform. Search by text, box slug, or creator account."
     >
       <Stack spacing={3}>
         <Stack component="form" direction={{ xs: "column", md: "row" }} spacing={2}>
@@ -136,7 +137,7 @@ export default async function AdminQuestionsPage({
                     )}
                   </TableCell>
                   <TableCell sx={{ borderBottom: "none" }}>
-                    {question.box.owner.phone}
+                    {getUserDisplayLabel(question.box.owner)}
                   </TableCell>
                   <TableCell sx={{ borderBottom: "none" }}>
                     <Button href={getPublicBoxPath(question.box.slug)} target="_blank">
@@ -207,7 +208,7 @@ export default async function AdminQuestionsPage({
                               Creator
                             </Typography>
                             <Typography variant="body2">
-                              {question.box.owner.phone}
+                              {getUserDisplayLabel(question.box.owner)}
                             </Typography>
                           </Box>
                           <Box sx={{ minWidth: 220, flex: "1 1 220px" }}>
