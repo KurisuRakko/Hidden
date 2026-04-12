@@ -120,19 +120,19 @@ export async function PublicShell({
                 >
                   {showAboutEntry && !back ? (
                     <IconButton
-                      component={Link}
                       href={publicPagePaths.about}
                       aria-label={t("common.actions.about")}
                       size="small"
-                      sx={(theme) => ({
+                      sx={{
                         flexShrink: 0,
                         width: { xs: 36, md: 38 },
                         height: { xs: 36, md: 38 },
                         borderRadius: 999,
-                        border: `1px solid ${theme.palette.divider}`,
+                        border: 1,
+                        borderColor: "divider",
                         bgcolor: "background.paper",
-                        boxShadow: theme.shadows[1],
-                      })}
+                        boxShadow: 1,
+                      }}
                     >
                       <InfoOutlined fontSize="small" />
                     </IconButton>
